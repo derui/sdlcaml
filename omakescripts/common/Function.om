@@ -1,0 +1,17 @@
+RequireFiles(files) =
+    .SCANNER: scan-%: $(files)
+    % : $(files)
+    export
+
+CreateCheckSum(pack, targets) =
+    chan = $(fopen $(pack), w)
+    fprintln($(chan), $(string $(targets)))
+    fprintln($(chan), $(string $(digest $(targets))))
+    close($(chan))
+
+RequireBuild(targets) =
+    dependencies.md5: $(targets)
+        println($(string $(sequence-sort $(compare), $(dependencies-all $(targets)))))
+        CreateCheckSum($@, $(sequence-sort $(compare), $(dependecies-all $(targets))))
+    RequireFiles(dependencies.md5)
+    export

@@ -1,0 +1,131 @@
+########################################################################
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this file, to deal in the File without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the File, and to permit persons to whom the
+# File is furnished to do so, subject to the following condition:
+#
+# THE FILE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE FILE OR
+# THE USE OR OTHER DEALINGS IN THE FILE.
+
+########################################################################
+# The standard OMakefile.
+# You will usually need to modify this file for your project.
+
+################################################
+# Configuration.  You may want to modify any of these configuration
+# variables.
+#
+open MyOCaml
+open configure/Configure
+open build/C
+
+#
+# This project requires ocamlfind (default - false).
+#
+USE_OCAMLFIND = true
+#
+OCAMLPACKS[] =
+#    glMLite
+#    stdlib
+#
+if $(not $(OCAMLFIND_EXISTS))
+   eprintln(This project requires ocamlfind, but is was not found.)
+   eprintln(You need to install ocamlfind and run "omake --configure".)
+   exit 1
+
+#
+# Include path
+#
+# OCAMLINCLUDES += ../lib
+
+#
+# Compile native or byte code?
+#
+# The default values are defined as follows:
+#
+NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
+BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
+
+#
+# Various options
+#
+OCAMLFLAGS    += -annot
+# OCAMLCFLAGS   +=
+# OCAMLOPTFLAGS +=
+# OCAML_LINK_FLAGS +=
+# OCAML_BYTE_LINK_FLAGS +=
+# OCAML_NATIVE_LINK_FLAGS +=
+
+################################################
+# Generated files
+#
+# Workaround for the fact that ocamldep does not pay attention to .mll
+# and .mly files.
+#
+# OCamlGeneratedFiles(parser.ml lexer.ml)
+
+################################################
+# Build bindings for OCaml to C.
+#
+
+INCLUDES += /usr/include/caml
+
+# check that can sdl-config use.
+.STATIC:
+	SDL_CONFIG_FOUND = $(ConfMsgFound $(CheckProg sdl-config))
+	SDL_CONFIG = $(if $(SDL_CONFIG_FOUND), sdl-config, "")
+
+	if $(not $(SDL_CONFIG_FOUND))
+		eprintln(can not build because sdl-config is not found. Please check to valid SDL installed)
+		$(exit 1)
+	SDL_CONFIGURE = $(shell $(SDL_CONFIG) --libs --cflags)
+	export
+
+lib%$(EXT_LIB): %$(EXT_OBJ)
+	$(OCAMLMKLIB) -verbose -o $(removesuffix $<) $<
+
+%$(EXT_OBJ): %.c :scanner: scan-c-%.c
+# build with ocamlc with options from sdl-config.
+	$(OCAMLC) -ccopt "$(SDL_CONFIGURE) $(PREFIXED_INCLUDES)" -verbose -o $@ -c $<
+
+FILES = $(removesuffix $(ls *.ml))
+
+LIBRARY_NAME = sdlcaml
+#
+OCAML_PACKAGE_NAME = $(capitalize $(LIBRARY_NAME))
+packages = $(OCamlPackage $(LIBRARY_NAME), $(FILES))
+
+CFILES = $(removesuffix $(ls *.c))
+STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
+
+#
+# OCAML_LIBS += ../lib/mylib
+# OCAML_CLIBS +=
+# OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
+OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS))"
+OCAML_LIB_FLAGS += -verbose
+# OCAML_PACKAGE_NAME =
+#
+.PHONY: clean mainlib static_libs
+
+.DEFAULT: static_libs mainlib
+
+static_libs: $(STATICLIBS)
+
+mainlib: $(OCamlMakeLibrary $(LIBRARY_NAME), $(removesuffix $(packages)))
+
+clean:
+	rm -f *$(EXT_OBJ)
+	rm -f lib*$(EXT_LIB)
+	rm -f sdlcaml*
+	rm -f *cmx
+	rm -f *cmi
+	rm -f *so
+	rm -f *annot
