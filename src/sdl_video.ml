@@ -56,11 +56,17 @@ type pixelformat = {
 }
 
 (**
- * type of color that is synonym of {!int}.
- * this type is included some color for instance, Red, Green,
- * Blue, Alpha  or pixel color such as RGBA.
+ * type of color which is included each color elements and
+ * combined with of those.
+ * this type has appliable functions such a conversion
+ * colors, or split color to elements.
  *)
-type color = int
+type color = {
+  red:int;                              (* red attribute *)
+  blue:int;                             (* blue attribute *)
+  green:int;                            (* green attribute *)
+  alpha:int;                            (* transparently *)
+}
 
 (**
  * Binding of {i SDL_SetVideoMode}. if this function failed, raise
@@ -97,3 +103,40 @@ external sdl_free_surface: surface -> unit = "sdlcaml_free_surface"
  * @return valid pixelformat in a given surface
  *)
 external sdl_get_pixelformat: surface -> pixelformat = "sdlcaml_get_pixelformat"
+
+(** result of {!sdl_blit_surface} function. *)
+type blit_result =
+  BLIT_SUCCESS
+| BLIT_FAILURE
+| BLIT_LOST
+
+(**
+ * bliting clipped src surface with src rect to clippied dist surface
+ * by dist rect.
+ * When this function return BLIT_LOST, these should be reloaded with
+ * artwork or be redrew by some operation, and re-blitted.
+ *
+ * {!srect} and {!drect} are optional arguments. if these are not
+ * received some rectangle, there are used to {b NULL}.
+ *
+ * @param src source surface
+ * @param dist distination surface
+ * @param srect size of the copied rectangle
+ * @param drect position of the copied rectangle's upper left corner
+ * @return result of SDL_BlitSurface operation.
+ *)
+external sdl_blit_surface: src:surface -> dist:surface
+  -> ?srect:rect -> ?drect:rect -> blit_result = "sdlcaml_blit_surface"
+
+(**
+ * Fill of the given rectangle with some color.
+ * this function will fill the whole surface if you doesn't give {b
+ * drect}.
+ *
+ * @param dist distination surface
+ * @param fill filling color that should be a pixel of the format used
+ *             by the distination surface
+ * @param drect filling space of rectanble
+ *)
+external sdl_fill_color: dist:surface -> fill:color -> ?drect:rect ->
+  unit = "sdlcaml_fill_rect"
