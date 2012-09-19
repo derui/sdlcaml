@@ -30,8 +30,8 @@ open MyOCaml
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
-#    glMLite
-#    stdlib
+    threads
+    oUnit
 #
 if $(not $(OCAMLFIND_EXISTS))
    eprintln(This project requires ocamlfind, but is was not found.)
@@ -54,7 +54,7 @@ BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 #
 # Various options
 #
-OCAMLFLAGS    += -annot
+OCAMLFLAGS    += -annot -thread
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
 OCAML_LINK_FLAGS += -cclib "$(shell sdl-config --libs)"
@@ -80,7 +80,7 @@ PROGRAM = test
 #
 OCAML_LIBS += ../src/sdlcaml
 # OCAML_CLIBS +=
-# OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
+# OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl
 # OCAML_LIB_FLAGS += -verbose
 # OCAML_PACKAGE_NAME =
