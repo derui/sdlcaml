@@ -85,19 +85,8 @@ sdl_initflags.h: initflag$(EXE) sdl_initflags.h.in
 
 initflag$(EXE): outputflag.c initflag.ml
 	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
-	$(OCAMLMKLIB) -o $@ $(addsuffix $(EXT_OBJ), $(removesuffix $<))
+	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
 	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
-
-videoflag$(EXE): outputflag.c videoflag.ml
-	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
-	$(OCAMLMKLIB) -o $@ $(addsuffix $(EXT_OBJ), $(removesuffix $<))
-	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
-
-sdl_video_flags.h: videoflag$(EXE) sdl_video_flags.h.in
-	section
-		flags = $(concat \\n, $(shella $<))
-		sed -e "s/#FLAGS/$(flags)/" $(nth 1, $+) > $@
-		cp $@ ../src/$@
 
 #
 # OCAML_LIBS += ../lib/mylib
@@ -106,7 +95,7 @@ sdl_video_flags.h: videoflag$(EXE) sdl_video_flags.h.in
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-.DEFAULT: sdl_initflags.h sdl_video_flags.h
+.DEFAULT: sdl_initflags.h
 
 .PHONY: clean
 
@@ -117,6 +106,4 @@ clean:
 	rm -f *.cmi
 	rm -f *.cmx
 	rm -f sdl_initflags.h
-	rm -f sdl_video_flags.h
 	rm -f initflag$(EXE)
-	rm -f videoflag$(EXE)

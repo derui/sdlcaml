@@ -98,14 +98,16 @@ OCAMLOPTFLAGS +=
 # OCAML_LIB_FLAGS +=
 #
 LIBRARY_NAME = sdlcaml
-LIB = bin/sdlcaml
 #
-OCAML_PACKAGE_NAME = $(capitalize $(LIBRARY_NAME))
 
-.DEFAULT:
+.DEFAULT: src/sdlcaml$(EXT_LIB)
+
+
+.PHONY: test
+
+test: test/test$(EXE)
 
 clean:
-	rm -f $(ls src/*cmi src/*cmx src/*cmo src/*o src/*cmxa)
 	rm -f $(LIB).opt
 	rm -f $(LIB).run
 	rm -f $(LIB).a

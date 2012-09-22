@@ -15,6 +15,8 @@ type subsystem = [
   | `JOYSTICK
 ]
 
+exception Sdl_init_exception of string
+
 (** Initializing SDL and SDL Subsystems for SDK version of 1.2
  *  Taking arguments to this function have to {e flags}. if {e auto_clean} isn't
  *  send, you must call {!sdl_quit} in the end of your program.

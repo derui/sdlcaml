@@ -1,4 +1,4 @@
-RequireFiles(files) =
+RequiredFiles(files) =
     .SCANNER: scan-%: $(files)
     % : $(files)
     export
@@ -8,6 +8,13 @@ CreateCheckSum(pack, targets) =
     fprintln($(chan), $(string $(targets)))
     fprintln($(chan), $(string $(digest $(targets))))
     close($(chan))
+
+# Install clean command which cleans all the target files exists under
+# the directory. Use with care.
+AutoClean() =
+	.PHONY: clean
+	clean:
+		rm -f $(filter-proper-targets $(ls R, .))
 
 RequireBuild(targets) =
     dependencies.md5: $(targets)

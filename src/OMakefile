@@ -22,8 +22,7 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open MyOCaml
-open configure/Configure
+open common/Function
 open build/C
 
 #
@@ -51,7 +50,7 @@ if $(not $(OCAMLFIND_EXISTS))
 # The default values are defined as follows:
 #
 NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
-BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
+BYTE_ENABLED = true
 
 #
 # Various options
@@ -75,8 +74,6 @@ OCAMLFLAGS    += -annot
 # Build bindings for OCaml to C.
 #
 
-INCLUDES += /usr/include/caml
-
 # check that can sdl-config use.
 .STATIC:
 	SDL_CONFIG_FOUND = $(ConfMsgFound $(CheckProg sdl-config))
@@ -88,21 +85,15 @@ INCLUDES += /usr/include/caml
 	SDL_CONFIGURE = $(shell $(SDL_CONFIG) --libs --cflags)
 	export
 
-lib%$(EXT_LIB): %$(EXT_OBJ)
-	$(OCAMLMKLIB) -verbose -o $(removesuffix $<) $<
+CFILES = $(removesuffix $(ls *.c))
 
 %$(EXT_OBJ): %.c :scanner: scan-c-%.c
-# build with ocamlc with options from sdl-config.
-	$(OCAMLC) -ccopt "$(SDL_CONFIGURE) $(PREFIXED_INCLUDES)" -verbose -o $@ -c $<
+	$(OCAMLC) -ccopt "$(SDL_CONFIGURE)" -verbose -o $@ -c $<
 
 FILES = $(removesuffix $(ls *.ml))
 
 LIBRARY_NAME = sdlcaml
 #
-OCAML_PACKAGE_NAME = $(capitalize $(LIBRARY_NAME))
-packages = $(OCamlPackage $(LIBRARY_NAME), $(FILES))
-
-CFILES = $(removesuffix $(ls *.c))
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
 #
@@ -113,19 +104,8 @@ OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS))"
 OCAML_LIB_FLAGS += -verbose
 # OCAML_PACKAGE_NAME =
 #
-.PHONY: clean mainlib static_libs
+RequiredFiles(../config/sdl_initflags.h)
 
-.DEFAULT: static_libs mainlib
+MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), $(EMPTY))
 
-static_libs: $(STATICLIBS)
-
-mainlib: $(OCamlMakeLibrary $(LIBRARY_NAME), $(removesuffix $(packages)))
-
-clean:
-	rm -f *$(EXT_OBJ)
-	rm -f lib*$(EXT_LIB)
-	rm -f sdlcaml*
-	rm -f *cmx
-	rm -f *cmi
-	rm -f *so
-	rm -f *annot
+.DEFAULT: sdlcaml.cmxa

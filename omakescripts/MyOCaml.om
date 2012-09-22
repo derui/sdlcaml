@@ -67,12 +67,7 @@ public.OCAML_LINK_FLAGS = $`(if $(and $(USE_OCAMLFIND) $(gt $(length $(OCAMLPACK
 public.OCAML_BYTE_LINK_FLAGS = -custom
 public.OCAML_NATIVE_LINK_FLAGS =
 # ocaml packaging option
-public.OCAML_PACKAGE_NAME =
-public.PREFIXED_OCAML_PACKAGE_FLAG() =
-    if $(and $(gt $(string-length $(OCAML_PACKAGE_NAME)), 0), $(NATIVE_ENABLED))
-        return -for-pack $(OCAML_PACKAGE_NAME)
-    else
-        return $(EMPTY)
+OCAML_PACKAGE_FLAG =
 
 public.LocalOCamlGeneratedFiles(files) =
     if $(OCAMLDEP_MODULES_ENABLED)
@@ -288,12 +283,12 @@ OCamlLinkSort(nodes) =
 
 # generic OCaml compile function.
 public.OCamlC() =
-    return $(OCAMLFIND) $(OCAMLC) $(LAZY_OCAMLFINDFLAGS) $(PREFIXED_OCAMLPACKS) $(OCAMLFLAGS)\
-              $(OCAMLCFLAGS) $(OCAMLPPFLAGS) $(PREFIXED_OCAMLINCLUDES)
+    value $(OCAMLFIND) $(OCAMLC) $(LAZY_OCAMLFINDFLAGS) $(PREFIXED_OCAMLPACKS) $(OCAMLFLAGS)\
+              $(OCAMLCFLAGS) $(OCAMLPPFLAGS) $(PREFIXED_OCAMLINCLUDES) $(OCAML_PACKAGE_FLAG)
 
 public.OCamlOpt() =
-    return $(OCAMLFIND) $(OCAMLOPT) $(LAZY_OCAMLFINDFLAGS) $(PREFIXED_OCAMLPACKS) $(OCAMLFLAGS)\
-              $(OCAMLOPTFLAGS) $(OCAMLPPFLAGS) $(PREFIXED_OCAMLINCLUDES) $(PREFIXED_OCAML_PACKAGE_FLAG)
+    value $(OCAMLFIND) $(OCAMLOPT) $(LAZY_OCAMLFINDFLAGS) $(PREFIXED_OCAMLPACKS) $(OCAMLFLAGS)\
+              $(OCAMLOPTFLAGS) $(OCAMLPPFLAGS) $(PREFIXED_OCAMLINCLUDES) $(OCAML_PACKAGE_FLAG)
 
 %.cmx : %.ml
     section rule
@@ -381,6 +376,9 @@ if you really want to build this file.
 %.cmi: %.mli :scanner: scan-ocaml-%.mli
     $(OCamlC) -c $<
 
+# build rules
+# ======================================================================
+
 public.OCamlProgram(name, files) =
    # XXX: JYH: these variables should be marked private in 0.9.9
    protected.CMOFILES  = $(addsuffix .cmo, $(files))
@@ -429,9 +427,19 @@ public.OCamlProgram(name, files) =
 
    return $(array $(PROG), $(if $(NATIVE_ENABLED), $(OPTPROG)), $(if $(BYTE_ENABLED), $(BYTEPROG)))
 
+# Add rules to build OCaml library $(name)
+#    name
+#        name of the library
+#    files
+#        OCaml module names (without .ml)
+#
+#   .. note :: Probably you should use MyOCamlPackage
+MyOCamlLibrary(library, files) =
+   install-lib: $(OCamlLibrary $(library), $(files))
+   AutoClean()
 
 # build library with targets. this function returns between one and three file names.
-OCamlMakeLibrary(library, targets) =
+OCamlLibrary(library, targets) =
     protected.name = $(file $(library))
 
     protected.OFILES = $(addsuffix $(EXT_OBJ), $(targets))
@@ -451,8 +459,66 @@ OCamlMakeLibrary(library, targets) =
                 $(OCAML_LIB_FLAGS) -a -o $(NATIVELIB) $(OCamlLinkSort $(CMXFILES))
     return $(array $(if $(NATIVE_ENABLED), $(NATIVELIB)), $(if $(NATIVE_ENABLED), $(CLIB)), $(if $(BYTE_ENABLED), $(BYTELIB)))
 
+# Add a rule for OCaml package $(name).cmo, $(name).cmx and etc.
+#    name
+#        target package name
+#    files
+#        ML module names (without .ml)
+#    cmodules
+#        C source files (without .c)
+#    linkopts
+#        C library link option (without OCaml -cclib options)
+#
+# Example:
+#     MyOCamlPackage(foo, alpha beta, $(EMPTY), $(EMPTY))
+public.MyOCamlPackage(name, files, cmodules, linkopts) =
+
+   CSTUBS=$(addsuffix $(EXT_OBJ), $(cmodules))
+   protected.OFILES   = $(addsuffix $(EXT_OBJ), $(files))
+   protected.CMOFILES = $(addsuffix .cmo, $(files))
+   protected.CMXFILES = $(addsuffix .cmx, $(files))
+
+   protected.CMO       = $(file $(name).cmo)
+   protected.CMX       = $(file $(name).cmx)
+   protected.CMA       = $(file $(name).cma)
+   protected.CMXA      = $(file $(name).cmxa)
+
+   CSTUBLIBRARIES=
+   if $(not $(equal $(cmodules), $(EMPTY))) then
+       CSTUBLIBRARIES= dll$(name).so lib$(name)$(EXT_LIB)
+       export
+
+   # add a rule for install this package.
+   .PHONY: install-lib
+   install-lib: $(CMO) $(CMX) $(CMA) $(CMXA)
+
+   $(CMA) $(CMXA) $(name)$(EXT_LIB) $(CSTUBLIBRARIES): $(CSTUBS) $(CMO) $(CMX)
+       if $(not $(equal $(cmodules), $(EMPTY)))
+           ocamlmklib -verbose -o $(name) $(CSTUBS) $(linkopts) $(CMO) $(CMX)
+       else
+           $(OCamlC) -a -o $(CMA) $(CMO)
+           $(OCamlCOpt) -a -o $(CMXA) $(CMX)
+
+   # the followings are nessesary for packing
+   OCAML_PACKAGE_FLAG = -for-pack $(capitalize $(name))
+   export OCAML_PACKAGE_FLAG
+
+   # add a rule for clean
+   AutoClean()
+
+   # build rule for package
+   OCamlPackage($(name), $(files))
+
+   export
+
+# Add some rules for buidling OCaml package.
+#   name
+#       target package name
+#   files
+#       ML modules name (without .ml)
 public.OCamlPackage(name, files) =
    # XXX: JYH: these variables should be marked private in 0.9.9
+
    protected.OFILES   = $(addsuffix $(EXT_OBJ), $(files))
    protected.CMOFILES = $(addsuffix .cmo, $(files))
    protected.CMXFILES = $(addsuffix .cmx, $(files))

@@ -24,14 +24,23 @@ static int ml_make_init_flag(value flags) {
   return flag;
 }
 
+static void sdlcaml_inner_quit(void) {
+  SDL_Quit();
+}
+
 CAMLprim value sdlcaml_init(value auto_clean, value flags) {
   int init_flag = ml_make_init_flag(flags);
 
-  return Val_unit;
-}
+  if (SDL_Init(init_flag) < 0) {
+    caml_raise_with_string(caml_named_value("SDL_init_exception"),
+                           SDL_GetError());
+  }
 
-static void sdlcaml_inner_quit(void) {
-  SDL_Quit();
+  if (is_none(auto_clean)) {
+    atexit(sdlcaml_inner_quit);
+  }
+
+  return Val_unit;
 }
 
 CAMLprim value sdlcaml_quit(value unit) {

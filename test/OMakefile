@@ -22,7 +22,7 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open MyOCaml
+open common/Function
 
 #
 # This project requires ocamlfind (default - false).
@@ -57,7 +57,8 @@ BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 OCAMLFLAGS    += -annot -thread
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
-OCAML_LINK_FLAGS += -cclib "$(shell sdl-config --libs)"
+#OCAML_LINK_FLAGS += -cclib "$(shell sdl-config --libs)"
+OCAML_LINK_FLAGS += -cclib "-L/usr/lib -lSDLmain -lSDL -mwindows"
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=
 
@@ -87,9 +88,14 @@ OCAML_LIBS += ../src/sdlcaml
 #
 .PHONY: clean
 
+# need sdlcaml library
+RequiredFiles(../src/sdlcaml$(EXT_LIB))
+
 .DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
 
 clean:
+	rm -f $(PROGRAM)$(EXE)
+	rm -f $(PROGRAM).opt
 	rm -f *cmx
 	rm -f *cmo
 	rm -f *cmi

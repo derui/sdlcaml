@@ -8,9 +8,9 @@ typedef struct lookup_info {
   int value;
 } lookup_info;
 
-/** 
- * lookup from key of OCaml to value of C, or from value of C to key OCaml 
- * To be able to receive table is constructed that first is key equal zero and 
+/**
+ * lookup from key of OCaml to value of C, or from value of C to key OCaml
+ * To be able to receive table is constructed that first is key equal zero and
  * value is length of table without itself.
  */
 int ml_lookup_to_c(lookup_info *table, value key);
@@ -21,5 +21,10 @@ value head(value list);
 value tail(value list);
 int is_not_nil(value list);
 
-#endif /* __COMMON_H__ */
+/** operations for 'a option */
+/* if given value is none, return 1.a*/
+int is_none(value opt);
+/* if given value is some, return 1.a*/
+int is_some(value opt);
 
+#endif /* __COMMON_H__ */

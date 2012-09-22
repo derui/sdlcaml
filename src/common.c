@@ -58,3 +58,13 @@ CAMLprim value tail(value list) {
 int is_not_nil(value list) {
   return (list != Val_emptylist);
 }
+
+/****************************************************/
+
+int is_none(value opt) {
+  return opt == Val_int(0);
+}
+
+int is_some(value opt) {
+  return !is_none(opt);
+}

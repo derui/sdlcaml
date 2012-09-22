@@ -31,6 +31,8 @@ type videomodes =
 | SDL_SRCALPHA     (** Surface blit uses alpha blending *)
 | SDL_PREALLOC     (** Surface uses preallocated memory *)
 
+exception Sdl_video_exception of string
+
 (**
  * Binding of {i SDL_Surface} but always hiding inner structure of
  * SDL_Surface.
@@ -65,7 +67,19 @@ type color = {
   red:int;                              (* red attribute *)
   blue:int;                             (* blue attribute *)
   green:int;                            (* green attribute *)
-  alpha:int;                            (* transparently *)
+  alpha:int;                            (* transparency *)
+}
+
+(**
+ * type of binding to {b SDL_Rect}. Each fields of this type has
+ * equivalent name of SDL_Rect's member.
+
+ *)
+type rect = {
+  x:int;                                (* left of left top corner *)
+  y:int;                                (* top of left top corner *)
+  w:int;                                (* rectangle width *)
+  h:int;                                (* rectangle height *)
 }
 
 (**
@@ -102,7 +116,8 @@ external sdl_free_surface: surface -> unit = "sdlcaml_free_surface"
  * functions
  * @return valid pixelformat in a given surface
  *)
-external sdl_get_pixelformat: surface -> pixelformat = "sdlcaml_get_pixelformat"
+external sdl_get_pixelformat: surface -> pixelformat =
+ "sdlcaml_get_pixelformat"
 
 (** result of {!sdl_blit_surface} function. *)
 type blit_result =
@@ -126,7 +141,7 @@ type blit_result =
  * @return result of SDL_BlitSurface operation.
  *)
 external sdl_blit_surface: src:surface -> dist:surface
-  -> ?srect:rect -> ?drect:rect -> blit_result = "sdlcaml_blit_surface"
+  -> ?srect:rect -> ?drect:rect -> unit -> blit_result = "sdlcaml_blit_surface"
 
 (**
  * Fill of the given rectangle with some color.
@@ -138,5 +153,51 @@ external sdl_blit_surface: src:surface -> dist:surface
  *             by the distination surface
  * @param drect filling space of rectanble
  *)
-external sdl_fill_color: dist:surface -> fill:color -> ?drect:rect ->
+external sdl_fill_rect: dist:surface -> fill:color -> ?drect:rect ->
+  unit ->
   unit = "sdlcaml_fill_rect"
+
+(**
+ * Return new surface created that of size is given width and height
+ * and with initialization flags.
+ * Depth of returning surface from this function is always 32-bits,
+ * I mean, always create surface that have ARGB format.
+ * If you create surface by this function, you have to apply
+ * {!sdl_free_surface} to it.
+ *
+ * @param width number of width pixels in surface
+ * @param height number of height pixels in surface
+ * @param flags initialization flag list
+ * @return created new surface
+ *)
+external sdl_create_surface: width:int -> height:int ->
+  flags:videomodes list -> surface = "sdlcaml_create_surface"
+
+(**
+ * update rectangle area on surface. It is nessesity from arguments that
+ * is only {b screen}.
+ * If all arguments omitted, update all area of given surface.
+ * Any optional arguments given, use it but other arguments used by
+ * default.
+ *
+ * @param x rectangle's left upper corner of left. default is 0.
+ * @param y rectangle's left upper corner of upper. defautl is 0.
+ * @param w width of rectangle. default is width of screen.
+ * @param h height of rectangle. default is height of screen.
+ * @param screen surface to update
+ *)
+external sdl_update_rect: ?x:int -> ?y:int ->
+  ?width:int -> ?height:int -> surface -> unit = "sdlcaml_update_rect"
+
+(**
+ * Swap screen buffers. The {!SDL_DOUBLEBUF} flags must have been
+ * passed to {!sdl_set_video_mode}.
+ * This function perform hardware flipping if hardware support
+ * double-buffering.
+ * On hardware that doesn't support double-buffering, this is
+ * equivalent to calling {!sdl_update_rect} with default.
+ *
+ * @param surface surface that is screen
+ * @raise Sdl_video_function When function fail
+ *)
+external sdl_flip: surface -> unit = "sdlcaml_flip"
