@@ -30,7 +30,7 @@ exception Sdl_init_exception of string
  *  @author derui
  *  @since 0.1
  *)
-external sdl_init : ?auto_clean:bool ->
+external init : ?auto_clean:bool ->
         flags:[< subsystem | `EVENTTHREAD | `NOPARACHUTE | `EVERYTHING] list ->
                 unit = "sdlcaml_init"
 (**
@@ -41,7 +41,7 @@ external sdl_init : ?auto_clean:bool ->
  * @author derui
  * @since 0.1
  *)
-external sdl_quit : unit -> unit = "sdlcaml_quit"
+external quit : unit -> unit = "sdlcaml_quit"
 
 (**
  * this return current version of SDL.
@@ -50,7 +50,7 @@ external sdl_quit : unit -> unit = "sdlcaml_quit"
  * @author derui
  * @since 0.1
  *)
-external sdl_version : unit -> int * int * int = "sdlcaml_version"
+external version : unit -> int * int * int = "sdlcaml_version"
 
 (**
  * return result of that if each subsystems are initialized.
@@ -59,7 +59,7 @@ external sdl_version : unit -> int * int * int = "sdlcaml_version"
  * @author derui
  * @since 0.1
  *)
-external sdl_was_init : subsystem list -> bool = "sdlcaml_was_init"
+external was_init : subsystem list -> bool = "sdlcaml_was_init"
 
 (**
  * Initializing a SDL subsystem.  this function used to after {!sdl_init}
@@ -71,7 +71,7 @@ external sdl_was_init : subsystem list -> bool = "sdlcaml_was_init"
  * @author derui
  * @since 0.1
  *)
-external sdl_init_subsystem : subsystem -> unit = "sdlcaml_init_subsystem"
+external init_subsystem : subsystem -> unit = "sdlcaml_init_subsystem"
 
 (**
  * Quit a SDL subsystem. this function have to call after {!sdl_init} or
@@ -83,4 +83,4 @@ external sdl_init_subsystem : subsystem -> unit = "sdlcaml_init_subsystem"
  * @author derui
  * @since 0.1
  *)
-external sdl_quit_subsystem :subsystem -> unit = "sdlcaml_quit_subsystem"
+external quit_subsystem :subsystem -> unit = "sdlcaml_quit_subsystem"

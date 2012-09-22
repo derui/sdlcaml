@@ -96,7 +96,7 @@ type rect = {
  * @return created surface by SDL with parameters
  * @raise Sdl_exception if SDL_SetVideoMode failed
  *)
-external sdl_set_video_mode:
+external set_video_mode:
   width:int -> height:int -> depth:int ->
     flags:videomodes list -> surface = "sdlcaml_set_video_mode"
 
@@ -105,7 +105,7 @@ external sdl_set_video_mode:
  *
  * @param surface target to apply SDL_FreeSurface
  *)
-external sdl_free_surface: surface -> unit = "sdlcaml_free_surface"
+external free_surface: surface -> unit = "sdlcaml_free_surface"
 
 (**
  * Returning PixelFormat struct in given surface.
@@ -116,7 +116,7 @@ external sdl_free_surface: surface -> unit = "sdlcaml_free_surface"
  * functions
  * @return valid pixelformat in a given surface
  *)
-external sdl_get_pixelformat: surface -> pixelformat =
+external get_pixelformat: surface -> pixelformat =
  "sdlcaml_get_pixelformat"
 
 (** result of {!sdl_blit_surface} function. *)
@@ -140,7 +140,7 @@ type blit_result =
  * @param drect position of the copied rectangle's upper left corner
  * @return result of SDL_BlitSurface operation.
  *)
-external sdl_blit_surface: src:surface -> dist:surface
+external blit_surface: src:surface -> dist:surface
   -> ?srect:rect -> ?drect:rect -> unit -> blit_result = "sdlcaml_blit_surface"
 
 (**
@@ -153,7 +153,7 @@ external sdl_blit_surface: src:surface -> dist:surface
  *             by the distination surface
  * @param drect filling space of rectanble
  *)
-external sdl_fill_rect: dist:surface -> fill:color -> ?drect:rect ->
+external fill_rect: dist:surface -> fill:color -> ?drect:rect ->
   unit ->
   unit = "sdlcaml_fill_rect"
 
@@ -170,7 +170,7 @@ external sdl_fill_rect: dist:surface -> fill:color -> ?drect:rect ->
  * @param flags initialization flag list
  * @return created new surface
  *)
-external sdl_create_surface: width:int -> height:int ->
+external create_surface: width:int -> height:int ->
   flags:videomodes list -> surface = "sdlcaml_create_surface"
 
 (**
@@ -186,7 +186,7 @@ external sdl_create_surface: width:int -> height:int ->
  * @param h height of rectangle. default is height of screen.
  * @param screen surface to update
  *)
-external sdl_update_rect: ?x:int -> ?y:int ->
+external update_rect: ?x:int -> ?y:int ->
   ?width:int -> ?height:int -> surface -> unit = "sdlcaml_update_rect"
 
 (**
@@ -200,4 +200,4 @@ external sdl_update_rect: ?x:int -> ?y:int ->
  * @param surface surface that is screen
  * @raise Sdl_video_function When function fail
  *)
-external sdl_flip: surface -> unit = "sdlcaml_flip"
+external flip: surface -> unit = "sdlcaml_flip"
