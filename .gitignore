@@ -10,3 +10,10 @@
 *.lai
 *.la
 *.a
+
+# Compiled OCaml objects
+*.cmo
+*.cmi
+*.cmx
+*.cmxa
+*.cma
