@@ -376,6 +376,9 @@ if you really want to build this file.
 %.cmi: %.mli :scanner: scan-ocaml-%.mli
     $(OCamlC) -c $<
 
+%.annot: %.ml :scanner: scan-ocaml-%.ml
+    $(OCamlC) $<
+
 # build rules
 # ======================================================================
 

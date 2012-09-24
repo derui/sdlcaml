@@ -1,5 +1,5 @@
 (**
- * this module provide lowlevel SDL bindings of SDL WM System. this don't include
+ * this module provide lowlevel SDL bindings for SDL WM. this don't include
  * high level API for user. these functions are often use only inner library.
  *
  * @author derui
@@ -23,6 +23,9 @@ external set_caption: ?title:string -> ?icon:string -> unit -> unit =
  * {b icon name}.
  * If you want to get only title or icon name, see and use
  * {!get_title} and {!get_icon_name} below.
+ *
+ * Notes, if you set something title or icon name yet, this return
+ * blank string as those.
  *
  * @return tuple as (title, icon name)
  *)
