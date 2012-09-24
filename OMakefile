@@ -18,6 +18,7 @@
 # The standard OMakefile.
 # You will usually need to modify this file for your project.
 open MyOCaml
+open common/Function
 
 ########################################################################
 # Phony targets are scoped, so you probably want to declare them first.
@@ -31,7 +32,7 @@ open MyOCaml
 # If so, define the subdirectory targets and uncomment this section.
 #
 
-.SUBDIRS: src config test
+.SUBDIRS: src config test doc
 
 ########################################################################
 # OCaml configuration.
@@ -99,11 +100,16 @@ OCAMLOPTFLAGS +=
 #
 LIBRARY_NAME = sdlcaml
 #
+REQUIRE[] =
+	src/sdl_initflags.h
+	src/sdl_generic.h
 
+RequiredFiles($(REQUIRE))
 .DEFAULT: src/sdlcaml$(EXT_LIB)
 
+.PHONY: test doc
 
-.PHONY: test
+doc:
 
 test: test/test$(EXE)
 

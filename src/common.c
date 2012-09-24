@@ -1,4 +1,6 @@
 #include <caml/mlvalues.h>
+#include <caml/memory.h>
+#include <caml/alloc.h>
 #include "common.h"
 
 int ml_lookup_to_c(lookup_info *table, value key) {
@@ -35,9 +37,17 @@ value ml_lookup_from_c(lookup_info *table, int value) {
   return Val_int(0);
 }
 
+int ml_table_size(lookup_info* table) {
+  if (table == NULL) {
+    return 0;
+  }
+
+  return table[0].value;
+}
+
 /*****************************************************/
 
-CAMLprim value head(value list) {
+value head(value list) {
 
   if (list != Val_emptylist) {
     return Field(list, 0);
@@ -46,13 +56,23 @@ CAMLprim value head(value list) {
   }
 }
 
-CAMLprim value tail(value list) {
+value tail(value list) {
 
   if (list != Val_emptylist) {
     return Field(list, 1);
   } else {
     return Val_emptylist;
   }
+}
+
+/* add cons to head of list */
+value add_head(value list, value data) {
+  CAMLparam2(list, data);
+  CAMLlocal1(cons);
+  cons = caml_alloc(2,0);
+  Store_field(cons, 0, data);
+  Store_field(cons, 1, list);
+  CAMLreturn(cons);
 }
 
 int is_not_nil(value list) {

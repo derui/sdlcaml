@@ -3,6 +3,8 @@
 
 #include <caml/mlvalues.h>
 
+#define Val_none (Val_int(0))
+
 typedef struct lookup_info {
   value key;
   int value;
@@ -15,10 +17,12 @@ typedef struct lookup_info {
  */
 int ml_lookup_to_c(lookup_info *table, value key);
 value ml_lookup_from_c(lookup_info *table, int value);
+int ml_table_size(lookup_info *table);
 
 /** list operation helper used from C */
 value head(value list);
 value tail(value list);
+value add_head(value list, value cons);
 int is_not_nil(value list);
 
 /** operations for 'a option */

@@ -83,6 +83,7 @@ type grab_mode =
  * When mode is SDL_GRAB_QUERY, not change grab mode, but return
  * current grab mode.
  *
- * @param
+ * @param grab_mode set or check grab mode
+ * @return current or new grab mode value
  *)
 external grab_input: grab_mode -> grab_mode = "sdlcaml_wm_grab_input"

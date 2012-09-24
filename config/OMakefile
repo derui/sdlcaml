@@ -77,6 +77,12 @@ OCAMLFLAGS    += -Wa -annot
 
 INCLUDES += /usr/include/caml
 
+sdl_generic.h: generic$(EXE) sdl_generic.h.in
+	section
+		rep = $(concat \\n, $(shella $<))
+		sed -e "s/#FLAGS/$(rep)/" $(nth 1, $+) > $@
+		cp $@ ../src/$@
+
 sdl_initflags.h: initflag$(EXE) sdl_initflags.h.in
 	section
 		initflags = $(concat \\n, $(shella $<))
@@ -88,6 +94,11 @@ initflag$(EXE): outputflag.c initflag.ml
 	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
 	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
 
+generic$(EXE): outputflag.c generic.ml
+	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
+	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
+	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
+
 #
 # OCAML_LIBS += ../lib/mylib
 # OCAML_CLIBS +=
@@ -95,7 +106,7 @@ initflag$(EXE): outputflag.c initflag.ml
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-.DEFAULT: sdl_initflags.h
+.DEFAULT: sdl_initflags.h sdl_generic.h
 
 .PHONY: clean
 
@@ -105,5 +116,6 @@ clean:
 	rm -f *.a
 	rm -f *.cmi
 	rm -f *.cmx
-	rm -f sdl_initflags.h
+	rm -f *.h
 	rm -f initflag$(EXE)
+	rm -f generic$(EXE)

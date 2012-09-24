@@ -1,5 +1,6 @@
-open build/Common.om
-open configure/Configure.om
+open build/Common
+open configure/Configure
+open common/Function
 
 public.USE_OCAMLFIND = false
 
@@ -38,6 +39,7 @@ public.OCAMLMKTOP = ocamlmktop
 public.OCAMLMKLIB = ocamlmklib
 public.OCAMLLINK = $`(OCAMLC)
 public.OCAMLOPTLINK = $`(OCAMLOPT)
+public.OCAMLDOC = ocamldoc
 
 #
 # Include path
@@ -373,10 +375,13 @@ if you really want to build this file.
             %.cmi %.cmx %$(EXT_OBJ): %.ml :scanner: scan-ocaml-%.ml
                 $(OCamlOpt) -c $<
 
-%.cmi: %.mli :scanner: scan-ocaml-%.mli
+%.cmi: %.mli
     $(OCamlC) -c $<
 
-%.annot: %.ml :scanner: scan-ocaml-%.ml
+%.mli: %.ml
+    $(OCamlC) -i $< > $@
+
+%.annot: %.ml
     $(OCamlC) $<
 
 # build rules
@@ -589,3 +594,30 @@ public.OCamlPackage(name, files) =
                    $(OCAMLCFLAGS) $(OCAML_LIB_FLAGS) -pack -o $(CMO) $(OCamlLinkSort $(CMOFILES))
 
    return $(TARGETS)
+
+# Generate document by ocamldoc for some targets.
+#   path
+#       output directory for generated documents
+#   files
+#       ML modules name (without .ml)
+public.GenerateOcamldoc(path, files) =
+    protected.ML       = $(addsuffix .ml, $(files))
+    protected.MLI       = $(addsuffix .mli, $(files))
+    protected.CMI       = $(addsuffix .cmi, $(files))
+    protected.DIR =
+
+    if $(not (equal $(dir $(path)), $(dir $(CWD))))
+        DIR = -d $(dir $(path))
+
+    depend.dot : $(ML) $(MLI) $(CMI)
+        $(OCAMLFIND) $(OCAMLDOC) $(PREFIXED_OCAMLINCLUDES) $(PREFIXED_OCAMLPACKS) \
+            -dot -dot-include-all -dot-reduce $+ -o $@
+
+    index.html: $(ML) $(MLI) $(CMI)
+        $(OCAMLFIND) $(OCAMLDOC) -html $(PREFIXED_OCAMLINCLUDES) $(PREFIXED_OCAMLPACKS) \
+             $(DIR) -m A -stars -all-params -colorize-code $+
+
+    # add a clean rule
+    AutoClean()
+
+    return index.html depend.dot

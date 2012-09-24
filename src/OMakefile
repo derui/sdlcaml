@@ -88,7 +88,7 @@ OCAMLFLAGS    += -annot
 CFILES = $(removesuffix $(ls *.c))
 
 %$(EXT_OBJ): %.c :scanner: scan-c-%.c
-	$(OCAMLC) -ccopt "$(SDL_CONFIGURE)" -verbose -o $@ -c $<
+	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE)" -verbose -o $@ -c $<
 
 FILES = $(removesuffix $(ls *.ml))
 
@@ -104,7 +104,9 @@ OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS))"
 OCAML_LIB_FLAGS += -verbose
 # OCAML_PACKAGE_NAME =
 #
-RequiredFiles(../config/sdl_initflags.h)
+REQUIRE[] =
+	sdl_initflags.h
+	sdl_generic.h
 
 MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), $(EMPTY))
 

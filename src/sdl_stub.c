@@ -29,6 +29,7 @@ static void sdlcaml_inner_quit(void) {
 }
 
 CAMLprim value sdlcaml_init(value auto_clean, value flags) {
+  CAMLparam2(auto_clean, flags);
   int init_flag = ml_make_init_flag(flags);
 
   if (SDL_Init(init_flag) < 0) {
@@ -40,17 +41,21 @@ CAMLprim value sdlcaml_init(value auto_clean, value flags) {
     atexit(sdlcaml_inner_quit);
   }
 
-  return Val_unit;
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value sdlcaml_quit(value unit) {
   /* only calling inner function */
+  CAMLparam0();
   sdlcaml_inner_quit();
+  CAMLnoreturn;
   return Val_unit;
 }
 
 CAMLprim value sdlcaml_version(value unit) {
-  value tuple = caml_alloc(3, 0);
+  CAMLparam0();
+  CAMLlocal1(tuple);
+  tuple = caml_alloc(3, 0);
 
   SDL_version version;
   SDL_VERSION(&version);
@@ -60,22 +65,25 @@ CAMLprim value sdlcaml_version(value unit) {
   Store_field( tuple, 1, Val_int(version.minor));
   Store_field( tuple, 2, Val_int(version.patch));
 
-  return ( tuple );
+  CAMLreturn(tuple);
 }
 
 CAMLprim value sdlcaml_init_subsystem(value flag) {
+  CAMLparam1(flag);
   int c_flag = ml_lookup_to_c(ml_init_flag_table, flag);
 
   if (SDL_InitSubSystem(c_flag)) {
     caml_raise_with_string(caml_named_value("SDL_init_exception"),
                            SDL_GetError());
   }
-  return Val_unit;
+
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value sdlcaml_quit_subsystem(value flag) {
+  CAMLparam1(flag);
   int c_flag = ml_lookup_to_c(ml_init_flag_table, flag);
 
   SDL_QuitSubSystem(c_flag);
-  return Val_unit;
+  CAMLreturn(Val_unit);
 }
