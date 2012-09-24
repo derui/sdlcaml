@@ -17,3 +17,15 @@
 *.cmx
 *.cmxa
 *.cma
+*.annot
+
+# compiled omake files
+*.omc
+
+# executable
+*.opt
+
+# generated documents
+*.html
+*.dot
+*.css

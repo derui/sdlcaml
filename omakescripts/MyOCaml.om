@@ -378,9 +378,6 @@ if you really want to build this file.
 %.cmi: %.mli
     $(OCamlC) -c $<
 
-%.mli: %.ml
-    $(OCamlC) -i $< > $@
-
 %.annot: %.ml
     $(OCamlC) $<
 
@@ -600,20 +597,28 @@ public.OCamlPackage(name, files) =
 #       output directory for generated documents
 #   files
 #       ML modules name (without .ml)
-public.GenerateOcamldoc(path, files) =
+#   imageext
+#       image extention without "." if generate depend image from .dot.
+public.GenerateOcamldoc(path, files, ?imageext) =
     protected.ML       = $(addsuffix .ml, $(files))
-    protected.MLI       = $(addsuffix .mli, $(files))
-    protected.CMI       = $(addsuffix .cmi, $(files))
+    protected.MLI       = $(filter-exists $(addsuffix .mli, $(files)))
     protected.DIR =
+    protected.DOT_FOUND = $(CheckProg dot)
+
 
     if $(not (equal $(dir $(path)), $(dir $(CWD))))
         DIR = -d $(dir $(path))
 
-    depend.dot : $(ML) $(MLI) $(CMI)
+    depend.dot : $(ML) $(MLI)
         $(OCAMLFIND) $(OCAMLDOC) $(PREFIXED_OCAMLINCLUDES) $(PREFIXED_OCAMLPACKS) \
             -dot -dot-include-all -dot-reduce $+ -o $@
 
-    index.html: $(ML) $(MLI) $(CMI)
+    if $(and $(not $(equal $(imageext), $(EMPTY))), $(DOT_FOUND))
+        depend.$(imageext): depend.dot
+            dot -T$(imageext) $< -o $@
+        export
+
+    index.html: $(ML) $(MLI)
         $(OCAMLFIND) $(OCAMLDOC) -html $(PREFIXED_OCAMLINCLUDES) $(PREFIXED_OCAMLPACKS) \
              $(DIR) -m A -stars -all-params -colorize-code $+
 
