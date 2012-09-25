@@ -49,7 +49,7 @@ type hat_state =
  * @param unit dummy argument
  * @return map for snapshot of the current keyboard state
  *)
-external get_key_state: ?num:int -> unit -> Sdl_key.state_map
+external get_key_state: unit -> Sdl_key.state_map
   = "sdlcaml_get_key_state"
 
 (**

@@ -179,3 +179,14 @@ module StateMap = Map.Make (
 
 (** type of map for key associate to each button state *)
 type state_map = Sdl_generic.button_state StateMap.t
+
+(**
+   This function is provided to be used from C.
+   To reveive array is converted into {!state_map}.
+*)
+let to_state_map statearray =
+  let make_map map (key, state) = Map.add key state in
+  Array.fold_left make_map Map.empty statearray
+
+let () =
+  Callback.register "sdlcaml_ml_convert_state_map" to_state_map
