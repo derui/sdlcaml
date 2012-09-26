@@ -10,6 +10,11 @@ typedef struct lookup_info {
   int value;
 } lookup_info;
 
+typedef struct generic_lookup_info {
+  int key;
+  void* value;
+} generic_lookup_info;
+
 /**
  * lookup from key of OCaml to value of C, or from value of C to key OCaml
  * To be able to receive table is constructed that first is key equal zero and
@@ -18,6 +23,17 @@ typedef struct lookup_info {
 int ml_lookup_to_c(lookup_info *table, value key);
 value ml_lookup_from_c(lookup_info *table, int value);
 int ml_table_size(lookup_info *table);
+
+/* privide to look up data from table of associating key with generic data
+   (void*).
+   It only look up by key of int, but to be useful.
+   If key can't look up from given table, return NULL.
+
+   Noted: format of table is similer to table used with lookup_info,
+          but first element of table is difference.
+          It is must to be {number of table element, 0}.
+ */
+void* ml_generic_lookup(generic_lookup_info* table, int key);
 
 /** list operation helper used from C */
 value head(value list);

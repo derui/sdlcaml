@@ -45,6 +45,23 @@ int ml_table_size(lookup_info* table) {
   return table[0].value;
 }
 
+void* ml_generic_lookup(generic_lookup_info *table, int key) {
+  if (table == NULL) {
+    return NULL;
+  }
+  int length = table[0].key;
+
+  for (int i = 1; i <= length; ++i) {
+    if (key == table[i].key) {
+      return table[i].value;
+    }
+  }
+
+  /* not found */
+  return NULL;
+}
+
+
 /*****************************************************/
 
 value head(value list) {

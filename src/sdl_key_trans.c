@@ -140,7 +140,7 @@ lookup_info ml_symkey_trans_table[] = {
 {Val_int(MLTAG_SDLK_EURO), SDLK_EURO}
 };
 
-lookup_info ml_modkey_trans_table = {
+lookup_info ml_modkey_trans_table[] = {
   {0, 12},
   {Val_int(MLTAG_KMOD_NONE), KMOD_NONE},
   {Val_int(MLTAG_KMOD_NUM), KMOD_NUM},

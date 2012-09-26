@@ -1,4 +1,10 @@
+(**
+   this module contains key synonyms binding SDLK_* and Modify key
+   binding MODK_*.
+   In addition them, provide it that state map associate key with state what key is
+   pressed or released.
 
+*)
 
 (**
  * Mapping {b SDLkey}. These often uses with {!Sdl_KeyStateMap.state_map}
@@ -185,8 +191,8 @@ type state_map = Sdl_generic.button_state StateMap.t
    To reveive array is converted into {!state_map}.
 *)
 let to_state_map statearray =
-  let make_map map (key, state) = Map.add key state in
-  Array.fold_left make_map Map.empty statearray
+  let make_map (key, state) map = StateMap.add key state map in
+  Array.fold_right make_map statearray StateMap.empty
 
 let () =
   Callback.register "sdlcaml_ml_convert_state_map" to_state_map

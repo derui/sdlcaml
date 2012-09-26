@@ -75,8 +75,9 @@ external get_mod_state: unit -> Sdl_key.modify_key list = "sdlcaml_get_mod_state
  *
  * @param delay how long key must be pressed
  * @param interval repeat speed
+ * @return true if succeeded.
  *)
-external enable_key_repeat: delay:int -> interval:int -> unit =
+external enable_key_repeat: delay:int -> interval:int -> bool =
   "sdlcaml_enable_key_repeat"
 
 (**

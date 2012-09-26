@@ -141,6 +141,17 @@ type event =
 | Syswm of sys_wm_event
 
 (**
+   Push some Event Structure onto the event queue.
+
+   If can't push onto 'the event queue any reason, raise {!Sdl_event_exception} with
+   result of {b SDL_GetError()}.
+
+   @param event wish event to push
+   @raise Sdl_event_exception if event can't push onto the event queue
+*)
+external push_event: event -> unit = "sdlcaml_push_event"
+
+(**
  * Pump the event loop, gathering events from the input devices.
  * Often call the need for this function is hidden from the user what
  * since {!poll_event} or {!wait_event} implicitly calls this function.
