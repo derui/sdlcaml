@@ -4,13 +4,13 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/fail.h>
+#include <caml/callback.h>
 #include "common.h"
-#include "sdl_generic.h"
 #include "sdl_event_trans.h"
 #include "sdl_event_convert.h"
 
 CAMLprim value sdlcaml_pump_events(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
 
   SDL_PumpEvents();
 
@@ -105,7 +105,7 @@ CAMLprim value sdlcaml_push_event(value ml_event) {
     if (event != NULL) {
       free(event);
     }
-    caml_raise_with_string(caml_named_value("SDL_event_exception"),
+    caml_raise_with_string(*caml_named_value("SDL_event_exception"),
                            SDL_GetError());
   }
 

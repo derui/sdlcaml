@@ -23,6 +23,7 @@
 # variables.
 #
 open common/Function
+open MyOCaml
 open build/C
 
 #
@@ -42,7 +43,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-# OCAMLINCLUDES += ../lib
+OCAMLINCLUDES += ../lib
 
 #
 # Compile native or byte code?
@@ -97,16 +98,13 @@ LIBRARY_NAME = sdlcaml
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
 #
-# OCAML_LIBS += ../lib/mylib
+OCAML_LIBS += ../lib/mylib
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
 OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS))"
 OCAML_LIB_FLAGS += -verbose
 # OCAML_PACKAGE_NAME =
 #
-REQUIRE[] =
-	sdl_initflags.h
-	sdl_generic.h
 
 MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), $(EMPTY))
 

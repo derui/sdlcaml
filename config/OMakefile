@@ -77,7 +77,7 @@ OCAMLFLAGS    += -Wa -annot
 
 INCLUDES += /usr/include/caml
 
-sdl_generic.h: generic$(EXE) sdl_generic.h.in
+sdl_generic_flags.h: generic$(EXE) sdl_generic_flags.h.in
 	section
 		rep = $(concat \\n, $(shella $<))
 		sed -e "s/#FLAGS/$(rep)/" $(nth 1, $+) > $@
@@ -106,7 +106,7 @@ generic$(EXE): outputflag.c generic.ml
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-.DEFAULT: sdl_initflags.h sdl_generic.h
+.DEFAULT: sdl_initflags.h sdl_generic_flags.h
 
 .PHONY: clean
 

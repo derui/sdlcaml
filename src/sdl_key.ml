@@ -143,6 +143,7 @@ type key_synonym =
 | SDLK_MENU                             (** menu *)
 | SDLK_POWER                            (** power *)
 | SDLK_EURO                             (** euro *)
+| SDLK_NONE                             (** only use in OCaml *)
 
 (**
  * Mapping modify keys in {b SDL_keysym}.
@@ -168,9 +169,12 @@ type modify_key =
    contained, it means that they are pressed now.
 *)
 type key_info = {
-  synonym:key_synonym;
-  modify_state:modify_key list;
+  synonym: key_synonym;
+  modify_state: modify_key list;
 }
+
+(** default {!key_info} *)
+let empty = {synonym = SDLK_NONE; modify_state = []}
 
 (** Map for key and key state. *)
 module StateMap = Map.Make (
@@ -188,11 +192,11 @@ type state_map = Sdl_generic.button_state StateMap.t
 
 (**
    This function is provided to be used from C.
-   To reveive array is converted into {!state_map}.
+   To reveive list is converted into {!state_map}.
 *)
-let to_state_map statearray =
+let to_state_map statelist =
   let make_map (key, state) map = StateMap.add key state map in
-  Array.fold_right make_map statearray StateMap.empty
+  List.fold_right make_map statelist StateMap.empty
 
-let () =
+let _ =
   Callback.register "sdlcaml_ml_convert_state_map" to_state_map

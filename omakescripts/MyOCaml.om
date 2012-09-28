@@ -489,7 +489,7 @@ public.MyOCamlPackage(name, files, cmodules, linkopts) =
    protected.CMXA      = $(file $(name).cmxa)
 
    CSTUBLIBRARIES=
-   if $(not $(equal $(cmodules), $(EMPTY))) then
+   if $(not $(equal $(cmodules), $(EMPTY)))
        CSTUBLIBRARIES= dll$(name).so lib$(name)$(EXT_LIB)
        export
 
@@ -502,7 +502,7 @@ public.MyOCamlPackage(name, files, cmodules, linkopts) =
            ocamlmklib -verbose -o $(name) $(CSTUBS) $(linkopts) $(CMO) $(CMX)
        else
            $(OCamlC) -a -o $(CMA) $(CMO)
-           $(OCamlCOpt) -a -o $(CMXA) $(CMX)
+           $(OCamlOpt) -a -o $(CMXA) $(CMX)
 
    # the followings are nessesary for packing
    OCAML_PACKAGE_FLAG = -for-pack $(capitalize $(name))

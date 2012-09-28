@@ -1,4 +1,4 @@
-RequiredFiles(files) =
+RequireFiles(files) =
     .SCANNER: scan-%: $(files)
     % : $(files)
     export
@@ -15,10 +15,11 @@ AutoClean() =
 	.PHONY: clean
 	clean:
 		rm -f $(filter-proper-targets $(ls R, .))
+	export
 
 RequireBuild(targets) =
     dependencies.md5: $(targets)
         println($(string $(sequence-sort $(compare), $(dependencies-all $(targets)))))
-        CreateCheckSum($@, $(sequence-sort $(compare), $(dependecies-all $(targets))))
+        CreateCheckSum($@, $(sequence-sort $(compare), $(dependencies-all $(targets))))
     RequireFiles(dependencies.md5)
     export

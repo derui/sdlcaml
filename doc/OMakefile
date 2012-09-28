@@ -17,7 +17,6 @@
 ########################################################################
 # The standard OMakefile.
 # You will usually need to modify this file for your project.
-open MyOCaml
 
 ########################################################################
 # Phony targets are scoped, so you probably want to declare them first.
@@ -96,8 +95,9 @@ OCAMLOPTFLAGS +=
 # OCAML_LIB_FLAGS +=
 #
 #
-
-.PHONY: doc
+.PHONY: doc clean
 
 doc: $(GenerateOcamldoc ., $(removesuffix $(ls R, ../src/*ml)))
 #	dot -Tpng depend.dot -o depend.png
+
+clean:

@@ -21,7 +21,7 @@ type mouse_button_state = {
  *)
 type mouse_state = {
   x:int; y:int;             (** The X/Y cooridnates function called *)
-  state:mouse_button_state list  (** see {!mouse_button_state} *)
+  button_states:mouse_button_state list  (** see {!mouse_button_state} *)
 }
 
 (** Variant for hat values *)
@@ -42,7 +42,7 @@ type hat_state =
  * mapped key with current state of it.
  * If you get some key state, you can apply {! Map.Make} functions to
  * returning it.
- * Key state is only two state that true is pressed, false is not
+ * Key state is expressed only two state that true is pressed, false is not
  * pressed.
  *
  * @param num number of returing state. default get all current key state
@@ -60,7 +60,17 @@ external get_key_state: unit -> Sdl_key.state_map
  * @param unit dummy argument
  * @return list of the state of modify keys.
  *)
-external get_mod_state: unit -> Sdl_key.modify_key list = "sdlcaml_get_mod_state"
+external get_mod_state: unit -> Sdl_key.modify_key list =
+ "sdlcaml_get_mod_state"
+
+(**
+   Set the current modify key states.
+   This function inverse {!get_mod_state}. Simply pass your desired
+   modifier state into modify_key list.
+
+   @param mod_key_list modifier key list
+*)
+external set_mod_state: Sdl_key.modify_key list -> unit = "sdlcaml_set_mod_state"
 
 (**
  * Enable of disable keyboard repeat rate.
@@ -71,7 +81,7 @@ external get_mod_state: unit -> Sdl_key.modify_key list = "sdlcaml_get_mod_state
  * Both {i delay} and {i interval} are expressed in milliseconds.
  *
  * Setting {i delay} to 0, disable key repeating. If you want to
- * reverse repeat setting to default, call {!detault_key_repeat}.
+ * restore this setting to default, call {!detault_key_repeat}.
  *
  * @param delay how long key must be pressed
  * @param interval repeat speed

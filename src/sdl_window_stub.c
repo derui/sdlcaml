@@ -43,7 +43,7 @@ CAMLprim value sdlcaml_wm_set_caption(value title, value icon, value dummy) {
 }
 
 CAMLprim value sdlcaml_wm_get_caption(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   char *current_icon_name = NULL;
   char *current_title = NULL;
 
@@ -72,7 +72,11 @@ CAMLprim value sdlcaml_wm_get_title(value unit) {
 
   SDL_WM_GetCaption(&current_title, &current_icon_name);
 
-  CAMLreturn(caml_copy_string(current_title));
+  if (current_title == NULL) {
+    CAMLreturn(caml_copy_string(""));
+  } else {
+    CAMLreturn(caml_copy_string(current_title));
+  }
 }
 
 CAMLprim value sdlcaml_wm_get_icon_name(value unit) {
@@ -82,7 +86,11 @@ CAMLprim value sdlcaml_wm_get_icon_name(value unit) {
 
   SDL_WM_GetCaption(&current_title, &current_icon_name);
 
-  CAMLreturn(caml_copy_string(current_icon_name));
+  if (current_icon_name == NULL) {
+    CAMLreturn(caml_copy_string(""));
+  } else {
+    CAMLreturn(caml_copy_string(current_icon_name));
+  }
 }
 
 CAMLprim value sdlcaml_wm_iconify_window(value unit) {

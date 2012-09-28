@@ -52,6 +52,16 @@ CAMLprim value sdlcaml_quit(value unit) {
   return Val_unit;
 }
 
+CAMLprim value sdlcaml_was_init(value subsystems) {
+  /* only calling inner function */
+  CAMLparam1(subsystems);
+  int flag = ml_make_init_flag(subsystems);
+
+  int initialized = SDL_WasInit(flag);
+
+  CAMLreturn(initialized == flag ? Val_true : Val_false);
+}
+
 CAMLprim value sdlcaml_version(value unit) {
   CAMLparam0();
   CAMLlocal1(tuple);

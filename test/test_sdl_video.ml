@@ -5,7 +5,7 @@ let test_set_up flag _ =
   begin
     Sdl.init [`VIDEO];
     Sdl_video.set_video_mode ~width:640 ~height:480 ~depth:32
-      ~flags:flag;
+      ~flags:flag
   end
 
 let test_tear_down surface =
@@ -93,13 +93,12 @@ let suite = "SDL video tests" >:::
       (bracket (test_set_up [Sdl_video.SDL_SWSURFACE]) test_sdl_blit_surface test_tear_down);
     "use alpha" >::
       (bracket (test_set_up [Sdl_video.SDL_SWSURFACE]) test_use_alpha
-  test_tear_down);
+         test_tear_down);
     "use double buffering" >::
       (bracket (test_set_up
                   [Sdl_video.SDL_SWSURFACE;Sdl_video.SDL_DOUBLEBUF])
          test_use_flip test_tear_down);
-
   ]
 
-let _ =
-  run_test_tt_main suite
+(* let _ = *)
+(*   run_test_tt_main suite *)
