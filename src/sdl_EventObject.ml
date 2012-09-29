@@ -281,7 +281,7 @@ let extract = function
     [`X ev.x ; `Y ev.y ; `Xrel ev.relx; `Yrel ev.rely; `ButtonState ev.button_state]
 
   | (ButtonDown ev | ButtonUp ev) ->
-    [`X ev.x ; `Y ev.y ; `Xrel ev.relx; `Yrel ev.rely; `Mouse ev.index]
+    [`X ev.x ; `Y ev.y ; `Mouse ev.index]
 
   | Jaxis ev       -> [`Joystick ev.index; `Axis ev.axis; `Value ev.value]
   | Jball ev       -> [`Joystick ev.index; `Ball ev.ball; `Xrel

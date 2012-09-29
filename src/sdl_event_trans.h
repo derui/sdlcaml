@@ -42,6 +42,9 @@
 #define EVENT_STRUCT_WIDTH            (15)
 #define EVENT_STRUCT_HEIGHT           (16)
 
+/* number of event structure field */
+#define EVENT_STRUCT_FIELD_NUM 17
+
 extern lookup_info ml_event_tag_table[];
 
 #endif /* __SDL_EVENT_TAGS_H__ */

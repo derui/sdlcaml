@@ -29,3 +29,7 @@
 *.html
 *.dot
 *.css
+
+# generated header file:no tracking
+config/sdl_initflags.h
+config/sdl_generic_flags.h

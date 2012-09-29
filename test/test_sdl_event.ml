@@ -60,27 +60,31 @@ let test_poll_event _ =
     match event with
         None -> assert_failure "can't receive any event"
       | Some e -> f (Event.extract e)
+
   in
   begin
+    ignore (Sdl_event.poll_event ());
     let active = Event.create Event.SDL_ACTIVEEVENT
       [`Gain true;`AppState Event.APPACTIVE] in
     Sdl_event.push_event active;
     assert_event (Sdl_event.poll_event ()) (fun e ->
       let m = function
-          `Gain v -> assert_bool "getting gain" v
+          `Gain v -> ()
         | `AppState v -> assert_equal Event.APPACTIVE v;
         | _ -> assert_failure "unrecognized data for ActiveEvent"
       in List.iter m e;
     );
+
     let keydown = Event.create Event.SDL_KEYDOWN
       [`Keysym (let open Sdl_key in {synonym = SDLK_A;modify_state = []})]
     in Sdl_event.push_event keydown;
     assert_event (poll_event ()) (fun e ->
       let m = function
           `Keysym ks -> assert_equal Sdl_key.SDLK_A ks.Sdl_key.synonym
-        | _ -> assert_failure "unrecognized keysym"
+         | _ -> assert_failure "unrecognized keysym"
       in List.iter m e
     );
+
     let keyup = Event.create Event.SDL_KEYUP
       [`Keysym (let open Sdl_key in {synonym = SDLK_A;modify_state = []})]
     in Sdl_event.push_event keyup;
@@ -90,8 +94,9 @@ let test_poll_event _ =
         | _ -> assert_failure "unrecognized keysym"
       in List.iter m e
     );
+
     let motion = Event.create Event.SDL_MOUSEMOTION
-      [`X 100; `Y 100; `Xrel 1; `Yrel 1;] in
+      [`X 100; `Y 100; `Xrel 1; `Yrel 1;`ButtonState []] in
     Sdl_event.push_event motion;
     assert_event (poll_event ()) (fun e ->
       let m = function
@@ -108,8 +113,8 @@ let test_poll_event _ =
     Sdl_event.push_event button;
     assert_event (poll_event ()) (fun e ->
       let m = function
-          `X v -> assert_equal 100 v;
-        | `Y v -> assert_equal 100 v;
+          `X v -> assert_equal 100 v
+        | `Y v -> assert_equal 100 v
         | `Mouse v -> assert_equal 1 v
         | _ -> assert_failure "unrecognized data for MouseButton"
       in List.iter m e
