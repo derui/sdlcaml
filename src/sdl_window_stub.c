@@ -66,7 +66,7 @@ CAMLprim value sdlcaml_wm_get_caption(value unit) {
 }
 
 CAMLprim value sdlcaml_wm_get_title(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   char *current_icon_name = NULL;
   char *current_title = NULL;
 
@@ -80,7 +80,7 @@ CAMLprim value sdlcaml_wm_get_title(value unit) {
 }
 
 CAMLprim value sdlcaml_wm_get_icon_name(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   char *current_icon_name = NULL;
   char *current_title = NULL;
 
@@ -94,7 +94,7 @@ CAMLprim value sdlcaml_wm_get_icon_name(value unit) {
 }
 
 CAMLprim value sdlcaml_wm_iconify_window(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   int result = SDL_WM_IconifyWindow();
 
   if (result) {
@@ -105,7 +105,7 @@ CAMLprim value sdlcaml_wm_iconify_window(value unit) {
 }
 
 CAMLprim value sdlcaml_wm_toggle_fullscreen(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   int result = SDL_WM_ToggleFullScreen(SDL_GetVideoSurface());
 
   if (result) {
@@ -116,7 +116,7 @@ CAMLprim value sdlcaml_wm_toggle_fullscreen(value unit) {
 }
 
 CAMLprim value sdlcaml_wm_grab_input(value mode) {
-  CAMLparam0();
+  CAMLparam1(mode);
   SDL_GrabMode c_mode = SDL_GRAB_QUERY;
   switch (Int_val(mode)) {
     case 0: c_mode = SDL_GRAB_QUERY; break;

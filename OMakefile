@@ -73,7 +73,7 @@ BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 #
 # Various options
 #
-OCAMLFLAGS    += -annot
+OCAMLFLAGS    += -annot -thread
 OCAMLCFLAGS   +=
 OCAMLOPTFLAGS +=
 # OCAML_LINK_FLAGS +=

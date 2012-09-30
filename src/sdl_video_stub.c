@@ -6,8 +6,32 @@
 #include <caml/memory.h>
 #include <caml/fail.h>
 #include <caml/callback.h>
+#include <caml/custom.h>
 #include "sdl_video_flags.h"
 #include "common.h"
+
+
+/* Encapsulation of opaque SDL surface (of type SDL_Surface *)
+   as Caml custom blocks
+ */
+static struct custom_operations sdl_surface_ops = {
+  "sdlcaml.sdl_surface",
+  custom_finalize_default,
+  custom_compare_default,
+  custom_hash_default,
+  custom_serialize_default,
+  custom_deserialize_default
+};
+
+/* Accessing the SDL_Surface * part of a Caml custom block */
+#define Surface_val(v) (*((SDL_Surface**)Data_custom_val(v)))
+
+/* Allocating a Caml custom block to hold the given SDL_Surface *  */
+static value alloc_surface(SDL_Surface* surface) {
+  value v = alloc_custom(&sdl_surface_ops, sizeof(SDL_Surface*), 0, 1);
+  Surface_val(v) = surface;
+  return v;
+}
 
 static int ml_make_video_setting_flag(value flags) {
   CAMLparam1(flags);
@@ -26,34 +50,32 @@ static int ml_make_video_setting_flag(value flags) {
 CAMLprim value sdlcaml_set_video_mode(value width, value height,
                                       value depth, value flag_list) {
   CAMLparam4(width, height, depth, flag_list);
-  SDL_Surface* surface = NULL;
+  SDL_Surface* raw_surface = NULL;
   int flag = ml_make_video_setting_flag(flag_list);
 
-  surface = SDL_SetVideoMode(Int_val(width), Int_val(height), Int_val(depth),
+  raw_surface = SDL_SetVideoMode(Int_val(width), Int_val(height), Int_val(depth),
                              flag);
-  if (surface == NULL) {
+  if (raw_surface == NULL) {
     caml_raise_with_string(*caml_named_value("SDL_video_exception"),
                            SDL_GetError());
   }
 
-  /* this surface don't apply garbage collection */
-  CAMLnoreturn;
-  return (value)surface;
+  CAMLreturn(alloc_surface(raw_surface));
 }
 
 CAMLprim value sdlcaml_free_surface(value surface) {
-  SDL_Surface* sur = (SDL_Surface*)surface;
+  CAMLparam1(surface);
 
-  SDL_FreeSurface(sur);
-  return Val_unit;
+  SDL_FreeSurface(Surface_val(surface));
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value sdlcaml_get_pixelformat(value surface) {
-  /* surface isn't included garbage collection */
-  CAMLparam0();
+  CAMLparam1(surface);
 
-  SDL_PixelFormat *format = ((SDL_Surface*)surface)->format;
-  value pixelformat = caml_alloc(16, 0);
+  SDL_PixelFormat *format = (Surface_val(surface))->format;
+  CAMLlocal1(pixelformat);
+  pixelformat = caml_alloc(16, 0);
 
   Store_field(pixelformat,  0, Val_int(format->BitsPerPixel));
   Store_field(pixelformat,  1, Val_int(format->BytesPerPixel));
@@ -77,7 +99,7 @@ CAMLprim value sdlcaml_get_pixelformat(value surface) {
 
 CAMLprim value sdlcaml_blit_surface(value src, value dist, value srect, value drect) {
   /* surfaces  mustn't include garbage colleciton! */
-  CAMLparam2(srect, drect);
+  CAMLparam4(srect, drect, dist, src);
   SDL_Rect src_rect = {0,0,0,0};
   SDL_Rect dist_rect = {0,0,0,0};
   SDL_Rect *srectp = NULL, *drectp = NULL;
@@ -100,9 +122,9 @@ CAMLprim value sdlcaml_blit_surface(value src, value dist, value srect, value dr
     drectp = &dist_rect;
   }
 
-  int blit_result = SDL_BlitSurface((SDL_Surface*)src,
+  int blit_result = SDL_BlitSurface(Surface_val(src),
                                     srectp,
-                                    (SDL_Surface*)dist,
+                                    Surface_val(dist),
                                     drectp);
   switch (blit_result) {
     case -1: CAMLreturn(Val_int(1));         /* Failed */
@@ -112,8 +134,7 @@ CAMLprim value sdlcaml_blit_surface(value src, value dist, value srect, value dr
 }
 
 CAMLprim value sdlcaml_fill_rect(value dist, value fill, value drect) {
-  /* surfaces  mustn't include garbage colleciton! */
-  CAMLparam2(fill, drect);
+  CAMLparam3(fill, drect, dist);
   CAMLlocal1(vrect);
   SDL_Rect dist_rect = {0,0,0,0};
   SDL_Rect *dist_rectp = NULL;
@@ -127,7 +148,7 @@ CAMLprim value sdlcaml_fill_rect(value dist, value fill, value drect) {
     dist_rectp = &dist_rect;
   }
 
-  SDL_PixelFormat* format = ((SDL_Surface*)dist)->format;
+  SDL_PixelFormat* format = (Surface_val(dist))->format;
 
   Uint32 color =
       Int_val(Field(fill, 0)) << format->Rshift |
@@ -135,7 +156,7 @@ CAMLprim value sdlcaml_fill_rect(value dist, value fill, value drect) {
       Int_val(Field(fill, 2)) << format->Bshift |
       Int_val(Field(fill, 3)) << format->Ashift;
 
-  SDL_FillRect((SDL_Surface*)dist, dist_rectp, color);
+  SDL_FillRect(Surface_val(dist), dist_rectp, color);
 
   CAMLreturn(Val_unit);
 }
@@ -165,25 +186,22 @@ CAMLprim value sdlcaml_create_surface(value width, value height,
   amask = 0xff000000;
 #endif
 
-  SDL_Surface* surface = SDL_CreateRGBSurface(init_flag,
+  SDL_Surface* raw_surface = SDL_CreateRGBSurface(init_flag,
       surface_width, surface_height, depth,
       rmask, gmask, bmask, amask);
-  if (surface == NULL) {
+  if (raw_surface == NULL) {
     caml_raise_with_string(*caml_named_value("SDL_video_exception"),
                            SDL_GetError());
   }
-  CAMLnoreturn;
-  /* surface mustn't include garbage collection! */
-  return (value)surface;
+  CAMLreturn(alloc_surface(raw_surface));
 }
 
 CAMLprim value sdlcaml_update_rect(value ox, value oy,
                                    value owidth, value oheight, value surface) {
-  CAMLparam4(ox, oy, owidth, oheight);
+  CAMLparam5(ox, oy, owidth, oheight, surface);
   int x = 0, y = 0;
-  SDL_Surface* screen = (SDL_Surface*)surface;
 
-  int w = screen->w, h = screen->h;
+  int w = (Surface_val(surface))->w, h = (Surface_val(surface))->h;
 
   if (is_some(ox)) {
     x = Int_val(Field(ox, 0));
@@ -201,13 +219,13 @@ CAMLprim value sdlcaml_update_rect(value ox, value oy,
     h = Int_val(Field(oheight, 0));
   }
 
-  SDL_UpdateRect(screen, x, y, w, h);
+SDL_UpdateRect(Surface_val(surface), x, y, w, h);
   CAMLreturn(Val_unit);
 }
 
 CAMLprim value sdlcaml_flip(value surface) {
-  CAMLparam0();
-  if (SDL_Flip((SDL_Surface*)surface)) {
+  CAMLparam1(surface);
+  if (SDL_Flip(Surface_val(surface))) {
     caml_raise_with_string(*caml_named_value("SDL_video_exception"),
                            SDL_GetError());
   }
@@ -216,9 +234,8 @@ CAMLprim value sdlcaml_flip(value surface) {
 }
 
 CAMLprim value sdlcaml_clear(value fill, value dist) {
-  CAMLparam1(fill);
-  SDL_PixelFormat* format = ((SDL_Surface*)dist)->format;
-
+  CAMLparam2(fill, dist);
+  SDL_PixelFormat* format = (Surface_val(dist))->format;
 
   Uint32 color = 0;
 
@@ -230,7 +247,6 @@ CAMLprim value sdlcaml_clear(value fill, value dist) {
         Int_val(Field(Field(fill, 0), 3)) << format->Ashift;
   }
 
-  SDL_FillRect(dist, NULL, color);
-  CAMLnoreturn;
-  return Val_unit;
+  SDL_FillRect(Surface_val(dist), NULL, color);
+  CAMLreturn(Val_unit);
 }

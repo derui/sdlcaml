@@ -8,12 +8,15 @@
 #include "common.h"
 
 CAMLprim value sdlcaml_getticks(value unit) {
-  return Val_int(SDL_GetTicks());
+  CAMLparam1(unit);
+  CAMLreturn(Val_int(SDL_GetTicks()));
 }
 
 CAMLprim value sdlcaml_delay(value times) {
+  CAMLparam1(times);
   int millseconds = Int_val(times);
 
   SDL_Delay(millseconds);
-  return Val_unit;
+
+  CAMLreturn(Val_unit);
 }

@@ -9,10 +9,13 @@
 #include "common.h"
 
 int ml_init_tag_to_flag(value tag) {
+  CAMLparam1(tag);
+  CAMLnoreturn;
   return ml_lookup_to_c(ml_init_flag_table, tag);
 }
 
 static int ml_make_init_flag(value flags) {
+  CAMLparam1(flags);
   value list = flags;
   int flag = 0;
 
@@ -21,6 +24,7 @@ static int ml_make_init_flag(value flags) {
     flag |= converted_tag;
     list = tail(list);
   }
+  CAMLnoreturn;
   return flag;
 }
 
@@ -48,8 +52,7 @@ CAMLprim value sdlcaml_quit(value unit) {
   /* only calling inner function */
   CAMLparam0();
   sdlcaml_inner_quit();
-  CAMLnoreturn;
-  return Val_unit;
+  CAMLreturn(unit);
 }
 
 CAMLprim value sdlcaml_was_init(value subsystems) {
@@ -63,7 +66,7 @@ CAMLprim value sdlcaml_was_init(value subsystems) {
 }
 
 CAMLprim value sdlcaml_version(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   CAMLlocal1(tuple);
   tuple = caml_alloc(3, 0);
 

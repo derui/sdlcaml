@@ -98,7 +98,7 @@ LIBRARY_NAME = sdlcaml
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
 #
-OCAML_LIBS += ../lib/mylib
+OCAML_LIBS += ../lib/mylib -custom
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
 OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS))"

@@ -84,7 +84,6 @@ OCAML_LIBS += ../src/sdlcaml ../lib/mylib
 # OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl
 # OCAML_LIB_FLAGS += -verbose
-# OCAML_PACKAGE_NAME =
 #
 .PHONY: clean
 
