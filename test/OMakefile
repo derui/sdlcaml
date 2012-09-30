@@ -95,6 +95,8 @@ OCAML_LIBS += ../src/sdlcaml ../lib/mylib
 clean:
 	rm -f $(PROGRAM)$(EXE)
 	rm -f $(PROGRAM).opt
+	rm -f $(PROGRAM).run
+	rm -f *o
 	rm -f *cmx
 	rm -f *cmo
 	rm -f *cmi

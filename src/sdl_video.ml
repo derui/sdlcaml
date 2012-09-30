@@ -201,3 +201,13 @@ external update_rect: ?x:int -> ?y:int ->
  * @raise Sdl_video_function When function fail
  *)
 external flip: surface -> unit = "sdlcaml_flip"
+
+(**
+   Clear given surface. Argument of {!fill} is color that fill out the
+   surface.
+   If doesn't given {!fill}, clearing surface color is {b black}.
+
+   @param fill color for filling up, default is black
+   @param surface target surface
+*)
+external clear: ?fill:color -> surface -> unit = "sdlcaml_clear"

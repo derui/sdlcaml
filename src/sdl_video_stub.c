@@ -114,14 +114,16 @@ CAMLprim value sdlcaml_blit_surface(value src, value dist, value srect, value dr
 CAMLprim value sdlcaml_fill_rect(value dist, value fill, value drect) {
   /* surfaces  mustn't include garbage colleciton! */
   CAMLparam2(fill, drect);
+  CAMLlocal1(vrect);
   SDL_Rect dist_rect = {0,0,0,0};
   SDL_Rect *dist_rectp = NULL;
 
   if (is_some(drect)) {
-    dist_rect.x = Field(drect, 0);
-    dist_rect.y = Field(drect, 1);
-    dist_rect.w = Field(drect, 2);
-    dist_rect.h = Field(drect, 3);
+    vrect = Field(drect, 0);
+    dist_rect.x = Int_val(Field(vrect, 0));
+    dist_rect.y = Int_val(Field(vrect, 1));
+    dist_rect.w = Int_val(Field(vrect, 2));
+    dist_rect.h = Int_val(Field(vrect, 3));
     dist_rectp = &dist_rect;
   }
 
@@ -211,4 +213,24 @@ CAMLprim value sdlcaml_flip(value surface) {
   }
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value sdlcaml_clear(value fill, value dist) {
+  CAMLparam1(fill);
+  SDL_PixelFormat* format = ((SDL_Surface*)dist)->format;
+
+
+  Uint32 color = 0;
+
+  if (is_some(fill)) {
+    color =
+        Int_val(Field(Field(fill, 0), 0)) << format->Rshift |
+        Int_val(Field(Field(fill, 0), 1)) << format->Gshift |
+        Int_val(Field(Field(fill, 0), 2)) << format->Bshift |
+        Int_val(Field(Field(fill, 0), 3)) << format->Ashift;
+  }
+
+  SDL_FillRect(dist, NULL, color);
+  CAMLnoreturn;
+  return Val_unit;
 }

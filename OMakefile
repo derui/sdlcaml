@@ -22,7 +22,7 @@ open MyOCaml
 ########################################################################
 # Phony targets are scoped, so you probably want to declare them first.
 #
-
+.PHONY: test clean doc
 # .PHONY: all install clean
 
 ########################################################################
@@ -99,7 +99,5 @@ OCAMLOPTFLAGS +=
 #
 
 .DEFAULT: src/sdlcaml.cmxa
-
-.PHONY: test clean doc
 
 test: test/test$(EXE)
