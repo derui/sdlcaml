@@ -14,7 +14,7 @@ let test_push_event _ =
   let open Sdl_event in
   begin
     let active = Event.create Event.SDL_ACTIVEEVENT
-      [`Gain (true);`AppState Event.APPACTIVE] in
+      [`Gain (true);`AppState [Event.APPACTIVE]] in
     Sdl_event.push_event active;
     let keydown = Event.create Event.SDL_KEYDOWN
       [`Keysym (let open Sdl_key in {synonym = SDLK_A;
@@ -65,12 +65,12 @@ let test_poll_event _ =
   begin
     ignore (Sdl_event.poll_event ());
     let active = Event.create Event.SDL_ACTIVEEVENT
-      [`Gain true;`AppState Event.APPACTIVE] in
+      [`Gain true;`AppState [Event.APPACTIVE]] in
     Sdl_event.push_event active;
     assert_event (Sdl_event.poll_event ()) (fun e ->
       let m = function
           `Gain v -> ()
-        | `AppState v -> assert_equal Event.APPACTIVE v;
+        | `AppState v -> assert_equal [Event.APPACTIVE] v;
         | _ -> assert_failure "unrecognized data for ActiveEvent"
       in List.iter m e;
     );

@@ -45,7 +45,6 @@ type app_state =
 | APPMOUSEFOCUS                         (** has mouse focus *)
 | APPINPUTFORCUS                        (** has keyboard focus *)
 | APPACTIVE                            (** application is visible *)
-| APPNONE                               (** only used by OCaml *)
 
 (**
    Readable value types. These only make use of
@@ -84,7 +83,7 @@ type value_type = [
 | `Xrel of int                          (* Relative X direction *)
 | `Yrel of int                          (* Relative Y direction *)
 | `Gain of bool                         (* gain or ingain window *)
-| `AppState of app_state                (* see {!app_state} *)
+| `AppState of app_state list           (* see {!app_state} *)
 | `Keysym of Sdl_key.key_info           (* key infomation *)
 | `ButtonState of Sdl_input.mouse_button_state list (* current button state of
                                                        mouse *)

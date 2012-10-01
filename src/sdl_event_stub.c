@@ -14,12 +14,11 @@ CAMLprim value sdlcaml_pump_events(value unit) {
 
   SDL_PumpEvents();
 
-  CAMLnoreturn;
-  return Val_unit;
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value sdlcaml_poll_event(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
 
   SDL_Event event;
   if (SDL_PollEvent(&event)) {
@@ -35,10 +34,10 @@ CAMLprim value sdlcaml_poll_event(value unit) {
 }
 
 CAMLprim value sdlcaml_wait_event(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
 
   SDL_Event event;
-  if (SDL_WaitEvent(&event)) {
+  if (SDL_WaitEvent(&event) >= 0) {
     CAMLlocal2(event_struct, option);
     event_struct = caml_convert_event_c2m(&event);
 
@@ -75,7 +74,7 @@ CAMLprim value sdlcaml_event_state(value etype, value state) {
 }
 
 CAMLprim value sdlcaml_get_app_state(value unit) {
-  CAMLparam0();
+  CAMLparam1(unit);
   CAMLlocal1(current_state);
   current_state = Val_emptylist;
 
@@ -104,6 +103,7 @@ CAMLprim value sdlcaml_push_event(value ml_event) {
   if (SDL_PushEvent(event)) {
     if (event != NULL) {
       free(event);
+      event = NULL;
     }
     caml_raise_with_string(*caml_named_value("SDL_event_exception"),
                            SDL_GetError());
@@ -111,8 +111,8 @@ CAMLprim value sdlcaml_push_event(value ml_event) {
 
   if (event != NULL) {
     free(event);
+    event = NULL;
   }
 
-  CAMLnoreturn;
-  return Val_unit;
+  CAMLreturn(Val_unit);
 }

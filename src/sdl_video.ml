@@ -65,8 +65,8 @@ type pixelformat = {
  *)
 type color = {
   red:int;                              (* red attribute *)
-  blue:int;                             (* blue attribute *)
   green:int;                            (* green attribute *)
+  blue:int;                             (* blue attribute *)
   alpha:int;                            (* transparency *)
 }
 

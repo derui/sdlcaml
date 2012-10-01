@@ -2,12 +2,11 @@ type app_state =
 | APPMOUSEFOCUS
 | APPINPUTFORCUS
 | APPACTIVE
-| APPNONE                               (* only used by OCaml *)
 
 (* all probable values of event structure  *)
 type t = {
   gain:bool;                       (** true if gain, false if loss  *)
-  app_state:app_state;             (** see {!app_state} *)
+  app_state:app_state list;             (** see {!app_state} *)
   keysym: Sdl_key.key_info;         (** key that is occured event  *)
   x:int;
   y:int;                       (** The x/y coordinates of the mouse *)
@@ -73,7 +72,7 @@ type value_type = [
 | `Xrel of int                          (* Relative X direction *)
 | `Yrel of int                          (* Relative Y direction *)
 | `Gain of bool                         (* gain or ingain window *)
-| `AppState of app_state                (* see {!app_state} *)
+| `AppState of app_state list           (* see {!app_state} *)
 | `Keysym of Sdl_key.key_info           (* key infomation *)
 | `ButtonState of Sdl_input.mouse_button_state list (* current button
                                                        state of mouse *)
@@ -110,7 +109,7 @@ type event_type =
 (* default event structure *)
 let empty_of_event = {
   gain = false;
-  app_state = APPNONE;
+  app_state = [];
   keysym = Sdl_key.empty;
   x = 0; y = 0; relx = 0; rely = 0;
   button_state = [];
