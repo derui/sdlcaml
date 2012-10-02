@@ -21,7 +21,7 @@ CAMLprim value sdlcaml_poll_event(value unit) {
   CAMLparam1(unit);
 
   SDL_Event event;
-  if (SDL_PollEvent(&event)) {
+  if (SDL_PollEvent(&event) == 1) {
     CAMLlocal2(event_struct, option);
     event_struct = caml_convert_event_c2m(&event);
 

@@ -47,4 +47,7 @@ int is_none(value opt);
 /* if given value is some, return 1.a*/
 int is_some(value opt);
 
+/* construct Some with the given value. this pair for Val_none */
+static inline value Val_some(value);
+
 #endif /* __COMMON_H__ */

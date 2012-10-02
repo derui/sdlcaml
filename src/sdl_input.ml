@@ -8,35 +8,6 @@
  *)
 
 (**
- * State of the mouse Buttons.
- * This type has all mouse button state whether is pressed or released.
- *)
-type mouse_button_state = {
-  index:int;                            (** mouse button index  *)
-  state:Sdl_generic.button_state;       (** current button state  *)
-}
-
-(**
- * Returning from {!get_mouse_state}. This only uses to check currently state.
- *)
-type mouse_state = {
-  x:int; y:int;             (** The X/Y cooridnates function called *)
-  button_states:mouse_button_state list  (** see {!mouse_button_state} *)
-}
-
-(** Variant for hat values *)
-type hat_state =
-| HAT_CENTERED
-| HAT_UP
-| HAT_RIGHT
-| HAT_DOWN
-| HAT_LEFT
-| HAT_RIGHTUP
-| HAT_RIGHTDOWN
-| HAT_LEFTUP
-| HAT_LEFTDOWN
-
-(**
  * Return current snapshot of the current keyboard state.
  * Returning array from this function is {!Sdl_KeyStateMap.state_map} that is
  * mapped key with current state of it.
@@ -89,16 +60,3 @@ external set_mod_state: Sdl_key.modify_key list -> unit = "sdlcaml_set_mod_state
  *)
 external enable_key_repeat: delay:int -> interval:int -> bool =
   "sdlcaml_enable_key_repeat"
-
-(**
- * Get the current state of the  mouse.
- * Getting state of the mouse include which are cursot position of
- * mouse as  x and y,
- * and current state of button which pressed or unpressed.
- *
- * If you want to check state of some mouse button, you have to
- * call {! get_mouse_button_state} with this function returned.
- *
- * @return current state of the mouse
- *)
-external get_mouse_state: unit -> mouse_state = "sdlcaml_get_mouse_state"

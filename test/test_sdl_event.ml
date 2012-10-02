@@ -13,43 +13,53 @@ let test_tear_down s =
 let test_push_event _ =
   let open Sdl_event in
   begin
-    let active = Event.create Event.SDL_ACTIVEEVENT
-      [`Gain (true);`AppState [Event.APPACTIVE]] in
+    let active = Active {
+      gain = true; active_state = [APPACTIVE]
+    } in
     Sdl_event.push_event active;
-    let keydown = Event.create Event.SDL_KEYDOWN
-      [`Keysym (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []})
-      ]
+    let keydown = KeyDown {
+      keysym = (let open Sdl_key in {synonym = SDLK_A;
+                                     modify_state = []});
+      key_state = `RELEASED
+    }
     in Sdl_event.push_event keydown;
-    let keyup = Event.create Event.SDL_KEYUP
-      [`Keysym (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []}
-       )
-      ] in
+    let keyup = KeyUp {
+      keysym = (let open Sdl_key in {synonym = SDLK_A;
+                                     modify_state = []});
+      key_state = `RELEASED
+    }
+    in
     Sdl_event.push_event keyup;
-    let motion = Event.create Event.SDL_MOUSEMOTION
-      [`X 100; `Y 100; `Xrel 1; `Yrel 1;] in
+    let motion = Motion {
+      motion_x = 100; motion_y = 100; motion_xrel = 1; motion_yrel = 1;
+      motion_states = [];
+    }
+    in
     Sdl_event.push_event motion;
-    let button = Event.create Event.SDL_MOUSEBUTTONDOWN
-      [`X 100; `Y 100; `Mouse 1] in
+    let button = ButtonDown {
+      mouse_x = 100; mouse_y = 100;
+      mouse_button = Sdl_mouse.MOUSE_LEFT; mouse_state = `PRESSED
+    } in
     Sdl_event.push_event button;
-    let button = Event.create Event.SDL_MOUSEBUTTONUP
-      [`X 100; `Y 100; `Mouse 1] in
+    let button =  ButtonUp {
+      mouse_x = 100; mouse_y = 100;
+      mouse_button = Sdl_mouse.MOUSE_RIGHT; mouse_state = `RELEASED
+    } in
     Sdl_event.push_event button;
-    let resize = Event.create Event.SDL_VIDEORESIZE
-      [`Width 100; `Height 100] in
+    let resize = Resize {width = 100; height = 100} in
     Sdl_event.push_event resize;
-    Sdl_event.push_event (Event.create Event.SDL_VIDEOEXPOSE []);
-    Sdl_event.push_event (Event.create Event.SDL_QUIT []);
+    Sdl_event.push_event Expose;
+    Sdl_event.push_event Quit;
   end
 
 let test_pump_event _ =
   let open Sdl_event in
   begin
-    let keydown = Event.create Event.SDL_KEYDOWN
-      [`Keysym (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []})
-      ]
+    let keydown = KeyDown {
+      keysym = (let open Sdl_key in {synonym = SDLK_A;
+                                     modify_state = []});
+      key_state = `PRESSED
+    }
     in Sdl_event.push_event keydown;
     Sdl_event.pump_events ()
   end
@@ -59,92 +69,119 @@ let test_poll_event _ =
   let assert_event event f =
     match event with
         None -> assert_failure "can't receive any event"
-      | Some e -> f (Event.extract e)
-
+      | Some e -> f e
   in
   begin
     ignore (Sdl_event.poll_event ());
-    let active = Event.create Event.SDL_ACTIVEEVENT
-      [`Gain true;`AppState [Event.APPACTIVE]] in
+    let active = Active {
+      gain = true; active_state = [APPACTIVE]
+    } in
     Sdl_event.push_event active;
     assert_event (Sdl_event.poll_event ()) (fun e ->
-      let m = function
-          `Gain v -> ()
-        | `AppState v -> assert_equal [Event.APPACTIVE] v;
+      match e with
+          Active e ->
+            begin
+              assert_equal true e.gain;
+              assert_equal [APPACTIVE] e.active_state;
+            end
         | _ -> assert_failure "unrecognized data for ActiveEvent"
-      in List.iter m e;
     );
 
-    let keydown = Event.create Event.SDL_KEYDOWN
-      [`Keysym (let open Sdl_key in {synonym = SDLK_A;modify_state = []})]
+    let keydown = KeyDown {
+      keysym = (let open Sdl_key in {synonym = SDLK_A;
+                                     modify_state = []});
+      key_state = `PRESSED
+    }
     in Sdl_event.push_event keydown;
     assert_event (poll_event ()) (fun e ->
-      let m = function
-          `Keysym ks -> assert_equal Sdl_key.SDLK_A ks.Sdl_key.synonym
-         | _ -> assert_failure "unrecognized keysym"
-      in List.iter m e
+      match e with
+          KeyDown e ->
+            begin
+              assert_equal Sdl_key.SDLK_A e.keysym.Sdl_key.synonym;
+              assert_equal `PRESSED e.key_state;
+            end
+        | _ -> assert_failure "unrecognized keysym"
     );
 
-    let keyup = Event.create Event.SDL_KEYUP
-      [`Keysym (let open Sdl_key in {synonym = SDLK_A;modify_state = []})]
+    let keyup = KeyUp {
+      keysym = (let open Sdl_key in {synonym = SDLK_A;
+                                     modify_state = []});
+      key_state = `RELEASED
+    }
     in Sdl_event.push_event keyup;
     assert_event (poll_event ()) (fun e ->
-      let m = function
-          `Keysym ks -> assert_equal Sdl_key.SDLK_A ks.Sdl_key.synonym
+      match e with
+          KeyDown e ->
+            begin
+              assert_equal Sdl_key.SDLK_A e.keysym.Sdl_key.synonym;
+              assert_equal `RELEASED e.key_state;
+            end
         | _ -> assert_failure "unrecognized keysym"
-      in List.iter m e
     );
 
-    let motion = Event.create Event.SDL_MOUSEMOTION
-      [`X 100; `Y 100; `Xrel 1; `Yrel 1;`ButtonState []] in
+    let motion = Motion {
+      motion_x = 100; motion_y = 100; motion_xrel = 0; motion_yrel = 0;
+      motion_states = [];
+    } in
     Sdl_event.push_event motion;
     assert_event (poll_event ()) (fun e ->
-      let m = function
-          `X v -> assert_equal 100 v;
-        | `Y v -> assert_equal 100 v;
-        | `Xrel v -> assert_equal 1 v;
-        | `Yrel v -> assert_equal 1 v;
-        | `ButtonState v -> assert_equal [] v
+      match e with
+          Motion e ->
+            begin
+              assert_equal 100 e.motion_x;
+              assert_equal 100 e.motion_y;
+              assert_equal 1 e.motion_xrel;
+              assert_equal 1 e.motion_yrel;
+              assert_equal [] e.motion_states;
+            end
         | _ -> assert_failure "unrecognized data for MotionEvent"
-      in List.iter m e
     );
-    let button = Event.create Event.SDL_MOUSEBUTTONDOWN
-      [`X 100; `Y 100; `Mouse 1] in
+    let button = ButtonDown {
+      mouse_x = 100; mouse_y = 100;
+      mouse_button = Sdl_mouse.MOUSE_LEFT;
+      mouse_state = `PRESSED
+    } in
     Sdl_event.push_event button;
     assert_event (poll_event ()) (fun e ->
-      let m = function
-          `X v -> assert_equal 100 v
-        | `Y v -> assert_equal 100 v
-        | `Mouse v -> assert_equal 1 v
+      match e with
+          ButtonDown e ->
+            begin
+              assert_equal 100 e.mouse_x;
+              assert_equal 100 e.mouse_y;
+              assert_equal Sdl_mouse.MOUSE_LEFT e.mouse_button
+            end
         | _ -> assert_failure "unrecognized data for MouseButton"
-      in List.iter m e
     );
 
-    let button = Event.create Event.SDL_MOUSEBUTTONUP
-      [`X 100; `Y 100; `Mouse 1] in
+    let button = ButtonUp {
+      mouse_x = 100; mouse_y = 100;
+      mouse_button = Sdl_mouse.MOUSE_LEFT;
+      mouse_state = `RELEASED
+    } in
     Sdl_event.push_event button;
     assert_event (poll_event ()) (fun e ->
-      let m = function
-          `X v -> assert_equal 100 v;
-        | `Y v -> assert_equal 100 v;
-        | `Mouse v -> assert_equal 1 v
+      match e with
+          ButtonDown e ->
+            begin
+              assert_equal 100 e.mouse_x;
+              assert_equal 100 e.mouse_y;
+              assert_equal Sdl_mouse.MOUSE_LEFT e.mouse_button
+            end
         | _ -> assert_failure "unrecognized data for MouseButton"
-      in List.iter m e
     );
 
-    let resize = Event.create Event.SDL_VIDEORESIZE
-      [`Width 100; `Height 200] in
+    let resize = Resize {width = 100; height = 200;} in
     Sdl_event.push_event resize;
     assert_event (poll_event ()) (fun e ->
-      let m = function
-          `Width v -> assert_equal 100 v;
-        | `Height v -> assert_equal 200 v;
+      match e with
+          Resize e ->
+            begin
+              assert_equal 100 e.width;
+              assert_equal 200 e.height;
+            end
         | _ -> assert_failure "not recognized data for Resize"
-      in List.iter m e
     );
 
-    Sdl_event.push_event (Event.create Event.SDL_VIDEOEXPOSE []);
-    Sdl_event.push_event (Event.create Event.SDL_QUIT []);
   end
 
 
