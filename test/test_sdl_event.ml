@@ -20,13 +20,13 @@ let test_push_event _ =
     let keydown = KeyDown {
       keysym = (let open Sdl_key in {synonym = SDLK_A;
                                      modify_state = []});
-      key_state = `RELEASED
+      key_state = false
     }
     in Sdl_event.push_event keydown;
     let keyup = KeyUp {
       keysym = (let open Sdl_key in {synonym = SDLK_A;
                                      modify_state = []});
-      key_state = `RELEASED
+      key_state = true
     }
     in
     Sdl_event.push_event keyup;
@@ -38,12 +38,12 @@ let test_push_event _ =
     Sdl_event.push_event motion;
     let button = ButtonDown {
       mouse_x = 100; mouse_y = 100;
-      mouse_button = Sdl_mouse.MOUSE_LEFT; mouse_state = `PRESSED
+      mouse_button = Sdl_mouse.MOUSE_LEFT; mouse_state = true
     } in
     Sdl_event.push_event button;
     let button =  ButtonUp {
       mouse_x = 100; mouse_y = 100;
-      mouse_button = Sdl_mouse.MOUSE_RIGHT; mouse_state = `RELEASED
+      mouse_button = Sdl_mouse.MOUSE_RIGHT; mouse_state = false
     } in
     Sdl_event.push_event button;
     let resize = Resize {width = 100; height = 100} in
@@ -58,7 +58,7 @@ let test_pump_event _ =
     let keydown = KeyDown {
       keysym = (let open Sdl_key in {synonym = SDLK_A;
                                      modify_state = []});
-      key_state = `PRESSED
+      key_state = true
     }
     in Sdl_event.push_event keydown;
     Sdl_event.pump_events ()
@@ -90,7 +90,7 @@ let test_poll_event _ =
     let keydown = KeyDown {
       keysym = (let open Sdl_key in {synonym = SDLK_A;
                                      modify_state = []});
-      key_state = `PRESSED
+      key_state = true
     }
     in Sdl_event.push_event keydown;
     assert_event (poll_event ()) (fun e ->
@@ -98,25 +98,23 @@ let test_poll_event _ =
           KeyDown e ->
             begin
               assert_equal Sdl_key.SDLK_A e.keysym.Sdl_key.synonym;
-              assert_equal `PRESSED e.key_state;
             end
-        | _ -> assert_failure "unrecognized keysym"
+        | _ -> assert_failure "unrecognized keydown keysym"
     );
 
     let keyup = KeyUp {
       keysym = (let open Sdl_key in {synonym = SDLK_A;
                                      modify_state = []});
-      key_state = `RELEASED
+      key_state = false
     }
     in Sdl_event.push_event keyup;
     assert_event (poll_event ()) (fun e ->
       match e with
-          KeyDown e ->
+          KeyUp e ->
             begin
               assert_equal Sdl_key.SDLK_A e.keysym.Sdl_key.synonym;
-              assert_equal `RELEASED e.key_state;
             end
-        | _ -> assert_failure "unrecognized keysym"
+        | _ -> assert_failure "unrecognized keyup keysym"
     );
 
     let motion = Motion {
@@ -130,8 +128,8 @@ let test_poll_event _ =
             begin
               assert_equal 100 e.motion_x;
               assert_equal 100 e.motion_y;
-              assert_equal 1 e.motion_xrel;
-              assert_equal 1 e.motion_yrel;
+              assert_equal 0 e.motion_xrel;
+              assert_equal 0 e.motion_yrel;
               assert_equal [] e.motion_states;
             end
         | _ -> assert_failure "unrecognized data for MotionEvent"
@@ -139,7 +137,7 @@ let test_poll_event _ =
     let button = ButtonDown {
       mouse_x = 100; mouse_y = 100;
       mouse_button = Sdl_mouse.MOUSE_LEFT;
-      mouse_state = `PRESSED
+      mouse_state = true
     } in
     Sdl_event.push_event button;
     assert_event (poll_event ()) (fun e ->
@@ -156,12 +154,12 @@ let test_poll_event _ =
     let button = ButtonUp {
       mouse_x = 100; mouse_y = 100;
       mouse_button = Sdl_mouse.MOUSE_LEFT;
-      mouse_state = `RELEASED
+      mouse_state = false
     } in
     Sdl_event.push_event button;
     assert_event (poll_event ()) (fun e ->
       match e with
-          ButtonDown e ->
+          ButtonUp e ->
             begin
               assert_equal 100 e.mouse_x;
               assert_equal 100 e.mouse_y;

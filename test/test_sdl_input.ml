@@ -12,8 +12,8 @@ let test_get_key_state _ =
   let statemap = get_key_state () in
   let key_check _ k =
     match k with
-      | `RELEASED -> ()
-      | `PRESSED -> assert_failure "hoge"
+      | false -> ()
+      | true -> assert_failure "hoge"
     in
   Sdl_key.StateMap.iter key_check statemap
 

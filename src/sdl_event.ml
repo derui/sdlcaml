@@ -45,17 +45,17 @@ type active_event = {
 
 (** Event structure for SDL_KEYDOWN or SDL_KEYUP  *)
 type keyboard_event = {
-  keysym:Sdl_key.key_info;              (** key states when event occured *)
-  key_state: Sdl_generic.button_state;  (** pressed or released. *)
+  keysym:Sdl_key.key_info;  (** key states when event occured *)
+  key_state: bool;          (** true if pressed, false if released. *)
 }
 
 (**
    Implementation from C to OCaml of mouse event structure.
 *)
 type mouse_motion_event = {
-  motion_x:int;                          (** current X/Y coordinates *)
+  motion_x:int;                         (** current X/Y coordinates *)
   motion_y:int;
-  motion_xrel:int;                       (** related X/Y coordinates
+  motion_xrel:int;                      (** related X/Y coordinates
                                             from previous  *)
   motion_yrel:int;
   motion_states:Sdl_mouse.mouse_button_state list;
@@ -65,7 +65,7 @@ type mouse_button_event = {
   mouse_x:int;                          (** current X/Y coordinates *)
   mouse_y:int;
   mouse_button:Sdl_mouse.button;
-  mouse_state:Sdl_generic.button_state;
+  mouse_state:bool;          (** true if pressed, false if released *)
 }
 
 (** event structure for SDL_JOYAXISMOTION  *)
@@ -95,7 +95,7 @@ type joyhat_event = {
 type joybutton_event = {
   joy_index:int;               (** index of joystick event occured  *)
   button:int;                  (** index of button  *)
-  button_state:Sdl_generic.button_state; (** pressed or released *)
+  button_state:bool;           (** pressed or released *)
 }
 
 (** Occured when resize window  *)

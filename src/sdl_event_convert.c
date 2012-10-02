@@ -6,7 +6,6 @@
 #include <caml/fail.h>
 
 #include "common.h"
-#include "sdl_generic_flags.h"
 #include "sdl_key_trans.h"
 #include "sdl_input_trans.h"
 #include "sdl_event_trans.h"
@@ -15,13 +14,24 @@
 static value value_of_mouse_button(Uint8 b) {
   CAMLparam0();
   CAMLlocal1(r);
-  if (SDL_BUTTON_LEFT <= b && b <= SDL_BUTTON_WHEELDOWN)
+  if (SDL_BUTTON_LEFT <= b && b <= SDL_BUTTON_WHEELDOWN) {
     r = Val_int(b - 1);
-  else {
-    r = caml_alloc_small(1, 0);
+  } else {
+    r = caml_alloc(1, 0);
     Field(r, 0) = Val_int(b);
   }
   CAMLreturn(r);
+}
+
+static Uint8 mouse_button_of_value(value val) {
+  CAMLparam1(val);
+
+  if (Is_long(val)) {
+    CAMLreturnT(Uint8, Int_val(val) + 1);
+  } else {
+    value r = Field(val, 0);
+    CAMLreturnT(Uint8, Int_val(Field(r, 0)));
+  }
 }
 
 value caml_convert_c2m_active_event(SDL_Event* event, value tag) {
@@ -55,7 +65,7 @@ value caml_convert_c2m_keyboard_event(SDL_Event* event, value tag) {
   CAMLparam1(tag);
   CAMLlocal4(event_tag, keyboard, keyinfo, modkey);
   event_tag = caml_alloc(1, Int_val(tag));
-  keyboard  = caml_alloc(1, 0);
+  keyboard  = caml_alloc(2, 0);
   keyinfo   = caml_alloc(2, 0);
   modkey    = Val_emptylist;
 
@@ -74,9 +84,9 @@ value caml_convert_c2m_keyboard_event(SDL_Event* event, value tag) {
 
   Store_field(keyboard, 0, keyinfo);
   if (Int_val(tag) == MLTAG_KEYDOWN) {
-    Store_field(keyboard, 1, ml_lookup_from_c(ml_generic_button_table, 1));
+    Store_field(keyboard, 1, Val_true);
   } else {
-    Store_field(keyboard, 1, ml_lookup_from_c(ml_generic_button_table, 0));
+    Store_field(keyboard, 1, Val_false);
   }
 
   Store_field(event_tag, 0, keyboard);
@@ -105,8 +115,7 @@ value caml_convert_c2m_mousemotion_event(SDL_Event* event, value tag) {
     if (event->motion.state & SDL_BUTTON(i)) {
       state = caml_alloc(2, 0);
       Store_field(state, 0, value_of_mouse_button(i));
-      Store_field(state, 1, ml_lookup_from_c(ml_generic_button_table,
-                                             event->motion.state & SDL_BUTTON(i)));
+      Store_field(state, 1, event->motion.state & SDL_BUTTON(i) ? Val_true : Val_false);
 
       button = add_head(button, state);
     }
@@ -122,16 +131,16 @@ value caml_convert_c2m_mousebutton_event(SDL_Event* event, value tag) {
   CAMLparam1(tag);
   CAMLlocal2(event_tag, statelist);
   event_tag = caml_alloc(1, Int_val(tag));
-  statelist = caml_alloc(3, 0);
+  statelist = caml_alloc(4, 0);
 
   Store_field(statelist, 0, Val_int(event->button.x));
   Store_field(statelist, 1, Val_int(event->button.y));
   Store_field(statelist, 2, value_of_mouse_button(event->button.button));
 
   if (Int_val(tag) == MLTAG_BUTTONDOWN) {
-    Store_field(statelist, 3, ml_lookup_from_c(ml_generic_button_table, 1));
+    Store_field(statelist, 3, Val_true);
   } else {
-    Store_field(statelist, 3, ml_lookup_from_c(ml_generic_button_table, 0));
+    Store_field(statelist, 3, Val_false);
   }
 
   Store_field(event_tag, 0, statelist);
@@ -206,9 +215,9 @@ value caml_convert_c2m_joybutton_event(SDL_Event* event, value tag) {
   Store_field(button, 1, Val_int(event->jbutton.button));
 
   if (Int_val(tag) == MLTAG_KEYDOWN) {
-    Store_field(button, 2, ml_lookup_from_c(ml_generic_button_table, 1));
+    Store_field(button, 2, Val_true);
   } else {
-    Store_field(button, 2, ml_lookup_from_c(ml_generic_button_table, 0));
+    Store_field(button, 2, Val_false);
   }
 
   Store_field(event_tag, 0, button);
@@ -376,8 +385,8 @@ SDL_Event* caml_convert_m2c_mousemotion_event(value ml_event) {
   value button_state = Field(ml_event, 4);
   while (is_not_nil(button_state)) {
     value hd = head(button_state);
-    int num = Int_val(hd);
-    int state = ml_lookup_to_c(ml_generic_button_table, Field(hd, 1));
+    int num = mouse_button_of_value(Field(ml_event, 2));
+    int state = Bool_val(Field(hd, 1));
 
     if (num >= MAX_BUTTON || num < 1) {
       /* do nothing */
@@ -399,7 +408,7 @@ SDL_Event* caml_convert_m2c_mousebuttonup_event(value ml_event) {
   e->type = SDL_MOUSEBUTTONUP;
   e->button.x = Int_val(Field(ml_event, 0));
   e->button.y = Int_val(Field(ml_event, 1));
-  e->button.button = Int_val(Field(Field(ml_event, 2), 0));
+  e->button.button = mouse_button_of_value(Field(ml_event, 2));
 
   CAMLreturnT(SDL_Event*, e);
 }
@@ -410,8 +419,7 @@ SDL_Event* caml_convert_m2c_mousebuttondown_event(value ml_event) {
   e->type = SDL_MOUSEBUTTONDOWN;
   e->button.x = Int_val(Field(ml_event, 0));
   e->button.y = Int_val(Field(ml_event, 1));
-
-  e->button.button = Int_val(Field(Field(ml_event, 2), 0));
+  e->button.button = mouse_button_of_value(Field(ml_event, 2));
 
   CAMLreturnT(SDL_Event*, e);
 }

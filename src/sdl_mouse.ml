@@ -21,11 +21,13 @@ type button =
 
 (**
  * State of the mouse Buttons.
- * This type has all mouse button state whether is pressed or released.
+ * This type has all mouse button state whether is pressed or
+ * released.(state is whether true if pressed or false if released)
+ *
  *)
 type mouse_button_state = {
   index:button;                            (** mouse button index  *)
-  state:Sdl_generic.button_state;       (** current button state  *)
+  state:bool;       (** current button state  *)
 }
 
 (**

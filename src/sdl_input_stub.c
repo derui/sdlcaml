@@ -5,7 +5,6 @@
 #include <caml/callback.h>
 
 #include "common.h"
-#include "sdl_generic_flags.h"
 #include "sdl_key_trans.h"
 
 CAMLprim value sdlcaml_get_key_state(value unit) {
@@ -22,8 +21,7 @@ CAMLprim value sdlcaml_get_key_state(value unit) {
 
     int current_key = ml_lookup_to_c(ml_symkey_trans_table, Val_int(i - 1));
     Store_field(tuple, 0, Val_int(i - 1));
-    Store_field(tuple, 1, ml_lookup_from_c(
-        ml_generic_button_table, keystates[current_key]));
+    Store_field(tuple, 1, keystates[current_key] ? Val_true : Val_false);
 
     preconvert_array = add_head(preconvert_array, tuple);
   }

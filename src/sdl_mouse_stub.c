@@ -5,7 +5,6 @@
 #include <caml/callback.h>
 
 #include "common.h"
-#include "sdl_generic_flags.h"
 
 value value_of_mousebutton_state(Uint8 state) {
   CAMLparam0();

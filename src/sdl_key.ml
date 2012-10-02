@@ -329,7 +329,7 @@ module StateMap = Map.Make (
 )
 
 (** type of map for key associate to each button state *)
-type state_map = Sdl_generic.button_state StateMap.t
+type state_map = bool StateMap.t
 
 (**
    This function is provided to be used from C.
