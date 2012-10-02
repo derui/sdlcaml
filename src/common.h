@@ -48,6 +48,6 @@ int is_none(value opt);
 int is_some(value opt);
 
 /* construct Some with the given value. this pair for Val_none */
-static inline value Val_some(value);
+value Val_some(value);
 
 #endif /* __COMMON_H__ */

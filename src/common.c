@@ -105,7 +105,7 @@ int is_not_nil(value list) {
 
 /****************************************************/
 
-static inline value Val_some( value v ) {
+value Val_some( value v ) {
   CAMLparam1( v );
   CAMLlocal1( some );
   some = caml_alloc(1, 0);
