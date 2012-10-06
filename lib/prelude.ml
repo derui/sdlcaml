@@ -39,3 +39,13 @@ let cmp_float ~epsilon f1 f2 =
   if sub_abs <= epsilon then 0
   else if sub < 0.0 then -1
   else 1
+
+type ('a, 'b) either =
+  Left of 'a
+| Right of 'b
+
+let is_left = function
+    Left _ -> true
+  | Right _ -> false
+
+let is_right e = not (is_left e)

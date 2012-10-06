@@ -84,6 +84,7 @@ OCAMLFLAGS    += -annot
 		eprintln(can not build because sdl-config is not found. Please check to valid SDL installed)
 		$(exit 1)
 	SDL_CONFIGURE = $(shell $(SDL_CONFIG) --libs --cflags)
+	SDL_CONFIGURE += -lSDL_mixer -DDEBUG
 	export
 
 CFILES = $(removesuffix $(ls *.c))
@@ -101,7 +102,7 @@ STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 OCAML_LIBS += ../lib/mylib -custom
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
-OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS))"
+OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS)) -lSDL_mixer"
 OCAML_LIB_FLAGS += -verbose
 # OCAML_PACKAGE_NAME =
 #

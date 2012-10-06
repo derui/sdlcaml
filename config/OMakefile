@@ -88,6 +88,18 @@ initflag$(EXE): outputflag.c initflag.ml
 	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
 	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
 
+sdl_mixer_flags.h: mixerflag$(EXE) sdl_mixer_flags.h.in
+	section
+		initflags = $(concat \\n, $(shella $<))
+		sed -e "s/#FLAGS/$(initflags)/" $(nth 1, $+) > $@
+		cp $@ ../src/$@
+
+mixerflag$(EXE): outputflag.c mixerflag.ml
+	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
+	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
+	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
+
+
 #
 # OCAML_LIBS += ../lib/mylib
 # OCAML_CLIBS +=
@@ -95,7 +107,7 @@ initflag$(EXE): outputflag.c initflag.ml
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-.DEFAULT: sdl_initflags.h
+.DEFAULT: sdl_initflags.h sdl_mixer_flags.h
 
 .PHONY: clean
 
@@ -107,3 +119,4 @@ clean:
 	rm -f *.cmx
 	rm -f *.h
 	rm -f initflag$(EXE)
+	rm -f mixerflag$(EXE)

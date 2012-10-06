@@ -35,3 +35,17 @@ val is_some : 'a option -> bool
   `epsilon`, result of comparing is `0` as true.
 *)
 val cmp_float : epsilon:float -> float -> float -> int
+
+type ('a, 'b) either =
+  Left of 'a
+| Right of 'b
+
+(**
+   Return the given {!either} is {!Left} or not.
+*)
+val is_left : ('a, 'b) either -> bool
+
+(**
+   Return the given {!either} is {!Right} or not.
+*)
+val is_right : ('a, 'b) either -> bool

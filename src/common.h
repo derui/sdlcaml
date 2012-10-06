@@ -50,4 +50,8 @@ int is_some(value opt);
 /* construct Some with the given value. this pair for Val_none */
 value Val_some(value);
 
+/* construct Left and Right with given value */
+value Val_left(value);
+value Val_right(value);
+
 #endif /* __COMMON_H__ */

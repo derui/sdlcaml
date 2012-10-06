@@ -1,12 +1,11 @@
 let variants = [
-  "TIMER";
-  "VIDEO";
-  "AUDIO";
-  "CDROM";
-  "JOYSTICK";
-  "EVENTTHREAD";
-  "NOPARACHUTE";
-  "EVERYTHING";
+  "All";
+  "Channel";
+  "Unreserved";
+  "FLAC";
+  "MOD";
+  "MP3";
+  "OGG";
 ]
 
 external variant_hash : string -> int = "variant_hash"
@@ -16,6 +15,5 @@ let _ =
     Printf.printf "#define MLTAG_%s %!" variant_name;
     variant_hash variant_name;
     Printf.printf "\n%!";
-
   in
   List.iter print_hash variants
