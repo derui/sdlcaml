@@ -29,8 +29,8 @@ open common/Function
 #
 USE_OCAMLFIND = true
 #
-# OCAMLPACKS[] =
-#    pack1
+OCAMLPACKS[] =
+     num
 #    pack2
 #
 if $(not $(OCAMLFIND_EXISTS))
@@ -41,7 +41,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-# OCAMLINCLUDES +=
+# OCAMLINCLUDES += /usr/lib/ocaml
 
 #
 # Compile native or byte code?
@@ -56,7 +56,7 @@ BYTE_ENABLED = true
 #
 OCAMLFLAGS    += -annot
 # OCAMLCFLAGS   +=
-# OCAMLOPTFLAGS += -for-pack $(capitalize $(PACKAGE))
+# OCAMLOPTFLAGS +=
 # OCAML_LINK_FLAGS +=
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=

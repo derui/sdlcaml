@@ -249,8 +249,9 @@ external play_channel: channel:[> channel| `Unreserved] -> chunk:chunk -> loops:
 
 *)
 external fadein_channel: channel:[> channel | `Unreserved] -> chunk:chunk -> loops:int
-  -> fade:int -> ?ticks:int -> (string, int) Mylib.Prelude.either
-    = "sdlcaml_mixer_fadein_channel"
+  -> fade:int -> ?ticks:int -> unit -> (string, int) Mylib.Prelude.either
+    = "sdlcaml_mixer_fadein_channel_native"
+  "sdlcaml_mixer_fadein_channel_bytecode"
 
 (**
    Pause channel, or all playing channel if AllChannel given.

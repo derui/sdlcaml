@@ -297,9 +297,10 @@ CAMLprim value sdlcaml_mixer_play_channel(value channel, value chunk, value loop
   CAMLreturn(Val_right(Val_int(samples)));
 }
 
-CAMLprim value sdlcaml_mixer_fadein_channel(value channel, value chunk, value loops,
-                                            value fade, value tick) {
+CAMLprim value sdlcaml_mixer_fadein_channel_native(value channel, value chunk, value loops,
+                                            value fade, value tick, value unit) {
   CAMLparam5(channel, chunk, loops, fade, tick);
+  CAMLxparam1(unit);
 
   int channel_raw = 0;
   switch (channel) {
@@ -319,6 +320,11 @@ CAMLprim value sdlcaml_mixer_fadein_channel(value channel, value chunk, value lo
   }
 
   CAMLreturn(Val_right(Val_int(samples)));
+}
+
+CAMLprim value sdlcaml_mixer_fadein_channel_bytecode(value *argv, int argn) {
+  return sdlcaml_mixer_fadein_channel_native(argv[0], argv[1], argv[2],
+                                             argv[3], argv[4], argv[5]);
 }
 
 CAMLprim value sdlcaml_mixer_pause(value channel) {

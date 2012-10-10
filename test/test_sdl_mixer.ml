@@ -82,24 +82,63 @@ let test_mixer_channels _ =
     ignore (open_audio ~freq:44100 ~format:AUDIO_S16LSB
       ~channels:2 ~chunk:1024);
 
-    (* assert_equal 2 (allocate_channels 2); *)
+    assert_equal 2 (allocate_channels 2);
     let vol = volume ~channel:(`Channel 1) ~volume:100 in
     assert_bool "a channel change volume" (vol = 128);
     assert_bool "all channels changes volume"
       ((volume ~channel:(`All) ~volume:100) > 0);
 
-    let ch = load_wav "Once.ogg" in
+    let ch = load_wav "battle001.wav" in
     match ch with
         Mylib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
       | Mylib.Prelude.Right ch -> begin
-        let p =  play_channel ~channel:(`Unreserved) ~chunk:ch
+        let p =  play_channel ~channel:(`Channel 1) ~chunk:ch
           ~loops:(-1) () in
         match p with
             Mylib.Prelude.Left s -> assert_failure (Printf.sprintf "play_channel
     failed : %s" s)
-          | Mylib.Prelude.Right _ -> Thread.delay 10.0;
+          | Mylib.Prelude.Right _ -> ();
+        assert_bool "playing now" (playing (`Channel 1));
+        pause (`Channel 1);
+        assert_bool "pause now" (paused (`Channel 1));
+        assert_bool "get chunk" (Mylib.Prelude.is_some
+                                   (get_chunk (`Channel 1)));
+        resume (`Channel 1);
+        halt_channel (`Channel 1);
+        ignore (fadeout_channel (`Channel 1) 100);
         free_chunk ch;
       end;
+
+    close ();
+    quit ();
+  end
+
+
+let test_mixer_groups _ =
+  let open Sdl_mixer in
+  begin
+    assert_equal 1 (List.length (init [`OGG]));
+    ignore (open_audio ~freq:44100 ~format:AUDIO_S16LSB
+      ~channels:2 ~chunk:1024);
+
+    assert_bool "group channel setting" (group_channel
+                                           ~which:(`Channel 1)
+                                           ~tag:1);
+    assert_equal 2
+      (group_channels ~from_to:(`Channel 0, `Channel 1) ~tag:1)
+      ~msg:"group channels failed";
+
+    assert_equal 2 (group_count 1);
+    match group_available 1 with
+      | Some _ -> assert_failure "not found avaliable group";
+      | None -> ();
+    match group_oldest 1 with
+      | Some _ -> assert_failure "not found oldest in group";
+      | None -> ();
+
+    match group_newer 1 with
+      | Some _ -> assert_failure "not found newer in group";
+      | None -> ();
 
     close ();
     quit ();
@@ -112,7 +151,8 @@ let suite = "SDL Mixer binding specs" >:::
     "initialize mixer" >:: (tmp_bracket test_mixer_initialize);
     "chunk specs" >:: (tmp_bracket test_mixer_chunk);
     "can be loading some wav" >:: (tmp_bracket test_mixer_load_wav);
-    "playing channel" >:: (tmp_bracket test_mixer_channels)
+    "playing channel" >:: (tmp_bracket test_mixer_channels);
+    "setting groups" >:: (tmp_bracket test_mixer_groups);
   ]
 
 let _ =

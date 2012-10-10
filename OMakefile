@@ -31,7 +31,7 @@ open MyOCaml
 # If so, define the subdirectory targets and uncomment this section.
 #
 
-.SUBDIRS: src lib config test doc
+.SUBDIRS: src config test doc
 
 ########################################################################
 # OCaml configuration.
