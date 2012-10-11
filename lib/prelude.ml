@@ -44,6 +44,16 @@ type ('a, 'b) either =
   Left of 'a
 | Right of 'b
 
+let either_left e f =
+  match e with
+      Left s -> Some (f s)
+    | Right _ -> None
+
+let either_right e f =
+  match e with
+      Left _ -> None
+    | Right s -> Some (f s)
+
 let is_left = function
     Left _ -> true
   | Right _ -> false

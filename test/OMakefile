@@ -22,7 +22,6 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open common/Function
 
 #
 # This project requires ocamlfind (default - false).
@@ -32,7 +31,8 @@ USE_OCAMLFIND = true
 OCAMLPACKS[] =
     threads
     oUnit
-    num
+    sdlcaml
+    sdlcaml.extlib
 #
 if $(not $(OCAMLFIND_EXISTS))
    eprintln(This project requires ocamlfind, but is was not found.)
@@ -80,7 +80,7 @@ FILES = $(removesuffix $(ls *.ml))
 PROGRAM = test
 
 #
-OCAML_LIBS += ../src/sdlcaml ../src/lib/mylib
+OCAML_LIBS += ../src/sdlcaml
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl
@@ -90,7 +90,7 @@ OCAML_LIBS += ../src/sdlcaml ../src/lib/mylib
 
 # need sdlcaml library
 
-.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
+test: $(OCamlProgram $(PROGRAM), $(FILES))
 
 clean:
 	rm -f $(PROGRAM)$(EXE)

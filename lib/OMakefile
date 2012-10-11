@@ -22,7 +22,6 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open common/Function
 
 #
 # This project requires ocamlfind (default - false).
@@ -66,11 +65,12 @@ OCAMLFLAGS    += -annot
 #
 FILES[] = $(removesuffix $(ls *ml))
 #
-LIB = mylib
+LIB = extlib
 #
 
-MyOCamlPackage($(LIB), $(FILES), $(EMPTY), $(EMPTY))
+MyOCamlPackage($(LIB), $(FILES), $(EMPTY), $(EMPTY), false)
+OCamlInstallParentPackage(sdlcaml, $(OCamlPackageGeneratedFiles $(LIB), $(EMPTY)))
 
 .PHONY: lib
 
-lib: mylib.cmxa
+lib: $(LIB).cmxa

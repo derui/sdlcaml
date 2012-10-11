@@ -22,8 +22,8 @@ let test_mixer_initialize _ =
       ~channels:2 ~chunk:1024 in
     begin
       match opened with
-          Mylib.Prelude.Left s -> assert_failure s
-        | Mylib.Prelude.Right _ -> ()
+          Extlib.Prelude.Left s -> assert_failure s
+        | Extlib.Prelude.Right _ -> ()
     end;
 
     match query_spec () with
@@ -64,8 +64,8 @@ let test_mixer_load_wav _ =
 
     let m = load_wav "Once.wav" in
     match m with
-        Mylib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
-      | Mylib.Prelude.Right ch -> begin
+        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
+      | Extlib.Prelude.Right ch -> begin
         assert_bool "volume changeable" ((volume_chunk ~chunk:ch
                                             ~volume:10) > 0);
         free_chunk ch;
@@ -90,18 +90,18 @@ let test_mixer_channels _ =
 
     let ch = load_wav "battle001.wav" in
     match ch with
-        Mylib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
-      | Mylib.Prelude.Right ch -> begin
+        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
+      | Extlib.Prelude.Right ch -> begin
         let p =  play_channel ~channel:(`Channel 1) ~chunk:ch
           ~loops:(-1) () in
         match p with
-            Mylib.Prelude.Left s -> assert_failure (Printf.sprintf "play_channel
+            Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "play_channel
     failed : %s" s)
-          | Mylib.Prelude.Right _ -> ();
+          | Extlib.Prelude.Right _ -> ();
         assert_bool "playing now" (playing (`Channel 1));
         pause (`Channel 1);
         assert_bool "pause now" (paused (`Channel 1));
-        assert_bool "get chunk" (Mylib.Prelude.is_some
+        assert_bool "get chunk" (Extlib.Prelude.is_some
                                    (get_chunk (`Channel 1)));
         resume (`Channel 1);
         halt_channel (`Channel 1);
@@ -140,6 +140,82 @@ let test_mixer_groups _ =
       | Some _ -> assert_failure "not found newer in group";
       | None -> ();
 
+    halt_group 1;
+    close ();
+    quit ();
+  end
+
+let test_mixer_music _ =
+  let open Sdl_mixer in
+  begin
+    ignore (init [`OGG]);
+    ignore (open_audio ~freq:44100 ~format:AUDIO_S16LSB
+      ~channels:2 ~chunk:1024);
+
+    assert_bool "music decoder must have more than 1"
+      ((get_num_music_decoders ()) > 0);
+    assert_bool "can get decoder name"
+      ((get_music_decoder 0) <> "");
+
+    match load_mus "Once.ogg" with
+        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_mus failed :
+        %s" s);
+      | Extlib.Prelude.Right m ->
+        begin
+          match play_music ~music:m ~loops:(-1) with
+              Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_mus failed : %s" s);
+            | Extlib.Prelude.Right _ -> ();
+
+          assert_bool "music volume change"
+            ((volume_music 120) = 128);
+          assert_bool "not playing music" (playing_music ());
+          pause_music ();
+          assert_bool "not paused music" (paused_music ());
+          resume_music ();
+          rewind_music ();
+          begin match set_music_position 10.0 with
+              Extlib.Prelude.Left s -> assert_failure
+                (Printf.sprintf "set_music_position failed : %s" s);
+            | Extlib.Prelude.Right _ -> ();
+          end;
+          halt_music ();
+        end;
+    close ();
+    quit ();
+  end
+
+let test_mixer_effects _ =
+  let open Sdl_mixer in
+  begin
+    assert_equal 1 (List.length (init [`OGG]));
+    ignore (open_audio ~freq:44100 ~format:AUDIO_S16LSB
+      ~channels:2 ~chunk:1024);
+
+    assert_equal 2 (allocate_channels 2);
+    let vol = volume ~channel:(`Channel 1) ~volume:100 in
+    assert_bool "a channel change volume" (vol = 128);
+    assert_bool "all channels changes volume"
+      ((volume ~channel:(`All) ~volume:100) > 0);
+
+    let ch = load_wav "battle001.wav" in
+    match ch with
+        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
+      | Extlib.Prelude.Right ch -> begin
+        let p =  play_channel ~channel:(`Channel 1) ~chunk:ch
+          ~loops:(-1) () in
+        begin match p with
+            Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "play_channel
+    failed : %s" s)
+          | Extlib.Prelude.Right _ -> ();
+        end;
+        begin match set_position ~channel:(`Channel 1) ~angle:100 ~dist:100 with
+          | Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "set_position failed : %s" s)
+          | Extlib.Prelude.Right _ -> ()
+        end;
+        halt_channel (`Channel 1);
+        free_chunk ch;
+      end;
+
     close ();
     quit ();
   end
@@ -153,6 +229,8 @@ let suite = "SDL Mixer binding specs" >:::
     "can be loading some wav" >:: (tmp_bracket test_mixer_load_wav);
     "playing channel" >:: (tmp_bracket test_mixer_channels);
     "setting groups" >:: (tmp_bracket test_mixer_groups);
+    "playing musics" >:: (tmp_bracket test_mixer_music);
+    "effects apply channel" >:: (tmp_bracket test_mixer_effects);
   ]
 
 let _ =

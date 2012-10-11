@@ -567,7 +567,7 @@ CAMLprim value sdlcaml_mixer_play_music(value music, value loops) {
     CAMLreturn(Val_left(caml_copy_string(Mix_GetError())));
   }
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(Val_right(Val_none));
 }
 
 CAMLprim value sdlcaml_mixer_fadein_music(value music, value loops,

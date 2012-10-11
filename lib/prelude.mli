@@ -41,6 +41,18 @@ type ('a, 'b) either =
 | Right of 'b
 
 (**
+   If given {!either} is left, return applied {!f} to Left value.
+   Return None if given {!either} is Right.
+*)
+val either_left : ('a, 'b) either -> ('a -> 'c) -> 'c option
+
+(**
+   If given {!either} is Right, return applied {!f} to Right value.
+   Return None if given {!either} is Left.
+*)
+val either_right : ('a, 'b) either -> ('b -> 'c) -> 'c option
+
+(**
    Return the given {!either} is {!Left} or not.
 *)
 val is_left : ('a, 'b) either -> bool

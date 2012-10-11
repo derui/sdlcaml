@@ -17,12 +17,13 @@
 ########################################################################
 # The standard OMakefile.
 # You will usually need to modify this file for your project.
+open common/Function.om
 open MyOCaml
 
 ########################################################################
 # Phony targets are scoped, so you probably want to declare them first.
 #
-.PHONY: test clean doc
+.PHONY: test clean doc all
 # .PHONY: all install clean
 
 ########################################################################
@@ -31,12 +32,15 @@ open MyOCaml
 # If so, define the subdirectory targets and uncomment this section.
 #
 
-.SUBDIRS: src config test doc
+.SUBDIRS: src config test doc lib
 
 ########################################################################
 # OCaml configuration.
 # Delete this section if you are not building OCaml files.
 #
+
+# mark file confined directory path.
+INSTALLED = $(BIG_ROOT)/installed
 
 ################################################
 # Configuration.  You may want to modify any of these configuration
@@ -100,4 +104,5 @@ OCAMLOPTFLAGS +=
 
 .DEFAULT: src/sdlcaml.cmxa
 
-test: test/test$(EXE)
+install:
+	CreateInstalled(sdlcaml, $(glob i, src/*ml) $(glob i, src/*c))

@@ -5,3 +5,11 @@ archive(byte) = "sdlcaml.cma"
 archive(byte, plugin) = "sdlcaml.cma"
 archive(native) = "sdlcaml.cmxa"
 exists_if = "sdlcaml.cma"
+package "extlib" (
+  version = "0.1"
+  description = "sdlcaml internal library"
+  archive(byte) = "extlib.cma"
+  archive(byte, plugin) = "extlib.cma"
+  archive(native) = "extlib.cmxa"
+  exists_if = "extlib.cma"
+)

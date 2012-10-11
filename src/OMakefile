@@ -14,8 +14,6 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE FILE OR
 # THE USE OR OTHER DEALINGS IN THE FILE.
 
-.SUBDIR: lib
-
 ########################################################################
 # The standard OMakefile.
 # You will usually need to modify this file for your project.
@@ -45,7 +43,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += lib
+OCAMLINCLUDES += ../lib
 
 #
 # Compile native or byte code?
@@ -100,13 +98,13 @@ LIBRARY_NAME = sdlcaml
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
 #
-OCAML_LIBS += lib/mylib -custom
+OCAML_LIBS += ../lib/extlib -custom
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
 OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS)) -lSDL_mixer"
 # OCAML_PACKAGE_NAME =
 #
 
-MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), $(EMPTY))
+MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), $(EMPTY), true)
 
-.DEFAULT: sdlcaml.cmxa
+.DEFAULT: ../lib/extlib.cmxa sdlcaml.cmxa

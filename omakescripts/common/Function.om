@@ -1,3 +1,24 @@
+
+.PHONY: all install uninstall clean
+
+BIG_ROOT=$(dir .)
+
+# To enable the installation mark files, you must define INSTALLED path
+# variable for the mark file directory like INSTALLED=$(BIG_ROOT)/installed and
+# make sure the directory $(INSTALLED) exists. This preparation must be done outside
+# this file.
+Installed(packs) =
+	if $(defined INSTALLED)
+		return $(addprefix $(INSTALLED)/, $(packs))
+	else
+		return $(array)
+
+# Create $(installed $(packed)) file fro the digest of $(targets)
+CreateInstalled(pack, targets)=
+	if $(defined INSTALLED)
+		println(dump md5 $(INSTALLED)/$(pack))
+		CreateCheckSum($(INSTALLED)/$(pack), $(targets))
+
 RequireFiles(files) =
     .SCANNER: scan-%: $(files)
     % : $(files)
