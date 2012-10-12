@@ -59,6 +59,8 @@ CAMLprim value sdlcaml_cd_open(value drive) {
     CAMLreturn(Val_none);
   }
 
+  /* when opening successful, update current CD status. */
+  SDL_CDStatus(cd);
   CAMLreturn(Val_some(alloc_cd(cd)));
 }
 
@@ -70,10 +72,17 @@ CAMLprim value sdlcaml_cd_status(value cd) {
   CAMLreturn(ml_convert_cd_status_from_c(stat));
 }
 
+CAMLprim value sdlcaml_cd_indrive(value cd) {
+  CAMLparam1(cd);
+
+  int ret = CD_INDRIVE(CD_val(cd));
+  CAMLreturn(ret == 1 ? Val_true : Val_false);
+}
+
 CAMLprim value sdlcaml_cd_play(value cd, value start, value length) {
   CAMLparam3(cd, start, length);
 
-  if (SDL_CDPlay(CD_val(cd), start, length)) {
+  if (SDL_CDPlay(CD_val(cd), Int_val(start), Int_val(length))) {
     CAMLreturn(Val_false);
   } else {
     CAMLreturn(Val_true);
@@ -94,21 +103,30 @@ CAMLprim value sdlcaml_cd_play_tracks(value cd, value track, value frame,
 
 CAMLprim value sdlcaml_cd_pause(value cd) {
   CAMLparam1(cd);
-  SDL_CDPause(CD_val(cd));
-  CAMLreturn(Val_unit);
+  if (SDL_CDPause(CD_val(cd))) {
+    CAMLreturn(Val_false);
+  } else {
+    CAMLreturn(Val_true);
+  }
 }
 
 CAMLprim value sdlcaml_cd_resume(value cd) {
   CAMLparam1(cd);
-  SDL_CDResume(CD_val(cd));
-  CAMLreturn(Val_unit);
+  if (SDL_CDResume(CD_val(cd))) {
+    CAMLreturn(Val_false);
+  } else {
+    CAMLreturn(Val_true);
+  }
 }
 
 
 CAMLprim value sdlcaml_cd_stop(value cd) {
   CAMLparam1(cd);
-  SDL_CDStop(CD_val(cd));
-  CAMLreturn(Val_unit);
+  if (SDL_CDStop(CD_val(cd))) {
+    CAMLreturn(Val_false);
+  } else {
+    CAMLreturn(Val_true);
+  }
 }
 
 CAMLprim value sdlcaml_cd_eject(value cd) {
@@ -159,9 +177,9 @@ CAMLprim value sdlcaml_cd_get_info(value cd) {
 
   Store_field(info, 0, Val_int(CD_val(cd)->id));
   Store_field(info, 1, ml_convert_cd_status_from_c((CD_val(cd)->status)));
-  Store_field(info, 2, Int_val(CD_val(cd)->numtracks));
-  Store_field(info, 3, Int_val(CD_val(cd)->cur_track));
-  Store_field(info, 4, Int_val(CD_val(cd)->cur_frame));
+  Store_field(info, 2, Val_int(CD_val(cd)->numtracks));
+  Store_field(info, 3, Val_int(CD_val(cd)->cur_track));
+  Store_field(info, 4, Val_int(CD_val(cd)->cur_frame));
 
   CAMLreturn(info);
 }

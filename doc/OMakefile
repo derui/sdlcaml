@@ -57,7 +57,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES = ../src
+OCAMLINCLUDES = ../src ../lib
 
 #
 # Compile native or byte code?
@@ -97,7 +97,10 @@ OCAMLOPTFLAGS +=
 #
 .PHONY: doc clean
 
-doc: $(GenerateOcamldoc ., $(removesuffix $(ls R, ../src/*ml)))
-#	dot -Tpng depend.dot -o depend.png
+generated = $(GenerateOcamldoc sdlcaml, $(dir sdlcaml/), $(removesuffix $(ls R, ../src/*ml)))
+generated += $(GenerateOcamldoc extlib, $(dir extlib/), $(removesuffix $(ls R, ../lib/*ml)))
+
+doc: $(generated)
+	dot -Tpng depend.dot -o depend.png
 
 clean:

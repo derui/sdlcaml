@@ -85,13 +85,23 @@ PROGRAM = test
 # OCAML_LIB_FLAGS += -cclib -lsdl
 # OCAML_LIB_FLAGS += -verbose
 #
-.PHONY: clean
+.PHONY: clean all test-clean
 
 # need sdlcaml library
 
 test: $(OCamlProgram $(PROGRAM), $(FILES))
 
 clean:
+	rm -f $(PROGRAM)$(EXE)
+	rm -f $(PROGRAM).opt
+	rm -f $(PROGRAM).run
+	rm -f *o
+	rm -f *cmx
+	rm -f *cmo
+	rm -f *cmi
+	rm -f *annot
+
+test-clean:
 	rm -f $(PROGRAM)$(EXE)
 	rm -f $(PROGRAM).opt
 	rm -f $(PROGRAM).run
