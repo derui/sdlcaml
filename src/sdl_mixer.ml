@@ -10,6 +10,8 @@
  * @since 0.1
  *)
 
+open Extlib
+
 (** SDL_Mixer support libraries  *)
 type mixerinit = [
   `FLAC
@@ -111,7 +113,7 @@ external quit : unit -> unit = "sdlcaml_mixer_quit"
 
 *)
 external open_audio: freq:int -> format:audio_format -> channels:int
-  -> chunk:int -> (string, unit) Extlib.Prelude.either = "sdlcaml_mixer_open_audio"
+  -> chunk:int -> (unit, string) Std.Either.t = "sdlcaml_mixer_open_audio"
 
 (**
    shutdown and cleanup the mixer API.
@@ -158,7 +160,7 @@ external get_chunk_decoder: int -> string = "sdlcaml_mixer_get_chunk_decoder"
    @param file file name to load sample from.
    @return the sample as a chunk. Left if failed
 *)
-external load_wav: string -> (string, chunk) Extlib.Prelude.either =
+external load_wav: string -> (chunk, string) Either.t =
   "sdlcaml_mixer_load_wav"
 
 (**
@@ -228,7 +230,7 @@ external volume: channel:[> channel|`All] -> volume:int -> int = "sdlcaml_mixer_
 *)
 external play_channel: channel:[> channel| `Unreserved] -> chunk:chunk -> loops:int ->
   ?ticks:int -> unit ->
-  (string, int) Extlib.Prelude.either = "sdlcaml_mixer_play_channel"
+    (int, string) Std.Either.t = "sdlcaml_mixer_play_channel"
 
 (**
    Play chunk on channel, or if channel is UnreservedChannel, pick the
@@ -249,7 +251,7 @@ external play_channel: channel:[> channel| `Unreserved] -> chunk:chunk -> loops:
 
 *)
 external fadein_channel: channel:[> channel | `Unreserved] -> chunk:chunk -> loops:int
-  -> fade:int -> ?ticks:int -> unit -> (string, int) Extlib.Prelude.either
+  -> fade:int -> ?ticks:int -> unit -> (int, string) Std.Either.t
     = "sdlcaml_mixer_fadein_channel_native"
   "sdlcaml_mixer_fadein_channel_bytecode"
 
@@ -447,7 +449,7 @@ external get_music_decoder: int -> string = "sdlcaml_mixer_get_music_decoder"
    @param file Name of music file to use.
    @return music construct or error string
 *)
-external load_mus: string -> (string, music) Extlib.Prelude.either = "sdlcaml_mixer_load_mus"
+external load_mus: string -> (music, string) Std.Either.t = "sdlcaml_mixer_load_mus"
 
 (**
    binding for {b Mix_FreeMusic}
@@ -464,8 +466,8 @@ external free_music: music -> unit = "sdlcaml_mixer_free_music"
    forever.
    @return Left if failed with error string.
 *)
-external play_music: music:music -> loops:int -> (string, unit)
-  Extlib.Prelude.either  = "sdlcaml_mixer_play_music"
+external play_music: music:music -> loops:int -> (unit, string)
+  Std.Either.t  = "sdlcaml_mixer_play_music"
 
 (**
    binding for {b Mix_FadeInMusic} and {b Mix_FadeInMusicPos}.
@@ -477,7 +479,7 @@ external play_music: music:music -> loops:int -> (string, unit)
    @return Left with error string if failed.
 *)
 external fadein_music : music:music -> loops:int -> ms:int ->
-  ?pos:float -> (string, unit) Extlib.Prelude.either = "sdlcaml_mixer_fadein_music"
+  ?pos:float -> (unit, string) Std.Either.t = "sdlcaml_mixer_fadein_music"
 
 
 (**
@@ -509,7 +511,7 @@ external rewind_music: unit -> unit = "sdlcaml_mixer_rewind_music"
    @param position Position to play from
    @return Left with error string if failed.
 *)
-external set_music_position: float -> (string, unit) Extlib.Prelude.either
+external set_music_position: float -> (unit, string) Std.Either.t
   = "sdlcaml_mixer_set_music_position"
 
 (**
@@ -564,7 +566,7 @@ external fading_music: unit -> fading = "sdlcaml_mixer_fading_music"
    @return Left with error string if failed with any reason.
 *)
 external set_panning: channel:channel -> left:int -> right:int ->
-  (string, unit) Extlib.Prelude.either = "sdlcaml_mixer_set_panning"
+  (unit, string) Std.Either.t = "sdlcaml_mixer_set_panning"
 
 (**
    binding for {b Mix_SetDistance}.
@@ -575,7 +577,7 @@ external set_panning: channel:channel -> left:int -> right:int ->
    @return Left with error string if failed with any reason.
 *)
 external set_distance: channel:channel -> dist:int ->
-  (string, unit) Extlib.Prelude.either = "sdlcaml_mixer_set_distance"
+  (unit, string) Std.Either.t = "sdlcaml_mixer_set_distance"
 
 (**
    binding for {b Mix_SetPosition}.
@@ -588,7 +590,7 @@ external set_distance: channel:channel -> dist:int ->
    @return Left with error string if failed with any reason.
 *)
 external set_position: channel:channel -> angle:int -> dist:int ->
-  (string, unit) Extlib.Prelude.either = "sdlcaml_mixer_set_position"
+  (unit, string) Std.Either.t = "sdlcaml_mixer_set_position"
 
 (**
    binding for {b Mix_UnregisterAllEffects}.
@@ -596,5 +598,5 @@ external set_position: channel:channel -> angle:int -> dist:int ->
    @param channel Channel to remove all effects from.
    @return Left with error string if failed.
 *)
-external unregister_all_effects: channel -> (string, unit) Extlib.Prelude.either
+external unregister_all_effects: channel -> (unit, string) Std.Either.t
   = "sdlcaml_mixer_unregister_all_effects"

@@ -7,5 +7,17 @@ module Option = Option
 module Prelude = Prelude
 module Stringable = Stringable
 module TypedCollection = TypedCollection
-module TypedMonad = TypedMonad
 module TypedStringable = TypedStringable
+
+module Either = Either
+
+(* extended List *)
+module List = struct
+  (* Inherits the original List module *)
+  include List
+
+
+  (* Inherits my extended List *)
+  include Ext_list
+
+end

@@ -1,5 +1,6 @@
 open Sdlcaml
 open OUnit
+open Extlib
 
 let test_set_up _ =
   Sdl.init [`AUDIO]
@@ -22,8 +23,8 @@ let test_mixer_initialize _ =
       ~channels:2 ~chunk:1024 in
     begin
       match opened with
-          Extlib.Prelude.Left s -> assert_failure s
-        | Extlib.Prelude.Right _ -> ()
+          Std.Either.Left s -> assert_failure s
+        | Std.Either.Right _ -> ()
     end;
 
     match query_spec () with
@@ -64,8 +65,8 @@ let test_mixer_load_wav _ =
 
     let m = load_wav "Once.wav" in
     match m with
-        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
-      | Extlib.Prelude.Right ch -> begin
+        Std.Either.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
+      | Std.Either.Right ch -> begin
         assert_bool "volume changeable" ((volume_chunk ~chunk:ch
                                             ~volume:10) > 0);
         free_chunk ch;
@@ -90,18 +91,18 @@ let test_mixer_channels _ =
 
     let ch = load_wav "battle001.wav" in
     match ch with
-        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
-      | Extlib.Prelude.Right ch -> begin
+        Std.Either.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
+      | Std.Either.Right ch -> begin
         let p =  play_channel ~channel:(`Channel 1) ~chunk:ch
           ~loops:(-1) () in
         match p with
-            Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "play_channel
+            Std.Either.Left s -> assert_failure (Printf.sprintf "play_channel
     failed : %s" s)
-          | Extlib.Prelude.Right _ -> ();
+          | Std.Either.Right _ -> ();
         assert_bool "playing now" (playing (`Channel 1));
         pause (`Channel 1);
         assert_bool "pause now" (paused (`Channel 1));
-        assert_bool "get chunk" (Extlib.Prelude.is_some
+        assert_bool "get chunk" (Option.is_some
                                    (get_chunk (`Channel 1)));
         resume (`Channel 1);
         halt_channel (`Channel 1);
@@ -158,13 +159,13 @@ let test_mixer_music _ =
       ((get_music_decoder 0) <> "");
 
     match load_mus "Once.ogg" with
-        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_mus failed :
+        Std.Either.Left s -> assert_failure (Printf.sprintf "load_mus failed :
         %s" s);
-      | Extlib.Prelude.Right m ->
+      | Std.Either.Right m ->
         begin
           match play_music ~music:m ~loops:(-1) with
-              Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_mus failed : %s" s);
-            | Extlib.Prelude.Right _ -> ();
+              Std.Either.Left s -> assert_failure (Printf.sprintf "load_mus failed : %s" s);
+            | Std.Either.Right _ -> ();
 
           assert_bool "music volume change"
             ((volume_music 120) = 128);
@@ -174,9 +175,9 @@ let test_mixer_music _ =
           resume_music ();
           rewind_music ();
           begin match set_music_position 10.0 with
-              Extlib.Prelude.Left s -> assert_failure
+              Std.Either.Left s -> assert_failure
                 (Printf.sprintf "set_music_position failed : %s" s);
-            | Extlib.Prelude.Right _ -> ();
+            | Std.Either.Right _ -> ();
           end;
           halt_music ();
         end;
@@ -199,18 +200,18 @@ let test_mixer_effects _ =
 
     let ch = load_wav "battle001.wav" in
     match ch with
-        Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
-      | Extlib.Prelude.Right ch -> begin
+      | Std.Either.Left s -> assert_failure (Printf.sprintf "load_wav failed : %s" s);
+      | Std.Either.Right ch -> begin
         let p =  play_channel ~channel:(`Channel 1) ~chunk:ch
           ~loops:(-1) () in
         begin match p with
-            Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "play_channel
+            Std.Either.Left s -> assert_failure (Printf.sprintf "play_channel
     failed : %s" s)
-          | Extlib.Prelude.Right _ -> ();
+          | Std.Either.Right _ -> ();
         end;
         begin match set_position ~channel:(`Channel 1) ~angle:100 ~dist:100 with
-          | Extlib.Prelude.Left s -> assert_failure (Printf.sprintf "set_position failed : %s" s)
-          | Extlib.Prelude.Right _ -> ()
+          | Std.Either.Left s -> assert_failure (Printf.sprintf "set_position failed : %s" s)
+          | Std.Either.Right _ -> ()
         end;
         halt_channel (`Channel 1);
         free_chunk ch;

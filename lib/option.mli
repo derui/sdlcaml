@@ -1,45 +1,58 @@
-(* Convert Option to string with translating function. *)
+(**
+   Add some functions for predefined {!option}.
+   this module provide below modules for 'a option.
+   - Monad
+   - TypedCollection
+
+   Use Make functor if you need type-specific option.
+   But, have remaks of specifiied module made by Make,
+   it can't use as Monad, so if need monadic Option, you use no
+   specified option, that is this module, which is solo access.
+*)
+
+(** Convert Option to string with translating function. *)
 val to_string : ('a -> string) -> 'a option -> string
 
-(* output string that converted option. *)
+(** output string that converted option. *)
 val print : Format.formatter -> ('a -> string) -> 'a option -> unit
 
-(* core functions for option with typed variable. If you use
-   specialized option, use Option.Make with functor. *)
-module type CoreS =
-sig
-  type 'a t = 'a option
-  val compare : 'a t -> 'a t -> int
-  val empty : 'a option
-  val identity : 'a option
-  (* alias of `some` *)
-  val singleton : 'a -> 'a t
-  val some : 'a -> 'a t
-  val add : 'a -> 'a t -> 'a t
-  val bind : 'a t -> ('a -> 'b t) -> 'b t
-  val fold : ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-  val safe_get : 'a -> 'a t -> 'a
-end
+(** return true if given option is None. *)
+val is_none : 'a option -> bool
 
-module Core : CoreS
+(** return true if given option is Some and some value. *)
+val is_some : 'a option -> bool
 
-module type S =
-sig
-  type elt
-  type t = elt option
-  val safe_get : elt -> t -> elt
-  include Monad.Type with type elt := elt
-                     and type t := t
-  include Collection.Type with type t := t and type elt := elt
-  include Compareable.Type with type t := t
-  include Monad.S with type elt := elt
-                     and type t := t
-  include Collection.S with type t := t and type elt := elt
-  include Compareable.S with type t := t
-end
+(** Compared to between two options with comparator for
+    between type variant of type.
 
-module Make(T:CompareStringable.Type) : S with type elt = T.t
-include CoreS
-include TypedCompareable.S with type 'a t := 'a option
-include TypedMonad.S with type 'a t := 'a option
+    Comparing resulted by this function are as follows:
+
+    | fst  | snd    | result
+    | -----+--------+--------
+    | None | None   |   0
+    | Some | None   |   1
+    | None | Some   |  -1
+    | Some | Some   | depend on comparator
+
+    comparator result are expected to equal {!Pervasive.compare}.
+    @param comparator compared to between any type value. default is {!Pervasive.compare}
+    @param first A option value
+    @param second A option value
+    @
+*)
+val compare_with : ?comparator:('a -> 'a -> int) -> 'a option -> 'a option -> int
+
+(**
+   Provide monadic operation with 'a option.
+
+   Monadic option behaved under {!Monad.Type} functions are following:
+
+   | return : Wraping given argument to Some.
+   | bind   : If given monad is None, chain of bindings finish on the
+   |          spot, and return None.
+   |          Otherwise it apply function and return result of
+   |          function wrapped Some
+*)
+include Monad_intf.S with type 'a t := 'a option
+include TypedCollection.Type with type 'a t := 'a option
 include TypedCollection.S with type 'a t := 'a option

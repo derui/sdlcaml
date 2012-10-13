@@ -1,63 +1,30 @@
-open Num
-(* identity function *)
+(**
+   The Prelude module.
+
+   Some useful and basically functions contained this module.
+   All functions doesn't belong any module, are used to some situation
+   as utility.
+*)
+
+(** identity function *)
 val id : 'a -> 'a
-(* constant function. always return first argument. *)
+(** constant function. always return first argument. *)
 val const : 'a -> 'b -> 'a
-(* flip argument align. *)
+(** flip argument align. *)
 val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
 
-(* control direction of to apply function to argument.
+(** control direction of to apply function to argument.
    |> looks like monad bind (>>=) is reversed to apply argument of
    normal direction.
 *)
 val (|>) : 'a -> ('a -> 'b ) -> 'b
 
-(* control direction of to apply function to argument.
+(** control direction of to apply function to argument.
    <| is alias of normal function application.
 *)
 val (<|) : ('a -> 'b) -> 'a -> 'b
 
-(* initialization list. this return list that applied each [0..n) to
-   f. it likes [f(0);f(1);..f(n-1)]
-*)
-val init : int -> (int -> 'a) -> 'a list
-
-(* return list within the compass of given min to given max. *)
-val range : num * num -> num list
-
-(* return true if given option is None. *)
-val is_none : 'a option -> bool
-
-(* return true if given option is Some and some value. *)
-val is_some : 'a option -> bool
-
-(* comparing floats that if one float has difference lesser than
+(** comparing floats that if one float has difference lesser than
   `epsilon`, result of comparing is `0` as true.
 *)
 val cmp_float : epsilon:float -> float -> float -> int
-
-type ('a, 'b) either =
-  Left of 'a
-| Right of 'b
-
-(**
-   If given {!either} is left, return applied {!f} to Left value.
-   Return None if given {!either} is Right.
-*)
-val either_left : ('a, 'b) either -> ('a -> 'c) -> 'c option
-
-(**
-   If given {!either} is Right, return applied {!f} to Right value.
-   Return None if given {!either} is Left.
-*)
-val either_right : ('a, 'b) either -> ('b -> 'c) -> 'c option
-
-(**
-   Return the given {!either} is {!Left} or not.
-*)
-val is_left : ('a, 'b) either -> bool
-
-(**
-   Return the given {!either} is {!Right} or not.
-*)
-val is_right : ('a, 'b) either -> bool

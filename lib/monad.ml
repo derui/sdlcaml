@@ -1,37 +1,51 @@
-module type Type =
-sig
-  type elt
-  type t
-  val identity : t
-  val singleton : elt -> t
-  val bind : t -> (elt -> t) -> t
-end
+open Monad_intf
 
-module type S =
-sig
-  type elt
-  type t
-  val (>>=) : t -> (elt -> t) -> t
-  val (<<=) : (elt -> t) -> t -> t
-  val fail :t
-  val return : elt -> t
-  val guard : (elt -> bool) -> elt -> t
-  val sequence : t -> (elt -> t) list -> t
-  val sequence_ : t -> (elt -> t) list -> unit
-end
-
-module Make (T:Type) : S with type elt := T.elt and type t := T.t =
+module Make (T:Type) : S with type 'a t := 'a T.t =
 struct
-  open T
-  let (>>=) = bind
-  let (<<=) f m = m >>= f
-  let fail = identity
-  let return = singleton
-  let guard f x = if f x then singleton x else identity
-  let rec sequence x = function
-    | [] -> x
-    | f::t -> sequence (x >>= f) t
-  let rec sequence_ x = function
-    | [] -> ()
-    | f::t -> sequence_ (x >>= f) t
+  include T
+
+  module Open_ = struct
+    let bind = T.bind
+    let (>>=) = T.bind
+    let return = T.return
+  end
+  include Open_
+  module Open = struct
+    type 'a t = 'a T.t
+    include Open_
+  end
+
+  let map f m = m >>= fun m -> return (f m)
+
+  let rec sequence = function
+    | [] -> return []
+    | x::xs ->
+      x >>= fun x ->
+      sequence xs >>= fun xs ->
+      return (x::xs)
+end
+
+module Make2 (T:Type2) : S2 with type ('a, 'z) t := ('a, 'z) T.t =
+struct
+
+  include T
+  module Open_ = struct
+    let bind = T.bind
+    let (>>=) = T.bind
+    let return = T.return
+  end
+  include Open_
+  module Open = struct
+    type ('a, 'z) t = ('a, 'z) T.t
+    include Open_
+  end
+
+  let map f m = m >>= fun m -> return (f m)
+
+  let rec sequence = function
+    | [] -> return []
+    | x::xs ->
+      x >>= fun x ->
+      sequence xs >>= fun xs ->
+      return (x::xs)
 end
