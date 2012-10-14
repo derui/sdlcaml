@@ -22,8 +22,6 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open MyOCaml
-open configure/Configure
 open build/C
 
 #
@@ -32,7 +30,7 @@ open build/C
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
-#    glMLite
+	str
 #    stdlib
 #
 if $(not $(OCAMLFIND_EXISTS))
@@ -56,9 +54,9 @@ BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 #
 # Various options
 #
-OCAMLFLAGS    += -Wa -annot
+OCAMLFLAGS    += -annot
 # OCAMLCFLAGS   +=
-# OCAMLOPTFLAGS +=
+OCAMLOPTFLAGS += -linkpkg
 # OCAML_LINK_FLAGS +=
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=
@@ -99,6 +97,16 @@ mixerflag$(EXE): outputflag.c mixerflag.ml
 	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
 	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
 
+sdl_gl_flags.h: glflag$(EXE) sdl_gl_flags.h.in
+	section
+		initflags = $(concat \\n, $(shella $<))
+		sed -e "s/#FLAGS/$(initflags)/" $(nth 1, $+) > $@
+		cp $@ ../src/$@
+
+glflag$(EXE): outputflag.c glflag.ml
+	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
+	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
+	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
 
 #
 # OCAML_LIBS += ../lib/mylib
@@ -107,7 +115,13 @@ mixerflag$(EXE): outputflag.c mixerflag.ml
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-.DEFAULT: sdl_initflags.h sdl_mixer_flags.h
+GENERATE = sdl_initflags.h
+GENERATE += sdl_mixer_flags.h
+GENERATE += sdl_gl_flags.h
+GENERATE += $(OCamlProgram gl_enum_generator, gl_enum_generator)
+GENERATE += $(OCamlProgram gl_api_generator, gl_api_generator)
+
+.DEFAULT: $(GENERATE)
 
 .PHONY: clean
 
@@ -118,5 +132,7 @@ clean:
 	rm -f *.cmi
 	rm -f *.cmx
 	rm -f *.h
+	rm -f glflag$(EXE)
 	rm -f initflag$(EXE)
 	rm -f mixerflag$(EXE)
+	rm -f gl_enum_generator$(EXE)

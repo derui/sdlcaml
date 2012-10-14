@@ -22,8 +22,6 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open common/Function
-open MyOCaml
 open build/C
 
 #
@@ -90,21 +88,49 @@ OCAMLFLAGS    += -annot
 %$(EXT_OBJ): %.c :scanner: scan-c-%.c
 	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE)" -verbose -o $@ -c $<
 
+GLENUM_GENERATED[] =
+	gl_enum.ml
+	gl_enum.mli
+	gl_enum_stubs.c
+	gl_enum.h
+
+SDLGL_GENERATED[] =
+	sdl_gl.ml
+	sdl_gl.mli
+	sdl_gl_stubs.c
+
+$(GLENUM_GENERATED): gl_enum.idl
+	$(CAMLIDL) -header $<
+	.PHONY: clean
+	clean:
+		rm -f $@
+	export
+
+$(SDLGL_GENERATED): sdl_gl.idl
+	$(CAMLIDL) -no-include $<
+	.PHONY: clean
+	clean:
+		rm -f $@
+	export
+
 CFILES = $(removesuffix $(ls *.c))
+CFILES += $(if $(not $(file-exists sdl_gl_stubs.c)), sdl_gl_stubs)
+CFILES += $(if $(not $(file-exists gl_enum_stubs.c)), gl_enum_stubs)
 FILES = $(removesuffix $(ls *.ml))
+FILES += sdl_gl gl_enum
 
 LIBRARY_NAME = sdlcaml
 #
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
 #
-OCAML_LIBS += ../lib/extlib -custom
+# OCAML_LIBS += ../lib/extlib -custom
 # OCAML_CLIBS +=
-# OCAML_OTHER_LIBS += nums Glut GL bigarray vertArray VBO
-OCAML_LIB_FLAGS += -cclib "$(addprefix $(absname $(CWD))/, $(STATICLIBS)) -lSDL_mixer"
-# OCAML_PACKAGE_NAME =
+# OCAML_OTHER_LIBS += camlidl
+# OCAML_LIB_FLAGS += -cclib -lsdlcaml
 #
+MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall -cclib -lcamlidl, true)
 
-MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), $(EMPTY), true)
-
-.DEFAULT: ../lib/extlib.cmxa sdlcaml.cmxa
+# As gl_enum.h is referenced by already existed .c file,
+# need to add generated files by camlidl to adependency for .DEFAULT.
+.DEFAULT: $(SDLGL_GENERATED) $(GLENUM_GENERATED) ../lib/extlib.cmxa sdlcaml.cmxa

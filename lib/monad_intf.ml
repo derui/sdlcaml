@@ -40,7 +40,7 @@ module type S = sig
   include Open
   module Open : Open with type 'a t = 'a t
 
-  (** alias {!bind} on {Type} *)
+  (** alias {!bind} on {!Type} *)
   val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
 
   (** given unmonadic function apply to monad.

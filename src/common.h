@@ -54,4 +54,7 @@ value Val_some(value);
 value Val_left(value);
 value Val_right(value);
 
+/* convert array as c layout to array of caml layout.  */
+value array_from_c(value* array, int size);
+
 #endif /* __COMMON_H__ */

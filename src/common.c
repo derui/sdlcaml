@@ -138,3 +138,15 @@ value Val_right(value v) {
   Store_field(right, 0, v);
   CAMLreturn(right);
 }
+
+
+value array_from_c(value* array, int size) {
+  CAMLparam0();
+  CAMLlocal1(ret);
+  ret = caml_alloc(size, 0);
+
+  for (int i = 0; i < size; ++i) {
+    Store_field(ret, i, array[i]);
+  }
+  CAMLreturn(ret);
+}

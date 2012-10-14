@@ -5,6 +5,8 @@
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/fail.h>
+#include <caml/callback.h>
+
 #include "sdl_initflags.h"
 #include "common.h"
 
@@ -37,7 +39,7 @@ CAMLprim value sdlcaml_init(value auto_clean, value flags) {
   int init_flag = ml_make_init_flag(flags);
 
   if (SDL_Init(init_flag) < 0) {
-    caml_raise_with_string(caml_named_value("SDL_init_exception"),
+    caml_raise_with_string(*caml_named_value("Sdl_init_exception"),
                            SDL_GetError());
   }
 

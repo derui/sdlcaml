@@ -1,0 +1,668 @@
+quote("#include <GL/gl.h>");
+
+quote("#include \"gl_enum.h\"");
+
+import "gl_enum.idl";
+// Miscellaneous
+void glClearIndex( float c );
+void glClearColor( float red, float green, float blue, float alpha );
+void glClear( unsigned int mask );
+void glIndexMask( unsigned int mask );
+void glColorMask( unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha );
+void glAlphaFunc( enum glenum func, float ref );
+void glBlendFunc( enum glenum sfactor, enum glenum dfactor );
+void glLogicOp( enum glenum opcode );
+void glCullFace( enum glenum mode );
+void glFrontFace( enum glenum mode );
+void glPointSize( float size );
+void glLineWidth( float width );
+void glLineStipple( int factor, unsigned short pattern );
+void glPolygonMode( enum glenum face, enum glenum mode );
+void glPolygonOffset( float factor, float units );
+void glPolygonStipple([in,bigarray] const unsigned char *mask );
+// argument of mask is 8-bit-per array, mapping string by camlidl limitation.
+void glGetPolygonStipple( [out,bigarray, size_is(128)] unsigned char *mask );
+// argument of mask is 8-bit-per array, mapping string by camlidl limitation.
+void glEdgeFlag( boolean flag );
+void glEdgeFlagv( [in] const boolean *flag );
+void glScissor( int x, int y, int width, int height);
+void glClipPlane( enum glenum plane, [in,bigarray]const double *equation );
+void glGetClipPlane( enum glenum plane, [out, size_is(4)]double *equation );
+void glDrawBuffer( enum glenum mode );
+void glReadBuffer( enum glenum mode );
+void glEnable( enum glenum cap );
+void glDisable( enum glenum cap );
+unsigned char glIsEnabled( enum glenum cap );
+void glEnableClientState( enum glenum cap );
+void glDisableClientState( enum glenum cap );
+void glGetBooleanv( enum glenum pname, [out]boolean params );
+void glGetDoublev( enum glenum pname, [out]double *params );
+void glGetFloatv( enum glenum pname, [out]float *params );
+void glGetIntegerv( enum glenum pname, [out]int *params );
+void glPushAttrib( unsigned int mask );
+void glPopAttrib( void );
+void glPushClientAttrib( unsigned int mask );
+void glPopClientAttrib( void );
+int glRenderMode( enum glenum mode );
+enum glenum glGetError( void );
+[string] unsigned char * glGetString( enum glenum name );
+void glFinish( void );
+void glFlush( void );
+void glHint( enum glenum target, enum glenum mode );
+
+// Depth Buffer
+void glClearDepth( double depth );
+void glDepthFunc( enum glenum func );
+void glDepthMask( unsigned char flag );
+void glDepthRange( double near_val, double far_val );
+
+// Accumulation Buffer
+void glClearAccum( float red, float green, float blue, float alpha );
+void glAccum( enum glenum op, float value );
+
+// Transformation
+void glMatrixMode( enum glenum mode );
+void glOrtho( double left, double right,
+              double bottom, double top,
+              double near_val, double far_val );
+void glFrustum( double left, double right,
+                double bottom, double top,
+                double near_val, double far_val );
+void glViewport( int x, int y, int width, int height );
+void glPushMatrix( void );
+void glPopMatrix( void );
+void glLoadIdentity( void );
+void glLoadMatrixd( [in,bigarray]const double *m );
+void glLoadMatrixf( [in,bigarray]const float *m );
+void glMultMatrixd( [in,bigarray]const double *m );
+void glMultMatrixf( [in,bigarray]const float *m );
+void glRotated( double angle, double x, double y, double z );
+void glRotatef( float angle, float x, float y, float z );
+void glScaled( double x, double y, double z );
+void glScalef( float x, float y, float z );
+void glTranslated( double x, double y, double z );
+void glTranslatef( float x, float y, float z );
+
+// Display Lists
+unsigned char glIsList( unsigned int list );
+void glDeleteLists( unsigned int list, int range );
+unsigned int glGenLists( int range );
+void glNewList( unsigned int list, enum glenum mode );
+void glEndList( void );
+void glCallList( unsigned int list );
+// void glCallLists( int n, enum glenum type, const void *lists );
+// Imiplementation's into gl.wrap.c
+void glListBase( unsigned int base );
+
+// Drawing Functions
+void glBegin( enum glenum mode );
+void glEnd( void );
+void glVertex2d( double x, double y );
+void glVertex2f( float x, float y );
+void glVertex2i( int x, int y );
+void glVertex2s( short x, short y );
+void glVertex3d( double x, double y, double z );
+void glVertex3f( float x, float y, float z );
+void glVertex3i( int x, int y, int z );
+void glVertex3s( short x, short y, short z );
+void glVertex4d( double x, double y, double z, double w );
+void glVertex4f( float x, float y, float z, float w );
+void glVertex4i( int x, int y, int z, int w );
+void glVertex4s( short x, short y, short z, short w );
+void glVertex2dv( [in,bigarray]const double *v );
+void glVertex2fv( [in,bigarray]const float *v );
+void glVertex2iv( [in,bigarray]const int *v );
+void glVertex2sv( [in,bigarray]const short *v );
+void glVertex3dv( [in,bigarray]const double *v );
+void glVertex3fv( [in,bigarray]const float *v );
+void glVertex3iv( [in,bigarray]const int *v );
+void glVertex3sv( [in,bigarray]const short *v );
+void glVertex4dv( [in,bigarray]const double *v );
+void glVertex4fv( [in,bigarray]const float *v );
+void glVertex4iv( [in,bigarray]const int *v );
+void glVertex4sv( [in,bigarray]const short *v );
+void glNormal3b( unsigned char nx, unsigned char ny, unsigned char nz );
+void glNormal3d( double nx, double ny, double nz );
+void glNormal3f( float nx, float ny, float nz );
+void glNormal3i( int nx, int ny, int nz );
+void glNormal3s( short nx, short ny, short nz );
+void glNormal3bv( [in,bigarray]const signed char *v );
+void glNormal3dv( [in,bigarray]const double *v );
+void glNormal3fv( [in,bigarray]const float *v );
+void glNormal3iv( [in,bigarray]const int *v );
+void glNormal3sv( [in,bigarray]const short *v );
+void glIndexd( double c );
+void glIndexf( float c );
+void glIndexi( int c );
+void glIndexs( short c );
+void glIndexub( unsigned char c );
+void glIndexdv( [in,bigarray]const double *c );
+void glIndexfv( [in,bigarray]const float *c );
+void glIndexiv( [in,bigarray]const int *c );
+void glIndexsv( [in,bigarray]const short *c );
+void glIndexubv( [in,bigarray]const unsigned char *c );
+void glColor3b( unsigned char red, unsigned char green, unsigned char blue );
+void glColor3d( double red, double green, double blue );
+void glColor3f( float red, float green, float blue );
+void glColor3i( int red, int green, int blue );
+void glColor3s( short red, short green, short blue );
+void glColor3ub( unsigned char red, unsigned char green, unsigned char blue );
+void glColor3ui( unsigned int red, unsigned int green, unsigned int blue );
+void glColor3us( unsigned short red, unsigned short green, unsigned short blue );
+void glColor4b( unsigned char red, unsigned char green,
+                unsigned char blue, unsigned char alpha );
+void glColor4d( double red, double green,
+                double blue, double alpha );
+void glColor4f( float red, float green,
+                float blue, float alpha );
+void glColor4i( int red, int green,
+                int blue, int alpha );
+void glColor4s( short red, short green,
+                short blue, short alpha );
+void glColor4ub( unsigned char red, unsigned char green,
+                 unsigned char blue, unsigned char alpha );
+void glColor4ui( unsigned int red, unsigned int green,
+                 unsigned int blue, unsigned int alpha );
+void glColor4us( unsigned short red, unsigned short green,
+                 unsigned short blue, unsigned short alpha );
+void glColor3bv( [in,bigarray]const signed char *v );
+void glColor3dv( [in,bigarray]const double *v );
+void glColor3fv( [in,bigarray]const float *v );
+void glColor3iv( [in,bigarray]const int *v );
+void glColor3sv( [in,bigarray]const short *v );
+void glColor3ubv( [in,bigarray]const unsigned char *v );
+void glColor3uiv( [in,bigarray]const unsigned int *v );
+void glColor3usv( [in,bigarray]const unsigned short *v );
+void glColor4bv( [in,bigarray]const signed char *v );
+void glColor4dv( [in,bigarray]const double *v );
+void glColor4fv( [in,bigarray]const float *v );
+void glColor4iv( [in,bigarray]const int *v );
+void glColor4sv( [in,bigarray]const short *v );
+void glColor4ubv( [in,bigarray]const unsigned char *v );
+void glColor4uiv( [in,bigarray]const unsigned int *v );
+void glColor4usv( [in,bigarray]const unsigned short *v );
+void glTexCoord1d( double s );
+void glTexCoord1f( float s );
+void glTexCoord1i( int s );
+void glTexCoord1s( short s );
+void glTexCoord2d( double s, double t );
+void glTexCoord2f( float s, float t );
+void glTexCoord2i( int s, int t );
+void glTexCoord2s( short s, short t );
+void glTexCoord3d( double s, double t, double r );
+void glTexCoord3f( float s, float t, float r );
+void glTexCoord3i( int s, int t, int r );
+void glTexCoord3s( short s, short t, short r );
+void glTexCoord4d( double s, double t, double r, double q );
+void glTexCoord4f( float s, float t, float r, float q );
+void glTexCoord4i( int s, int t, int r, int q );
+void glTexCoord4s( short s, short t, short r, short q );
+void glTexCoord1dv( [in,bigarray]const double *v );
+void glTexCoord1fv( [in,bigarray]const float *v );
+void glTexCoord1iv( [in,bigarray]const int *v );
+void glTexCoord1sv( [in,bigarray]const short *v );
+void glTexCoord2dv( [in,bigarray]const double *v );
+void glTexCoord2fv( [in,bigarray]const float *v );
+void glTexCoord2iv( [in,bigarray]const int *v );
+void glTexCoord2sv( [in,bigarray]const short *v );
+void glTexCoord3dv( [in,bigarray]const double *v );
+void glTexCoord3fv( [in,bigarray]const float *v );
+void glTexCoord3iv( [in,bigarray]const int *v );
+void glTexCoord3sv( [in,bigarray]const short *v );
+void glTexCoord4dv( [in,bigarray]const double *v );
+void glTexCoord4fv( [in,bigarray]const float *v );
+void glTexCoord4iv( [in,bigarray]const int *v );
+void glTexCoord4sv( [in,bigarray]const short *v );
+void glRasterPos2d( double x, double y );
+void glRasterPos2f( float x, float y );
+void glRasterPos2i( int x, int y );
+void glRasterPos2s( short x, short y );
+void glRasterPos3d( double x, double y, double z );
+void glRasterPos3f( float x, float y, float z );
+void glRasterPos3i( int x, int y, int z );
+void glRasterPos3s( short x, short y, short z );
+void glRasterPos4d( double x, double y, double z, double w );
+void glRasterPos4f( float x, float y, float z, float w );
+void glRasterPos4i( int x, int y, int z, int w );
+void glRasterPos4s( short x, short y, short z, short w );
+void glRasterPos2dv( [in,bigarray]const double *v );
+void glRasterPos2fv( [in,bigarray]const float *v );
+void glRasterPos2iv( [in,bigarray]const int *v );
+void glRasterPos2sv( [in,bigarray]const short *v );
+void glRasterPos3dv( [in,bigarray]const double *v );
+void glRasterPos3fv( [in,bigarray]const float *v );
+void glRasterPos3iv( [in,bigarray]const int *v );
+void glRasterPos3sv( [in,bigarray]const short *v );
+void glRasterPos4dv( [in,bigarray]const double *v );
+void glRasterPos4fv( [in,bigarray]const float *v );
+void glRasterPos4iv( [in,bigarray]const int *v );
+void glRasterPos4sv( [in,bigarray]const short *v );
+void glRectd( double x1, double y1, double x2, double y2 );
+void glRectf( float x1, float y1, float x2, float y2 );
+void glRecti( int x1, int y1, int x2, int y2 );
+void glRects( short x1, short y1, short x2, short y2 );
+void glRectdv( [in,bigarray]const double *v1, [in,bigarray]const double *v2 );
+void glRectfv( [in,bigarray]const float *v1,  [in,bigarray]const float *v2 );
+void glRectiv( [in,bigarray]const int *v1,    [in,bigarray]const int *v2 );
+void glRectsv( [in,bigarray]const short *v1,  [in,bigarray]const short *v2 );
+
+// Vertex Arrays (1.1)
+// void glVertexPointer( int size, enum glenum type,
+//                       int stride, const void *ptr );
+// void glNormalPointer( enum glenum type, int stride,
+//                       const void *ptr );
+// void glColorPointer( int size, enum glenum type,
+//                      int stride, const void *ptr );
+// void glIndexPointer( enum glenum type, int stride,
+//                      const void *ptr );
+// void glTexCoordPointer( int size, enum glenum type,
+//                         int stride, const void *ptr );
+// void glEdgeFlagPointer( int stride, const void *ptr );
+// void glGetPointerv( enum glenum pname, void **params );
+// Implementation's into gl.wrap.c
+void glArrayElement( int i );
+void glDrawArrays( enum glenum mode, int first, int count );
+// void glDrawElements( enum glenum mode, int count,
+//                      enum glenum type, const void *indices );
+// void glInterleavedArrays( enum glenum format, int stride,
+//                           const void *pointer );
+// Implementation's into gl.wrap.c
+
+// Lighting
+void glShadeModel( enum glenum mode );
+void glLightf( enum glenum light, enum glenum pname, float param );
+void glLighti( enum glenum light, enum glenum pname, int param );
+void glLightfv( enum glenum light, enum glenum pname,
+                [in,bigarray]const float *params );
+void glLightiv( enum glenum light, enum glenum pname,
+                [in,bigarray]const int *params );
+// void glGetLightfv( enum glenum light, enum glenum pname,
+//                    float *params );
+// void glGetLightiv( enum glenum light, enum glenum pname,
+//                    int *params );
+// Implementation's into gl.wrap.c
+void glLightModelf( enum glenum pname, float param );
+void glLightModeli( enum glenum pname, int param );
+void glLightModelfv( enum glenum pname, [in,bigarray]const float *params );
+void glLightModeliv( enum glenum pname, [in,bigarray]const int *params );
+void glMaterialf( enum glenum face, enum glenum pname, float param );
+void glMateriali( enum glenum face, enum glenum pname, int param );
+void glMaterialfv( enum glenum face, enum glenum pname, [in,bigarray]const float *params );
+void glMaterialiv( enum glenum face, enum glenum pname, [in,bigarray]const int *params );
+// void glGetMaterialfv( enum glenum face, enum glenum pname, float *params );
+// void glGetMaterialiv( enum glenum face, enum glenum pname, int *params );
+// Implementation's into gl.wrap.c
+void glColorMaterial( enum glenum face, enum glenum mode );
+
+// Raster functions
+void glPixelZoom( float xfactor, float yfactor );
+void glPixelStoref( enum glenum pname, float param );
+void glPixelStorei( enum glenum pname, int param );
+void glPixelTransferf( enum glenum pname, float param );
+void glPixelTransferi( enum glenum pname, int param );
+void glPixelMapfv( enum glenum map, int mapsize,
+                   [in]const float *values );
+void glPixelMapuiv( enum glenum map, int mapsize,
+                    [in]const unsigned int *values );
+void glPixelMapusv( enum glenum map, int mapsize,
+                    [in]const unsigned short *values );
+void glGetPixelMapfv( enum glenum map, [out]float *values );
+void glGetPixelMapuiv( enum glenum map, [out]unsigned int *values );
+void glGetPixelMapusv( enum glenum map, [out]unsigned short *values );
+void glBitmap( int width, int height,
+               float xorig, float yorig,
+               float xmove, float ymove,
+               [in,bigarray]const unsigned char *bitmap );
+// void glReadPixels( int x, int y,
+//                    int width, int height,
+//                    enum glenum format, enum glenum type,
+//                    void *pixels );
+// void glDrawPixels( int width, int height,
+//                    enum glenum format, enum glenum type,
+//                    const void *pixels );
+// Implementation's into gl.wrap.c
+void glCopyPixels( int x, int y,
+                   int width, int height,
+                   enum glenum type );
+
+// Stenciling
+void glStencilFunc( enum glenum func, int ref, unsigned int mask );
+void glStencilMask( unsigned int mask );
+void glStencilOp( enum glenum fail, enum glenum zfail, enum glenum zpass );
+void glClearStencil( int s );
+
+// Texture mapping
+void glTexGend( enum glenum coord, enum glenum pname, double param );
+void glTexGenf( enum glenum coord, enum glenum pname, float param );
+void glTexGeni( enum glenum coord, enum glenum pname, int param );
+void glTexGendv( enum glenum coord, enum glenum pname, [in,bigarray]const double *params );
+void glTexGenfv( enum glenum coord, enum glenum pname, [in,bigarray]const float *params );
+void glTexGeniv( enum glenum coord, enum glenum pname, [in,bigarray]const int *params );
+// void glGetTexGendv( enum glenum coord, enum glenum pname, double *params );
+// void glGetTexGenfv( enum glenum coord, enum glenum pname, float *params );
+// void glGetTexGeniv( enum glenum coord, enum glenum pname, int *params );
+// Implementation's into gl.wrap.c
+void glTexEnvf( enum glenum target, enum glenum pname, float param );
+void glTexEnvi( enum glenum target, enum glenum pname, int param );
+void glTexEnvfv( enum glenum target, enum glenum pname, [in,bigarray]const float *params );
+void glTexEnviv( enum glenum target, enum glenum pname, [in,bigarray]const int *params );
+// void glGetTexEnvfv( enum glenum target, enum glenum pname, float *params );
+// void glGetTexEnviv( enum glenum target, enum glenum pname, int *params );
+// Implementation's into gl.wrap.c
+void glTexParameterf( enum glenum target, enum glenum pname, float param );
+void glTexParameteri( enum glenum target, enum glenum pname, int param );
+void glTexParameterfv( enum glenum target, enum glenum pname,
+                       [in,bigarray]const float *params );
+void glTexParameteriv( enum glenum target, enum glenum pname,
+                       [in,bigarray]const int *params );
+void glGetTexParameterfv( enum glenum target,
+                          enum glenum pname, float *params);
+void glGetTexParameteriv( enum glenum target,
+                          enum glenum pname, int *params );
+// void glGetTexLevelParameterfv( enum glenum target, int level,
+//                                enum glenum pname, float *params );
+// void glGetTexLevelParameteriv( enum glenum target, int level,
+//                                enum glenum pname, int *params );
+// void glTexImage1D( enum glenum target, int level,
+//                    int internalFormat,
+//                    int width, int border,
+//                    enum glenum format, enum glenum type,
+//                    const void *pixels );
+// void glTexImage2D( enum glenum target, int level,
+//                    int internalFormat,
+//                    int width, int height,
+//                    int border, enum glenum format, enum glenum type,
+//                    const void *pixels );
+// void glGetTexImage( enum glenum target, int level,
+//                     enum glenum format, enum glenum type,
+//                     void *pixels );
+// Implementation's into gl.wrap.c
+
+// 1.1 functions
+void glGenTextures( int n, [out,bigarray,size_is(n)]unsigned int *textures );
+void glDeleteTextures( int n, [in,bigarray]const unsigned int *textures);
+void glBindTexture( enum glenum target, unsigned int texture );
+void glPrioritizeTextures( int n,
+                           [in,bigarray]const unsigned int *textures,
+                           [in,bigarray]const float *priorities );
+unsigned char glAreTexturesResident( int n,
+                                     [in,bigarray]const unsigned int *textures,
+                                     unsigned char *residences );
+unsigned char glIsTexture( unsigned int texture );
+// void glTexSubImage1D( enum glenum target, int level,
+//                       int xoffset,
+//                       int width, enum glenum format,
+//                       enum glenum type, const void *pixels );
+// void glTexSubImage2D( enum glenum target, int level,
+//                       int xoffset, int yoffset,
+//                       int width, int height,
+//                       enum glenum format, enum glenum type,
+//                       const void *pixels );
+// Implementation's into gl.wrap.c
+void glCopyTexImage1D( enum glenum target, int level,
+                       enum glenum internalformat,
+                       int x, int y,
+                       int width, int border );
+void glCopyTexImage2D( enum glenum target, int level,
+                       enum glenum internalformat,
+                       int x, int y,
+                       int width, int height,
+                       int border );
+void glCopyTexSubImage1D( enum glenum target, int level,
+                          int xoffset, int x, int y,
+                          int width );
+void glCopyTexSubImage2D( enum glenum target, int level,
+                          int xoffset, int yoffset,
+                          int x, int y,
+                          int width, int height );
+
+// Evaluators
+void glMap1d( enum glenum target, double u1, double u2,
+              int stride,
+              int order, [in,bigarray]const double *points );
+void glMap1f( enum glenum target, float u1, float u2,
+              int stride,
+              int order, [in,bigarray]const float *points );
+void glMap2d( enum glenum target,
+              double u1, double u2, int ustride, int uorder,
+              double v1, double v2, int vstride, int vorder,
+              [in,bigarray]const double *points );
+void glMap2f( enum glenum target,
+              float u1, float u2, int ustride, int uorder,
+              float v1, float v2, int vstride, int vorder,
+              [in,bigarray]const float *points );
+// void glGetMapdv( enum glenum target, enum glenum query, double *v );
+// void glGetMapfv( enum glenum target, enum glenum query, float *v );
+// void glGetMapiv( enum glenum target, enum glenum query, int *v );
+// Implementation's into gl.wrap.c
+void glEvalCoord1d( double u );
+void glEvalCoord1f( float u );
+void glEvalCoord1dv( [in,bigarray]const double *u );
+void glEvalCoord1fv( [in,bigarray]const float *u );
+void glEvalCoord2d( double u, double v );
+void glEvalCoord2f( float u, float v );
+void glEvalCoord2dv( [in,bigarray]const double *u );
+void glEvalCoord2fv( [in,bigarray]const float *u );
+void glMapGrid1d( int un, double u1, double u2 );
+void glMapGrid1f( int un, float u1, float u2 );
+void glMapGrid2d( int un, double u1, double u2,
+                  int vn, double v1, double v2 );
+void glMapGrid2f( int un, float u1, float u2,
+                  int vn, float v1, float v2 );
+void glEvalPoint1( int i );
+void glEvalPoint2( int i, int j );
+void glEvalMesh1( enum glenum mode, int i1, int i2 );
+void glEvalMesh2( enum glenum mode, int i1, int i2, int j1, int j2 );
+
+// Fog
+void glFogf( enum glenum pname, float param );
+void glFogi( enum glenum pname, int param );
+void glFogfv( enum glenum pname, [in,bigarray]const float *params );
+void glFogiv( enum glenum pname, [in,bigarray]const int *params );
+
+// Selection and Feedback
+void glFeedbackBuffer( int size, enum glenum type, [out,bigarray,size_is(size)]float *buffer );
+void glPassThrough( float token );
+void glSelectBuffer( int size, [out,bigarray,size_is(size)]unsigned int *buffer );
+void glInitNames( void );
+void glLoadName( unsigned int name );
+void glPushName( unsigned int name );
+void glPopName( void );
+
+// OpenGL 1.2
+// void glDrawRangeElements( enum glenum mode, unsigned int start,
+//                           unsigned int end, int count, enum glenum type, const void *indices );
+// void glTexImage3D( enum glenum target, int level,
+//                    int internalFormat,
+//                    int width, int height,
+//                    int depth, int border,
+//                    enum glenum format, enum glenum type,
+//                    const void *pixels );
+// void glTexSubImage3D( enum glenum target, int level,
+//                       int xoffset, int yoffset,
+//                       int zoffset, int width,
+//                       int height, int depth,
+//                       enum glenum format,
+//                       enum glenum type, const void *pixels);
+// Implementation's into gl.wrap.c
+void glCopyTexSubImage3D( enum glenum target, int level,
+                          int xoffset, int yoffset,
+                          int zoffset, int x,
+                          int y, int width,
+                          int height );
+
+// GL_ARB_imaging
+// void glColorTable( enum glenum target, enum glenum internalformat,
+//                    int width, enum glenum format,
+//                    enum glenum type, const void *table );
+// void glColorSubTable( enum glenum target,
+//                       int start, int count,
+//                       enum glenum format, enum glenum type,
+//                       const void *data );
+// Implementation's into gl.wrap.c
+void glColorTableParameteriv(enum glenum target, enum glenum pname,
+                             [in,bigarray]const int *params);
+void glColorTableParameterfv(enum glenum target, enum glenum pname,
+                             [in,bigarray]const float *params);
+void glCopyColorSubTable( enum glenum target, int start,
+                          int x, int y, int width );
+void glCopyColorTable( enum glenum target, enum glenum internalformat,
+                       int x, int y, int width );
+// void glGetColorTable( enum glenum target, enum glenum format,
+//                       enum glenum type, void *table );
+// void glGetColorTableParameterfv( enum glenum target, enum glenum pname,
+//                                  float *params );
+// void glGetColorTableParameteriv( enum glenum target, enum glenum pname,
+//                                  int *params );
+// Implementation's into gl.wrap.c
+void glBlendEquation( enum glenum mode );
+void glBlendColor( float red, float green,
+                   float blue, float alpha );
+void glHistogram( enum glenum target, int width,
+                  enum glenum internalformat, unsigned char sink );
+void glResetHistogram( enum glenum target );
+// void glGetHistogram( enum glenum target, unsigned char reset,
+//                      enum glenum format, enum glenum type,
+//                      void *values );
+// void glGetHistogramParameterfv( enum glenum target, enum glenum pname,
+//                                 float *params );
+// void glGetHistogramParameteriv( enum glenum target, enum glenum pname,
+//                                 int *params );
+// Implementation's into gl.wrap.c
+void glMinmax( enum glenum target, enum glenum internalformat,
+               unsigned char sink );
+void glResetMinmax( enum glenum target );
+// void glGetMinmax( enum glenum target, unsigned char reset,
+//                   enum glenum format, enum glenum types,
+//                   void *values );
+// void glGetMinmaxParameterfv( enum glenum target, enum glenum pname,
+//                              float *params );
+// void glGetMinmaxParameteriv( enum glenum target, enum glenum pname,
+//                              int *params );
+// void glConvolutionFilter1D( enum glenum target,
+//                             enum glenum internalformat, int width, enum glenum format, enum glenum type,
+//                             const void *image );
+// void glConvolutionFilter2D( enum glenum target,
+//                             enum glenum internalformat, int width, int height, enum glenum format,
+//                             enum glenum type, const void *image );
+// Implementation's into gl.wrap.c
+void glConvolutionParameterf( enum glenum target, enum glenum pname,
+                              float params );
+void glConvolutionParameterfv( enum glenum target, enum glenum pname,
+                               const float *params );
+void glConvolutionParameteri( enum glenum target, enum glenum pname,
+                              int params );
+void glConvolutionParameteriv( enum glenum target, enum glenum pname,
+                               const int *params );
+void glCopyConvolutionFilter1D( enum glenum target,
+                                enum glenum internalformat, int x, int y, int width );
+void glCopyConvolutionFilter2D( enum glenum target,
+                                enum glenum internalformat, int x, int y, int width,
+                                int height);
+// void glGetConvolutionFilter( enum glenum target, enum glenum format,
+//                              enum glenum type, void *image );
+// void glGetConvolutionParameterfv( enum glenum target, enum glenum pname,
+//                                   float *params );
+// void glGetConvolutionParameteriv( enum glenum target, enum glenum pname,
+//                                   int *params );
+// void glSeparableFilter2D( enum glenum target,
+//                           enum glenum internalformat, int width, int height, enum glenum format,
+//                           enum glenum type, const void *row, const void *column );
+// void glGetSeparableFilter( enum glenum target, enum glenum format,
+//                            enum glenum type, void *row, void *column, void *span );
+// Implementation's into gl.wrap.c
+
+// OpenGL 1.3
+void glActiveTexture( enum glenum texture );
+void glClientActiveTexture( enum glenum texture );
+// void glCompressedTexImage1D( enum glenum target, int level, enum glenum internalformat, int width, int border, int imageSize, const void *data );
+// void glCompressedTexImage2D( enum glenum target, int level, enum glenum internalformat, int width, int height, int border, int imageSize, const void *data );
+// void glCompressedTexImage3D( enum glenum target, int level, enum glenum internalformat, int width, int height, int depth, int border, int imageSize, const void *data );
+// void glCompressedTexSubImage1D( enum glenum target, int level, int xoffset, int width, enum glenum format, int imageSize, const void *data );
+// void glCompressedTexSubImage2D( enum glenum target, int level, int xoffset, int yoffset, int width, int height, enum glenum format, int imageSize, const void *data );
+// void glCompressedTexSubImage3D( enum glenum target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, enum glenum format, int imageSize, const void *data );
+// void glGetCompressedTexImage( enum glenum target, int lod, void *img );
+// Implementation's into gl.wrap.c
+void glMultiTexCoord1d( enum glenum target, double s );
+void glMultiTexCoord1dv( enum glenum target, [in,bigarray]const double *v );
+void glMultiTexCoord1f( enum glenum target, float s );
+void glMultiTexCoord1fv( enum glenum target, [in,bigarray]const float *v );
+void glMultiTexCoord1i( enum glenum target, int s );
+void glMultiTexCoord1iv( enum glenum target, [in,bigarray]const int *v );
+void glMultiTexCoord1s( enum glenum target, short s );
+void glMultiTexCoord1sv( enum glenum target, [in,bigarray]const short *v );
+void glMultiTexCoord2d( enum glenum target, double s, double t );
+void glMultiTexCoord2dv( enum glenum target, [in,bigarray]const double *v );
+void glMultiTexCoord2f( enum glenum target, float s, float t );
+void glMultiTexCoord2fv( enum glenum target, [in,bigarray]const float *v );
+void glMultiTexCoord2i( enum glenum target, int s, int t );
+void glMultiTexCoord2iv( enum glenum target, [in,bigarray]const int *v );
+void glMultiTexCoord2s( enum glenum target, short s, short t );
+void glMultiTexCoord2sv( enum glenum target, [in,bigarray]const short *v );
+void glMultiTexCoord3d( enum glenum target, double s, double t, double r );
+void glMultiTexCoord3dv( enum glenum target, [in,bigarray]const double *v );
+void glMultiTexCoord3f( enum glenum target, float s, float t, float r );
+void glMultiTexCoord3fv( enum glenum target, [in,bigarray]const float *v );
+void glMultiTexCoord3i( enum glenum target, int s, int t, int r );
+void glMultiTexCoord3iv( enum glenum target, [in,bigarray]const int *v );
+void glMultiTexCoord3s( enum glenum target, short s, short t, short r );
+void glMultiTexCoord3sv( enum glenum target, [in,bigarray]const short *v );
+void glMultiTexCoord4d( enum glenum target, double s, double t, double r, double q );
+void glMultiTexCoord4dv( enum glenum target, [in,bigarray]const double *v );
+void glMultiTexCoord4f( enum glenum target, float s, float t, float r, float q );
+void glMultiTexCoord4fv( enum glenum target, [in,bigarray]const float *v );
+void glMultiTexCoord4i( enum glenum target, int s, int t, int r, int q );
+void glMultiTexCoord4iv( enum glenum target, [in,bigarray]const int *v );
+void glMultiTexCoord4s( enum glenum target, short s, short t, short r, short q );
+void glMultiTexCoord4sv( enum glenum target, [in,bigarray]const short *v );
+void glLoadTransposeMatrixd( [in,bigarray]const double m[16] );
+void glLoadTransposeMatrixf( [in,bigarray]const float m[16] );
+void glMultTransposeMatrixd( [in,bigarray]const double m[16] );
+void glMultTransposeMatrixf( [in,bigarray]const float m[16] );
+void glSampleCoverage( float value, unsigned char invert );
+
+// GL_ARB_multitexture
+void glActiveTextureARB(enum glenum texture);
+void glClientActiveTextureARB(enum glenum texture);
+void glMultiTexCoord1dARB(enum glenum target, double s);
+void glMultiTexCoord1dvARB(enum glenum target, [in,bigarray]const double *v);
+void glMultiTexCoord1fARB(enum glenum target, float s);
+void glMultiTexCoord1fvARB(enum glenum target, [in,bigarray]const float *v);
+void glMultiTexCoord1iARB(enum glenum target, int s);
+void glMultiTexCoord1ivARB(enum glenum target, [in,bigarray]const int *v);
+void glMultiTexCoord1sARB(enum glenum target, short s);
+void glMultiTexCoord1svARB(enum glenum target, [in,bigarray]const short *v);
+void glMultiTexCoord2dARB(enum glenum target, double s, double t);
+void glMultiTexCoord2dvARB(enum glenum target, [in,bigarray]const double *v);
+void glMultiTexCoord2fARB(enum glenum target, float s, float t);
+void glMultiTexCoord2fvARB(enum glenum target, [in,bigarray]const float *v);
+void glMultiTexCoord2iARB(enum glenum target, int s, int t);
+void glMultiTexCoord2ivARB(enum glenum target, [in,bigarray]const int *v);
+void glMultiTexCoord2sARB(enum glenum target, short s, short t);
+void glMultiTexCoord2svARB(enum glenum target, [in,bigarray]const short *v);
+void glMultiTexCoord3dARB(enum glenum target, double s, double t, double r);
+void glMultiTexCoord3dvARB(enum glenum target, [in,bigarray]const double *v);
+void glMultiTexCoord3fARB(enum glenum target, float s, float t, float r);
+void glMultiTexCoord3fvARB(enum glenum target, [in,bigarray]const float *v);
+void glMultiTexCoord3iARB(enum glenum target, int s, int t, int r);
+void glMultiTexCoord3ivARB(enum glenum target, [in,bigarray]const int *v);
+void glMultiTexCoord3sARB(enum glenum target, short s, short t, short r);
+void glMultiTexCoord3svARB(enum glenum target, [in,bigarray]const short *v);
+void glMultiTexCoord4dARB(enum glenum target, double s, double t, double r, double q);
+void glMultiTexCoord4dvARB(enum glenum target, [in,bigarray]const double *v);
+void glMultiTexCoord4fARB(enum glenum target, float s, float t, float r, float q);
+void glMultiTexCoord4fvARB(enum glenum target, [in,bigarray]const float *v);
+void glMultiTexCoord4iARB(enum glenum target, int s, int t, int r, int q);
+void glMultiTexCoord4ivARB(enum glenum target, [in,bigarray]const int *v);
+void glMultiTexCoord4sARB(enum glenum target, short s, short t, short r, short q);
+void glMultiTexCoord4svARB(enum glenum target, [in,bigarray]const short *v);
+
+
+// GLhandleARB glCreateDebugObjectMESA (void);
+// void glClearDebugLogMESA (GLhandleARB obj, enum glenum logType, enum glenum shaderType);
+// void glGetDebugLogMESA (GLhandleARB obj, enum glenum logType, enum glenum shaderType, int maxLength,
+//                         int *length, GLcharARB *debugLog);
+// int glGetDebugLogLengthMESA (GLhandleARB obj, enum glenum logType, enum glenum shaderType);
+// void glProgramCallbackMESA(enum glenum target, GLprogramcallbackMESA callback, void *data);
+// void glGetProgramRegisterfvMESA(enum glenum target, int len, const unsigned char *name, float *v);
+// void glBlendEquationSeparateATI( enum glenum modeRGB, enum glenum modeA );

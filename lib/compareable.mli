@@ -1,18 +1,17 @@
-
 (** this module is used to functor when needs some modules to compare
     t.
 
     usage: when you want to add compareable ability into module,
     include with applying Make that is in this module.
 
-    include Compareable.Make({...})
+    include Compareable.Make(...)
 *)
 module type Type =
 sig
   type t
-  (** compare elements. if first @t@ is less than second, return -1.
-      if first @t@ equal second, return 0.
-      return 1 if first @t@ is greater than second.
+  (** compare elements. if first is less than second, return -1.
+      if first equal second, return 0.
+      return 1 if first is greater than second.
   *)
   val compare : t -> t -> int
 end

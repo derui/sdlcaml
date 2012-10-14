@@ -33,6 +33,25 @@ static value alloc_surface(SDL_Surface* surface) {
   return v;
 }
 
+int ml_convert_gl_attr_to_c(value attr) {
+  CAMLparam1(attr);
+
+  switch (Int_val(attr)) {
+    case  0: CAMLreturnT(int, SDL_GL_RED_SIZE);
+    case  1: CAMLreturnT(int, SDL_GL_GREEN_SIZE);
+    case  2: CAMLreturnT(int, SDL_GL_BLUE_SIZE);
+    case  3: CAMLreturnT(int, SDL_GL_ALPHA_SIZE);
+    case  4: CAMLreturnT(int, SDL_GL_DOUBLEBUFFER);
+    case  5: CAMLreturnT(int, SDL_GL_BUFFER_SIZE);
+    case  6: CAMLreturnT(int, SDL_GL_DEPTH_SIZE);
+    case  7: CAMLreturnT(int, SDL_GL_STENCIL_SIZE);
+    case  8: CAMLreturnT(int, SDL_GL_ACCUM_RED_SIZE);
+    case  9: CAMLreturnT(int, SDL_GL_ACCUM_GREEN_SIZE);
+    case 10: CAMLreturnT(int, SDL_GL_ACCUM_BLUE_SIZE);
+    case 11: CAMLreturnT(int, SDL_GL_ACCUM_ALPHA_SIZE);
+  }
+}
+
 static int ml_make_video_setting_flag(value flags) {
   CAMLparam1(flags);
   value list = flags;
@@ -248,5 +267,28 @@ CAMLprim value sdlcaml_clear(value fill, value dist) {
   }
 
   SDL_FillRect(Surface_val(dist), NULL, color);
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value sdlcaml_video_gl_set_attribute(value attr, value v) {
+  CAMLparam2(attr, v);
+
+  int ret = SDL_GL_SetAttribute(ml_convert_gl_attr_to_c(attr),
+                                Int_val(v));
+  CAMLreturn(ret ? Val_true : Val_false);
+}
+
+CAMLprim value sdlcaml_video_gl_get_attribute(value attr) {
+  CAMLparam1(attr);
+
+  int val;
+  SDL_GL_GetAttribute(ml_convert_gl_attr_to_c(attr),
+                      &val);
+  CAMLreturn(Val_int(val));
+}
+
+CAMLprim value sdlcaml_video_gl_swap_buffer(value unit) {
+  CAMLparam1(unit);
+  SDL_GL_SwapBuffers();
   CAMLreturn(Val_unit);
 }

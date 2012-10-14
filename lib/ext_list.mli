@@ -12,7 +12,8 @@ val range : Num.num * Num.num -> Num.num list
 (** range specified for int. detail behavior equals {!range} *)
 val range_int : int * int -> int list
 
-(** initialization list. this return list that applied each [0..n) to
-   f. it likes [f(0);f(1);..f(n-1)]
+(**
+   initialization list. this return list that applied each \[0..n) to
+   f. it likes \[f(0);f(1);..f(n-1)\]
 *)
 val init : int -> (int -> 'a) -> 'a list

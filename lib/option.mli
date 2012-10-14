@@ -1,6 +1,7 @@
 (**
    Add some functions for predefined {!option}.
    this module provide below modules for 'a option.
+
    - Monad
    - TypedCollection
 
@@ -38,7 +39,7 @@ val is_some : 'a option -> bool
     @param comparator compared to between any type value. default is {!Pervasive.compare}
     @param first A option value
     @param second A option value
-    @
+    @return -1 is lesser than, 1 is greater than, to equal 1
 *)
 val compare_with : ?comparator:('a -> 'a -> int) -> 'a option -> 'a option -> int
 
