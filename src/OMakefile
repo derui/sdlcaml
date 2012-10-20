@@ -114,6 +114,9 @@ $(SDLGL_GENERATED): sdl_gl.idl
 	export
 
 CFILES = $(removesuffix $(ls *.c))
+# They found no place first, so they need to add to dependencies.
+# But after they generated, multi-definition link error if they
+# still add to dependencies.
 CFILES += $(if $(not $(file-exists sdl_gl_stubs.c)), sdl_gl_stubs)
 CFILES += $(if $(not $(file-exists gl_enum_stubs.c)), gl_enum_stubs)
 FILES = $(removesuffix $(ls *.ml))
