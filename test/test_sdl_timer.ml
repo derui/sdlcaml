@@ -2,10 +2,10 @@ open Sdlcaml
 open OUnit
 
 let test_set_up _ =
-  Sdl.init [`TIMER]
+  Sdl_init.init [`TIMER]
 
 let test_tear_up _ =
-  Sdl.quit ()
+  Sdl_init.quit ()
 
 
 let test_get_tick_timer _ =
@@ -30,7 +30,7 @@ let test_delay _ =
 
 let suite = "timer tests" >:::
   [ "get tick time" >:: (bracket test_set_up test_get_tick_timer
-  test_tear_up);
+                           test_tear_up);
     "delay with SDL" >:: (bracket test_set_up test_delay test_tear_up)
   ]
 

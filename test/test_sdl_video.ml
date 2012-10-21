@@ -3,7 +3,7 @@ open OUnit
 
 let test_set_up flag _ =
   begin
-    Sdl.init [`VIDEO];
+    Sdl_init.init [`VIDEO];
     Sdl_video.set_video_mode ~width:640 ~height:480 ~depth:32
       ~flags:flag
   end
@@ -11,7 +11,7 @@ let test_set_up flag _ =
 let test_tear_down surface =
   begin
     Sdl_video.free_surface surface;
-    Sdl.quit ();
+    Sdl_init.quit ();
   end
 
 let test_sdl_video_init surface =

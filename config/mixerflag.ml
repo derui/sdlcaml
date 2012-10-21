@@ -8,7 +8,7 @@ let variants = [
   "OGG";
 ]
 
-external variant_hash : string -> int = "variant_hash"
+external variant_hash : string -> unit = "variant_hash"
 
 let _ =
   let print_hash variant_name =

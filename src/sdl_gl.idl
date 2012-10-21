@@ -45,7 +45,7 @@ void glPushClientAttrib( unsigned int mask );
 void glPopClientAttrib( void );
 int glRenderMode( enum glenum mode );
 enum glenum glGetError( void );
-[string] unsigned char * glGetString( enum glenum name );
+[string] const char * glGetString( enum glenum name );
 void glFinish( void );
 void glFlush( void );
 void glHint( enum glenum target, enum glenum mode );

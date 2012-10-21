@@ -88,7 +88,7 @@ CAMLprim value sdlcaml_init_subsystem(value flag) {
   int c_flag = ml_lookup_to_c(ml_init_flag_table, flag);
 
   if (SDL_InitSubSystem(c_flag)) {
-    caml_raise_with_string(caml_named_value("SDL_init_exception"),
+    caml_raise_with_string(*caml_named_value("SDL_init_exception"),
                            SDL_GetError());
   }
 

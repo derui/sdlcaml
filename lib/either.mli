@@ -12,7 +12,14 @@
 *)
 
 (** Have two way result. Often Left is failed to culculate and
-    error message, Right as `right' calculation with calculated result.
+    error message, Right as `right' calculation with calculated
+    result.
+
+    Note: Please look cautious type variant of {Either.t} before  use
+    it. Sorry the variant arrangements is not very understand that
+    the first type variant is for {b Right}, and second it is for {b
+    Left}. Reason of this design is to add monadic interface to
+    Either. (Added monadic interface here detail locate in {!monad} module.)
 *)
 type ('a, 'b) t =
 | Left of 'b

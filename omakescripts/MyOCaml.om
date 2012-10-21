@@ -505,7 +505,7 @@ public.MyOCamlPackage(name, files, cmodules, linkopts, is_install) =
 
    $(CMA) $(CMXA) $(name)$(EXT_LIB) $(CSTUBLIBRARIES): $(CSTUBS) $(CMO) $(CMX)
        if $(not $(equal $(cmodules), $(EMPTY)))
-           ocamlmklib -verbose -o $(name) $(CSTUBS) $(linkopts) $(CMO) $(CMX)
+           ocamlmklib -o $(name) $(CSTUBS) $(linkopts) $(CMO) $(CMX)
        else
            $(OCamlC) -a -o $(CMA) $(CMO)
            $(OCamlOpt) -a -o $(CMXA) $(CMX)

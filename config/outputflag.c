@@ -4,7 +4,7 @@
 
 CAMLprim value variant_hash(value variant) {
 
-  printf("(%d)", caml_hash_variant(String_val(variant)));
+  printf("(%d)", (int)caml_hash_variant(String_val(variant)));
   fflush(stdout);
   return Val_unit;
 }

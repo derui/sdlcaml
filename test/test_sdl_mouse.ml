@@ -2,10 +2,10 @@ open Sdlcaml
 open OUnit
 
 let test_set_up _ =
-  Sdl.init [`VIDEO]
+  Sdl_init.init [`VIDEO]
 
 let test_tear_down _ =
-  Sdl.quit ()
+  Sdl_init.quit ()
 
 let test_mouse_state _ =
   let open Sdl_mouse in

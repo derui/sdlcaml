@@ -86,7 +86,7 @@ OCAMLFLAGS    += -annot
 	export
 
 %$(EXT_OBJ): %.c :scanner: scan-c-%.c
-	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE)" -verbose -o $@ -c $<
+	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE)" -o $@ -c $<
 
 GLENUM_GENERATED[] =
 	gl_enum.ml

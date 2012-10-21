@@ -3,7 +3,7 @@ open OUnit
 
 let test_set_up _ =
   begin
-    Sdl.init [`VIDEO];
+    Sdl_init.init [`VIDEO];
     Sdl_video.set_video_mode ~width:640 ~height:480 ~depth:32
       ~flags:[Sdl_video.SDL_SWSURFACE]
   end
@@ -11,7 +11,7 @@ let test_set_up _ =
 let test_tear_down surface =
   begin
     Sdl_video.free_surface surface;
-    Sdl.quit ();
+    Sdl_init.quit ();
   end
 
 let test_change_window_caption _ =
@@ -50,8 +50,8 @@ let test_change_window_icon _ =
 let test_toggle_fullscreen _ =
   let open Sdl_window in
   begin
-    (* ignore (toggle_fullscreen ()); *)
-    (* ignore (toggle_fullscreen ()); *)
+  (* ignore (toggle_fullscreen ()); *)
+  (* ignore (toggle_fullscreen ()); *)
   end
 
 let test_grab_input _ =
