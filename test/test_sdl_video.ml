@@ -100,5 +100,5 @@ let suite = "SDL video tests" >:::
          test_use_flip test_tear_down);
   ]
 
-(* let _ = *)
-(*   run_test_tt_main suite *)
+let _ =
+  run_test_tt_main suite

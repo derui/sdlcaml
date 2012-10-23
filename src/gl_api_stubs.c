@@ -12,7 +12,7 @@
 #include "common.h"
 
 #include "gl_enum_convert.h"
-#include "sdl_gl_flags.h"
+#include "gl_flags.h"
 
 #define t_prim CAMLprim value
 

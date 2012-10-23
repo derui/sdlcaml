@@ -4,7 +4,7 @@ let loop_count = ref 0
 let prev_time = ref 0
 
 let _ =
-  Sdl.init [`VIDEO];
+  Sdl_init.init [`VIDEO];
   prev_time := Sdl_timer.get_ticks ();
 
   let surface = Sdl_video.set_video_mode ~width:800 ~height:600
@@ -41,4 +41,4 @@ let _ =
 
   Sdl_video.free_surface surface;
   Sdl_video.free_surface blit;
-  Sdl.quit ()
+  Sdl_init.quit ()

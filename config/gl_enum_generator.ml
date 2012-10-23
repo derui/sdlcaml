@@ -1,7 +1,7 @@
 
 (* regexps *)
 let reg_newline = ref (Str.regexp "\\(\n\\|\r\n\\|\r\\)$")
-let reg_glenum = ref (Str.regexp "^#define +GL_\\([a-zA-Z0-9]+\\)[ \t]+\\([a-zA-Z0-9]+\\).*$")
+let reg_glenum = ref (Str.regexp "^#define +GL_\\([a-zA-Z0-9_]+\\)[ \t]+\\([a-zA-Z0-9]+\\).*$")
 let reg_split = ref (Str.regexp "_")
 
 (* helper functions *)

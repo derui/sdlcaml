@@ -6,8 +6,8 @@ import "gl_enum.idl";
 // Miscellaneous
 void glClearIndex( float c );
 void glClearColor( float red, float green, float blue, float alpha );
-void glClear( unsigned int mask );
-void glIndexMask( unsigned int mask );
+void glClear(glenum_set mask );
+void glIndexMask(glenum_set mask );
 void glColorMask( unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha );
 void glAlphaFunc( enum glenum func, float ref );
 void glBlendFunc( enum glenum sfactor, enum glenum dfactor );

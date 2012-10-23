@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include <SDL_video.h>
 
 #include <caml/alloc.h>
 #include <caml/mlvalues.h>
@@ -58,7 +57,7 @@ static int ml_make_video_setting_flag(value flags) {
   int flag = 0;
 
   while (is_not_nil(list)) {
-    int converted_tag = ml_lookup_to_c(ml_video_flag_table, Int_val(head(list)));
+    int converted_tag = ml_lookup_to_c(ml_video_flag_table, head(list));
     flag |= converted_tag;
     list = tail(list);
   }
@@ -73,7 +72,7 @@ CAMLprim value sdlcaml_set_video_mode(value width, value height,
   int flag = ml_make_video_setting_flag(flag_list);
 
   raw_surface = SDL_SetVideoMode(Int_val(width), Int_val(height), Int_val(depth),
-                             flag);
+                                 flag);
   if (raw_surface == NULL) {
     caml_raise_with_string(*caml_named_value("SDL_video_exception"),
                            SDL_GetError());
@@ -275,13 +274,13 @@ CAMLprim value sdlcaml_video_gl_set_attribute(value attr, value v) {
 
   int ret = SDL_GL_SetAttribute(ml_convert_gl_attr_to_c(attr),
                                 Int_val(v));
-  CAMLreturn(ret ? Val_true : Val_false);
+  CAMLreturn(ret == 0 ? Val_true : Val_false);
 }
 
 CAMLprim value sdlcaml_video_gl_get_attribute(value attr) {
   CAMLparam1(attr);
 
-  int val;
+  int val = 0;
   SDL_GL_GetAttribute(ml_convert_gl_attr_to_c(attr),
                       &val);
   CAMLreturn(Val_int(val));

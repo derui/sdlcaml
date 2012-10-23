@@ -95,9 +95,9 @@ GLENUM_GENERATED[] =
 	gl_enum.h
 
 SDLGL_GENERATED[] =
-	sdl_gl.ml
-	sdl_gl.mli
-	sdl_gl_stubs.c
+	gl_auto.ml
+	gl_auto.mli
+	gl_auto_stubs.c
 
 $(GLENUM_GENERATED): gl_enum.idl
 	$(CAMLIDL) -header $<
@@ -106,7 +106,7 @@ $(GLENUM_GENERATED): gl_enum.idl
 		rm -f $@
 	export
 
-$(SDLGL_GENERATED): sdl_gl.idl
+$(SDLGL_GENERATED): gl_auto.idl
 	$(CAMLIDL) -no-include $<
 	.PHONY: clean
 	clean:
@@ -117,10 +117,10 @@ CFILES = $(removesuffix $(ls *.c))
 # They found no place first, so they need to add to dependencies.
 # But after they generated, multi-definition link error if they
 # still add to dependencies.
-CFILES += $(if $(not $(file-exists sdl_gl_stubs.c)), sdl_gl_stubs)
+CFILES += $(if $(not $(file-exists gl_auto_stubs.c)), gl_auto_stubs)
 CFILES += $(if $(not $(file-exists gl_enum_stubs.c)), gl_enum_stubs)
 FILES = $(removesuffix $(ls *.ml))
-FILES += sdl_gl gl_enum
+FILES += gl_auto gl_enum
 
 LIBRARY_NAME = sdlcaml
 #
