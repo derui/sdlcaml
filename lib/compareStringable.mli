@@ -4,7 +4,7 @@
 module type Type =
   sig
     (** add compareable ability between same module.t  *)
-    include Compareable.Type
+    include Comparable.Type
     (** add stringable ability that can convert module.t to string  *)
     include Stringable.Type with type t := t
   end
@@ -12,7 +12,7 @@ module type Type =
 (** Module implementation interface  *)
 module type S =
   sig
-    include Compareable.S
+    include Comparable.S
     include Stringable.S with type t := t
   end
 

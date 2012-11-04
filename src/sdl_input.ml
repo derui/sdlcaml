@@ -20,7 +20,7 @@
  * @param unit dummy argument
  * @return map for snapshot of the current keyboard state
  *)
-external get_key_state: unit -> Sdl_key.state_map
+external get_key_state: unit -> bool Sdl_key.StateMap.t
   = "sdlcaml_get_key_state"
 
 (**

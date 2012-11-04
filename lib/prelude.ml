@@ -14,4 +14,3 @@ let cmp_float ~epsilon f1 f2 =
   if sub_abs <= epsilon then 0
   else if sub < 0.0 then -1
   else 1
-

@@ -17,3 +17,12 @@ val range_int : int * int -> int list
    f. it likes \[f(0);f(1);..f(n-1)\]
 *)
 val init : int -> (int -> 'a) -> 'a list
+
+(** return list within the compass of given min to given max.
+    This function is alias to {!range_int}
+*)
+val (--) : int -> int -> int list
+
+(** This function is alias to {!range}
+*)
+val (--/) : Num.num -> Num.num -> Num.num list

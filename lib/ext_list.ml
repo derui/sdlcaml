@@ -13,3 +13,6 @@ let range_int (s, l) =
 let init n f =
   let f = fun l n -> l @ [(f n)] in
   List.fold_left f [] (range_int (0, n - 1))
+
+let (--) mi ma = range_int (mi, ma)
+let (--/) mi ma = range (mi, ma)

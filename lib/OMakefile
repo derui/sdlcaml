@@ -73,4 +73,6 @@ OCamlInstallParentPackage(sdlcaml, $(OCamlPackageGeneratedFiles $(LIB), $(EMPTY)
 
 .PHONY: lib
 
+.DEFAULT: $(LIB).cmxa
+
 lib: $(LIB).cmxa

@@ -1,3 +1,14 @@
+(**
+   this module contains key synonyms binding SDLK_* and Modify key
+   binding MODK_*.
+   In addition them, provide it that state map associate key with state what key is
+   pressed or released.
+
+*)
+
+(**
+ * Mapping {b SDLkey}. These often uses with {!Sdl_KeyStateMap.state_map}
+ *)
 type key_synonym =
 | SDLK_BACKSPACE                        (** backspace *)
 | SDLK_TAB                              (** tab *)
@@ -134,6 +145,16 @@ type key_synonym =
 | SDLK_EURO                             (** euro *)
 | SDLK_NONE                             (** only use in OCaml *)
 
+(**
+   convert keysym into string. string converted is simply
+   without change constructor name.
+*)
+val keysym_printer: key_synonym -> string
+
+(**
+ * Mapping modify keys in {b SDL_keysym}.
+ * These often uses with {!Sdl_event.get_mod_state}
+ *)
 type modify_key =
 | KMOD_NONE                             (** No modifiers applicable *)
 | KMOD_NUM                              (** Numlock is down *)
@@ -148,165 +169,28 @@ type modify_key =
 | KMOD_SHIFT                            (** A Shift key is down *)
 | KMOD_ALT                              (** An Alt key is down *)
 
-let keysym_printer = function
-  | SDLK_BACKSPACE    -> "SDLK_BACKSPACE"
-  | SDLK_TAB          -> "SDLK_TAB"
-  | SDLK_CLEAR        -> "SDLK_CLEAR"
-  | SDLK_RETURN       -> "SDLK_RETURN"
-  | SDLK_PAUSE        -> "SDLK_PAUSE"
-  | SDLK_ESCAPE       -> "SDLK_ESCAPE"
-  | SDLK_SPACE        -> "SDLK_SPACE"
-  | SDLK_EXCLAIM      -> "SDLK_EXCLAIM"
-  | SDLK_QUOTEDBL     -> "SDLK_QUOTEDBL"
-  | SDLK_HASH         -> "SDLK_HASH"
-  | SDLK_DOLLAR       -> "SDLK_DOLLAR"
-  | SDLK_AMPERSAND    -> "SDLK_AMPERSAND"
-  | SDLK_QUOTE        -> "SDLK_QUOTE"
-  | SDLK_LEFTPAREN    -> "SDLK_LEFTPAREN"
-  | SDLK_RIGHTPAREN   -> "SDLK_RIGHTPAREN"
-  | SDLK_ASTERISK     -> "SDLK_ASTERISK"
-  | SDLK_PLUS         -> "SDLK_PLUS"
-  | SDLK_COMMA        -> "SDLK_COMMA"
-  | SDLK_MINUS        -> "SDLK_MINUS"
-  | SDLK_PERIOD       -> "SDLK_PERIOD"
-  | SDLK_SLASH        -> "SDLK_SLASH"
-  | SDLK_0            -> "SDLK_0"
-  | SDLK_1            -> "SDLK_1"
-  | SDLK_2            -> "SDLK_2"
-  | SDLK_3            -> "SDLK_3"
-  | SDLK_4            -> "SDLK_4"
-  | SDLK_5            -> "SDLK_5"
-  | SDLK_6            -> "SDLK_6"
-  | SDLK_7            -> "SDLK_7"
-  | SDLK_8            -> "SDLK_8"
-  | SDLK_9            -> "SDLK_9"
-  | SDLK_COLON        -> "SDLK_COLON"
-  | SDLK_SEMICOLON    -> "SDLK_SEMICOLON"
-  | SDLK_LESS         -> "SDLK_LESS"
-  | SDLK_EQUALS       -> "SDLK_EQUALS"
-  | SDLK_GREATER      -> "SDLK_GREATER"
-  | SDLK_QUESTION     -> "SDLK_QUESTION"
-  | SDLK_AT           -> "SDLK_AT"
-  | SDLK_LEFTBRACKET  -> "SDLK_LEFTBRACKET"
-  | SDLK_BACKSLASH    -> "SDLK_BACKSLASH"
-  | SDLK_RIGHTBRACKET -> "SDLK_RIGHTBRACKET"
-  | SDLK_CARET        -> "SDLK_CARET"
-  | SDLK_UNDERSCORE   -> "SDLK_UNDERSCORE"
-  | SDLK_BACKQUOTE    -> "SDLK_BACKQUOTE"
-  | SDLK_A            -> "SDLK_A"
-  | SDLK_B            -> "SDLK_B"
-  | SDLK_C            -> "SDLK_C"
-  | SDLK_D            -> "SDLK_D"
-  | SDLK_E            -> "SDLK_E"
-  | SDLK_F            -> "SDLK_F"
-  | SDLK_G            -> "SDLK_G"
-  | SDLK_H            -> "SDLK_H"
-  | SDLK_I            -> "SDLK_I"
-  | SDLK_J            -> "SDLK_J"
-  | SDLK_K            -> "SDLK_K"
-  | SDLK_L            -> "SDLK_L"
-  | SDLK_M            -> "SDLK_M"
-  | SDLK_N            -> "SDLK_N"
-  | SDLK_O            -> "SDLK_O"
-  | SDLK_P            -> "SDLK_P"
-  | SDLK_Q            -> "SDLK_Q"
-  | SDLK_R            -> "SDLK_R"
-  | SDLK_S            -> "SDLK_S"
-  | SDLK_T            -> "SDLK_T"
-  | SDLK_U            -> "SDLK_U"
-  | SDLK_V            -> "SDLK_V"
-  | SDLK_W            -> "SDLK_W"
-  | SDLK_X            -> "SDLK_X"
-  | SDLK_Y            -> "SDLK_Y"
-  | SDLK_Z            -> "SDLK_Z"
-  | SDLK_DELETE       -> "SDLK_DELETE"
-  | SDLK_KP0          -> "SDLK_KP0"
-  | SDLK_KP1          -> "SDLK_KP1"
-  | SDLK_KP2          -> "SDLK_KP2"
-  | SDLK_KP3          -> "SDLK_KP3"
-  | SDLK_KP4          -> "SDLK_KP4"
-  | SDLK_KP5          -> "SDLK_KP5"
-  | SDLK_KP6          -> "SDLK_KP6"
-  | SDLK_KP7          -> "SDLK_KP7"
-  | SDLK_KP8          -> "SDLK_KP8"
-  | SDLK_KP9          -> "SDLK_KP9"
-  | SDLK_KP_PERIOD    -> "SDLK_KP_PERIOD"
-  | SDLK_KP_DIVIDE    -> "SDLK_KP_DIVIDE"
-  | SDLK_KP_MULTIPLY  -> "SDLK_KP_MULTIPLY"
-  | SDLK_KP_MINUS     -> "SDLK_KP_MINUS"
-  | SDLK_KP_PLUS      -> "SDLK_KP_PLUS"
-  | SDLK_KP_ENTER     -> "SDLK_KP_ENTER"
-  | SDLK_KP_EQUALS    -> "SDLK_KP_EQUALS"
-  | SDLK_UP           -> "SDLK_UP"
-  | SDLK_DOWN         -> "SDLK_DOWN"
-  | SDLK_RIGHT        -> "SDLK_RIGHT"
-  | SDLK_LEFT         -> "SDLK_LEFT"
-  | SDLK_INSERT       -> "SDLK_INSERT"
-  | SDLK_HOME         -> "SDLK_HOME"
-  | SDLK_END          -> "SDLK_END"
-  | SDLK_PAGEUP       -> "SDLK_PAGEUP"
-  | SDLK_PAGEDOWN     -> "SDLK_PAGEDOWN"
-  | SDLK_F1           -> "SDLK_F1"
-  | SDLK_F2           -> "SDLK_F2"
-  | SDLK_F3           -> "SDLK_F3"
-  | SDLK_F4           -> "SDLK_F4"
-  | SDLK_F5           -> "SDLK_F5"
-  | SDLK_F6           -> "SDLK_F6"
-  | SDLK_F7           -> "SDLK_F7"
-  | SDLK_F8           -> "SDLK_F8"
-  | SDLK_F9           -> "SDLK_F9"
-  | SDLK_F10          -> "SDLK_F10"
-  | SDLK_F11          -> "SDLK_F11"
-  | SDLK_F12          -> "SDLK_F12"
-  | SDLK_F13          -> "SDLK_F13"
-  | SDLK_F14          -> "SDLK_F14"
-  | SDLK_F15          -> "SDLK_F15"
-  | SDLK_NUMLOCK      -> "SDLK_NUMLOCK"
-  | SDLK_CAPSLOCK     -> "SDLK_CAPSLOCK"
-  | SDLK_SCROLLOCK    -> "SDLK_SCROLLOCK"
-  | SDLK_RSHIFT       -> "SDLK_RSHIFT"
-  | SDLK_LSHIFT       -> "SDLK_LSHIFT"
-  | SDLK_RCTRL        -> "SDLK_RCTRL"
-  | SDLK_LCTRL        -> "SDLK_LCTRL"
-  | SDLK_RALT         -> "SDLK_RALT"
-  | SDLK_LALT         -> "SDLK_LALT"
-  | SDLK_RMETA        -> "SDLK_RMETA"
-  | SDLK_LMETA        -> "SDLK_LMETA"
-  | SDLK_LSUPER       -> "SDLK_LSUPER"
-  | SDLK_RSUPER       -> "SDLK_RSUPER"
-  | SDLK_MODE         -> "SDLK_MODE"
-  | SDLK_HELP         -> "SDLK_HELP"
-  | SDLK_PRINT        -> "SDLK_PRINT"
-  | SDLK_SYSREQ       -> "SDLK_SYSREQ"
-  | SDLK_BREAK        -> "SDLK_BREAK"
-  | SDLK_MENU         -> "SDLK_MENU"
-  | SDLK_POWER        -> "SDLK_POWER"
-  | SDLK_EURO         -> "SDLK_EURO"
-  | SDLK_NONE         -> "SDLK_NONE"
-
+(**
+   Mapping {b SDL_keysym}. however, {!keysym.mod_key} is the list of
+   current modify key state. If some {!mod_key} variants are
+   contained, it means that they are pressed now.
+*)
 type key_info = {
   synonym: key_synonym;
   modify_state: modify_key list;
 }
 
-let empty = {synonym = SDLK_NONE; modify_state = []}
+(** default {!key_info} *)
+val empty: key_info
 
-module Compare =
-  struct
-    type t = key_synonym
-    let compare x y =
-      if x < y then -1
-      else if x = y then 0
-      else 1
-  end
+module Compare : Extlib.Std.Comparable.Type with type t := key_synonym
 
-module Comparable = Extlib.Std.Comparable.Make(Compare)
+module Comparable : Extlib.Std.Comparable.S with type t := key_synonym
 
-module StateMap = Map.Make (Compare)
+(** Map for key and key state. *)
+module StateMap : Map.S with type key := key_synonym
 
-let to_state_map statelist =
-  let make_map (key, state) map = StateMap.add key state map in
-  List.fold_right make_map statelist StateMap.empty
-
-let _ =
-  Callback.register "sdlcaml_ml_convert_state_map" to_state_map
+(**
+   This function is provided to be used from C.
+   To reveive list is converted into {!state_map}.
+*)
+val to_state_map: (key_synonym * bool) list -> bool StateMap.t

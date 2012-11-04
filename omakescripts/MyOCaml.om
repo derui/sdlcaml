@@ -26,6 +26,12 @@ public.USE_OCAMLFIND = false
     NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
     BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 
+    # Debug build enable if defined DEBUG variable when --configure or first time of omake execution.
+    DEBUG_ENABLE = false
+    if $(and $(defined DEBUG), $(equal $(DEBUG), 1))
+        DEBUG_ENABLE = true
+    	export
+
 public.CAMLIDL = $`(if $(CAMLIDL_EXISTS), camlidl)
 public.OCAMLFIND = $`(if $(USE_OCAMLFIND), ocamlfind)
 public.OCAMLFINDFLAGS =
@@ -64,7 +70,7 @@ public.PREFIXED_OCAMLPACKS =\
 declare OCAMLDEPFLAGS
 public.OCAMLPPFLAGS  =
 public.OCAMLFLAGS    = -warn-error A
-public.OCAMLCFLAGS   = -g
+public.OCAMLCFLAGS   = $`(if $(DEBUG_ENABLE), -g)
 public.OCAMLOPTFLAGS =
 public.OCAMLCPPFLAGS =
 public.OCAML_LINK_FLAGS = $`(if $(and $(USE_OCAMLFIND) $(gt $(length $(OCAMLPACKS)), 0)), -linkpkg, $(EMPTY))

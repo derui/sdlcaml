@@ -4,7 +4,9 @@ module Mouse = Sdl_mouse
 module Mixer = Sdl_mixer
 module Input = Sdl_input
 module Key = Sdl_key
+
 module Timer = Sdl_timer
 module Init = Sdl_init
 module Window = Sdl_window
 module Cdrom = Sdl_cdrom
+module Joystick = Sdl_joystick
