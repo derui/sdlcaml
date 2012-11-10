@@ -5,6 +5,6 @@
 
 #FLAGS
 
-extern lookup_info ml_mixer_flag_table[];
+extern struct lookup_info ml_mixer_flag_table[];
 
 #endif /*__SDL_MIXER_FLAGS_H__*/

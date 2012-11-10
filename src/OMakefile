@@ -126,6 +126,8 @@ LIBRARY_NAME = sdlcaml
 #
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
+CONFIG_GENERATED = gl_flags.h sdl_initflags.h sdl_mixer_flags.h
+
 #
 # OCAML_LIBS += ../lib/extlib -custom
 # OCAML_CLIBS +=
@@ -136,4 +138,4 @@ MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall -cclib -lcamlidl, t
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
-.DEFAULT: $(SDLGL_GENERATED) $(GLENUM_GENERATED) ../lib/extlib.cmxa sdlcaml.cmxa
+.DEFAULT: $(SDLGL_GENERATED) $(GLENUM_GENERATED) ../lib/extlib.cmxa sdlcaml.cmxa $(RequireFiles $(CONFIG_GENERATED))

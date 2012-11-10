@@ -75,38 +75,34 @@ OCAMLOPTFLAGS += -linkpkg
 
 INCLUDES += /usr/include/caml
 
-sdl_initflags.h: initflag$(EXE) sdl_initflags.h.in
-	section
-		initflags = $(concat \\n, $(shella $<))
-		sed -e "s/#FLAGS/$(initflags)/" $(nth 1, $+) > $@
-		cp $@ ../src/$@
+GenerateFlags(output) =
+	FLAG_GENERATE_PROG_NAME = $(removesuffix $(output))
+	FLAG_GENERATE_PROG = $(addsuffix $(EXE), $(removesuffix $(output)))
 
-initflag$(EXE): outputflag.c initflag.ml
-	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
-	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
-	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
+	$(output): $(FLAG_GENERATE_PROG) $(output).in
+		section
+			initflags = $(shella $<)
+			stdout = $(fopen $(output), w)
+			fsubst($(string $(nth 1, $+)))
+			case $"^#FLAGS"
+				foreach(x, $(initflags))
+					println($x)
+				value
+			cp $@ ../src/$@
 
-sdl_mixer_flags.h: mixerflag$(EXE) sdl_mixer_flags.h.in
-	section
-		initflags = $(concat \\n, $(shella $<))
-		sed -e "s/#FLAGS/$(initflags)/" $(nth 1, $+) > $@
-		cp $@ ../src/$@
+	../src/$(output): $(output)
+		section
+			cp ../config/$(output) $@
 
-mixerflag$(EXE): outputflag.c mixerflag.ml
-	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
-	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
-	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
+	$(FLAG_GENERATE_PROG): outputflag.c $(FLAG_GENERATE_PROG_NAME).ml
+		section
+			TARGET = $@
+			$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
+			$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
+			$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $(TARGET))$(EXT_LIB))"
+	export
 
-gl_flags.h: glflag$(EXE) gl_flags.h.in
-	section
-		initflags = $(concat \\n, $(shella $<))
-		sed -e "s/#FLAGS/$(initflags)/" $(nth 1, $+) > $@
-		cp $@ ../src/$@
-
-glflag$(EXE): outputflag.c glflag.ml
-	$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
-	$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
-	$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $@)$(EXT_LIB))"
+	return $(array $(FLAG_GENERATE_PROG), $(output), ../src/$(output))
 
 #
 # OCAML_LIBS += ../lib/mylib
@@ -115,13 +111,13 @@ glflag$(EXE): outputflag.c glflag.ml
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-GENERATE = sdl_initflags.h
-GENERATE += sdl_mixer_flags.h
-GENERATE += gl_flags.h
-GENERATE += $(OCamlProgram gl_enum_generator, gl_enum_generator)
-GENERATE += $(OCamlProgram gl_api_generator, gl_api_generator)
+GENERATE = $(GenerateFlags sdl_initflags.h)
+GENERATE += $(GenerateFlags sdl_mixer_flags.h)
+GENERATE += $(GenerateFlags gl_flags.h)
 
 .DEFAULT: $(GENERATE)
+
+generator: $(OCamlProgram gl_enum_generator, gl_enum_generator) $(OCamlProgram gl_api_generator, gl_api_generator)
 
 .PHONY: clean
 
@@ -132,7 +128,5 @@ clean:
 	rm -f *.cmi
 	rm -f *.cmx
 	rm -f *.h
-	rm -f glflag$(EXE)
-	rm -f initflag$(EXE)
-	rm -f mixerflag$(EXE)
+	rm -f $(GENERATE)
 	rm -f gl_enum_generator$(EXE)

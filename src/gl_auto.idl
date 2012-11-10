@@ -1,4 +1,5 @@
-quote("#include <GL/gl.h>");
+
+quote("#include \"gl.afx.h\"");
 
 quote("#include \"gl_enum.h\"");
 

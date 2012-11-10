@@ -12,6 +12,7 @@
 #define MLTAG_NOPARACHUTE (1032187521)
 #define MLTAG_EVERYTHING (566131943)
 
+
 extern lookup_info ml_init_flag_table[];
 
 #endif /*__SDL_INITFLAGS_H__*/
