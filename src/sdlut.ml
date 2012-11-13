@@ -330,3 +330,5 @@ let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
   try
     mainloop false
    with Game_loop_exit -> ()
+
+let force_exit_game_loop () = raise Game_loop_exit

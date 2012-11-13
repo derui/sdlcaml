@@ -88,6 +88,10 @@ FILES = $(removesuffix $(ls *.ml))
 
 PROGRAMS =
 	foreach(x, $(FILES))
+		.PHONY: run-$(removeprefix test_sdl_, $x)
+		run-$(removeprefix test_sdl_, $x):
+			./$x
+		export
 		value $(OCamlProgram $x, $x)
 
 #
@@ -97,13 +101,12 @@ PROGRAMS =
 # OCAML_LIB_FLAGS += -cclib -lsdl
 # OCAML_LIB_FLAGS += -verbose
 #
-.PHONY: clean all test-clean
 
 # need sdlcaml library
 
 test: $(PROGRAMS)
 
-run:
+run-all:
 	foreach(x, $(FILES))
 		./$x
 

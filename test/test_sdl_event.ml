@@ -76,12 +76,13 @@ let test_poll_event _ =
     let active = Active {
       gain = true; active_state = [APPACTIVE]
     } in
+    Sdl_timer.delay 1;
     Sdl_event.push_event active;
     assert_event (Sdl_event.poll_event ()) (fun e ->
       match e with
       | Active e ->
           begin
-            assert_equal true e.gain;
+            assert_bool "window do not gained" e.gain;
             assert_equal [APPACTIVE] e.active_state;
           end
       | _ -> assert_failure "unrecognized data for ActiveEvent"

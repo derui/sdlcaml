@@ -25,9 +25,6 @@ let test_sdl_get_pixel_format surface =
     let open Sdl_video in
     assert_equal 32 format.bits_per_pixel;
     assert_equal 4 format.bytes_per_pixel;
-    assert_equal 0xFF0000 format.rmask;
-    assert_equal 0xFF00 format.gmask;
-    assert_equal 0xFF format.bmask;
   end
 
 let test_sdl_fill_color surface =

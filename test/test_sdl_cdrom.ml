@@ -18,12 +18,15 @@ let test_cdrom_basic_operations _ =
       | None -> assert_failure "can't open CDROM Drive"
       | Some cd ->
         begin
+          let info = get_info cd in
           ignore (status cd);
-          assert_bool "play cd failed" (play ~cd ~start:0
-                                          ~length:0);
-          assert_bool "play cd track failed"
-            (play_tracks ~cd ~track:1 ~frame:0 ~ntracks:1
-               ~nframes:1);
+          if info.numtracks > 0 then begin
+            assert_bool "play cd failed" (play ~cd ~start:0
+                                            ~length:0);
+            assert_bool "play cd track failed"
+              (play_tracks ~cd ~track:1 ~frame:0 ~ntracks:1
+                 ~nframes:1);
+          end;
           assert_bool "can't pause" (pause cd);
           assert_bool "can't resume" (resume cd);
           assert_bool "can't stop" (stop cd);

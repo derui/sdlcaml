@@ -25,6 +25,17 @@
     To need finalization, you add some code to after {!game_loop}.
 
     Event callback and game loop are integrated into single thread.
+
+    Example)
+
+    Sdl.Init.init [`VIDEO];
+    Sdl.Video.set_video_mode ~width:640 ~height:800 ~depth:32 ~flags:[Sdl.Video.SDL_SWSURFACE];
+
+    (* add display callback *)
+    Sdlut.display_callback (fun () -> something);
+
+    (* enter game loop with default fps and frame skipping setting. *)
+    Sdlut.game_loop ();
 *)
 
 (** type of usable callback functions *)
@@ -186,12 +197,12 @@ val display_callback:func:(unit -> unit) -> unit
 val move_callback:func:(unit -> unit) -> unit
 
 (** Integrate Keyboard and Joystick input infomations.
-    Integrated input provide mapping keyboard keystroke to joystick axis and joystick button.
+    Integrated input provide to be mapping keyboard keystroke to joystick axis and joystick button.
 
     But, now this don't be able to integrate mouse into keyboard and joystick,
     so mouse input handling is independent from them.
 
-    {!input_info} returned as result from this function is used to with {!input_callback},
+    Returning {!input_info} as result from this function is used to with {!input_callback},
     and don't forget to call {!input_close} with it when game loop ended.
 
     @param id unique number to each integrated input_info.
@@ -257,3 +268,8 @@ val axis_state: info:input_info -> state:[< `Axis of Sdl_joystick.axis] -> int
 (** Force update all {!input_info} already integrated.
 *)
 val force_update: unit -> unit
+
+(** Exit game loop arised by game_loop.
+    Noted, this function exit game loop forcely, raise exception no wait.
+*)
+val force_exit_game_loop: unit -> unit
