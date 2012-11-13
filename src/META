@@ -1,5 +1,5 @@
 version = "0.1"
-description = "SDL - OCaml bindings"
+description = "SDL bindings for OCaml"
 requires = "num sdlcaml.extlib bigarray"
 archive(byte) = "sdlcaml.cma"
 archive(byte, plugin) = "sdlcaml.cma"

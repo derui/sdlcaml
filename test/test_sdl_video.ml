@@ -83,7 +83,7 @@ let test_use_flip surface =
 
 let suite = "SDL video tests" >:::
   [ "video initialize" >::
-      (bracket (test_set_up [Sdl_video.SDL_SWSURFACE]) test_sdl_video_init
+      (bracket (test_set_up [Sdl_video.SDL_HWSURFACE]) test_sdl_video_init
          test_tear_down);
     "get current pixel format" >::
       (bracket (test_set_up [Sdl_video.SDL_SWSURFACE]) test_sdl_get_pixel_format test_tear_down);

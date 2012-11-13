@@ -10,6 +10,14 @@
 #include "sdl_initflags.h"
 #include "common.h"
 
+/* trick for SDLMain under MacOSX */
+#ifdef __APPLE__
+int main(int argc, char *argv[]) {
+  caml_main(argv);
+  return 0;
+}
+#endif
+
 int ml_init_tag_to_flag(value tag) {
   CAMLparam1(tag);
   CAMLnoreturn;

@@ -88,30 +88,28 @@ OCAMLFLAGS    += -annot
 %$(EXT_OBJ): %.c :scanner: scan-c-%.c
 	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE)" -o $@ -c $<
 
-GLENUM_GENERATED[] =
-	gl_enum.ml
-	gl_enum.mli
-	gl_enum_stubs.c
-	gl_enum.h
+CamlIDLGenerate(idl, options) =
+	IDL_FILE = $(addsuffix .idl, $(idl))
+	ML = $(addsuffix .ml, $(idl))
+	MLI = $(addsuffix .mli, $(idl))
+	STUB = $(addsuffix _stubs.c, $(idl))
+	HEADER =
+	if $(mem -header, $(options))
+		HEADER = $(addsuffix .h, $(idl))
+		export HEADER
 
-SDLGL_GENERATED[] =
-	gl_auto.ml
-	gl_auto.mli
-	gl_auto_stubs.c
+	section rule
+		$(STUB) $(ML) $(MLI) $(HEADER): $(IDL_FILE)
+			$(CAMLIDL) $(options) $<
+			.PHONY: clean
+			clean:
+				rm -f $@
+			export
 
-$(GLENUM_GENERATED): gl_enum.idl
-	$(CAMLIDL) -header $<
-	.PHONY: clean
-	clean:
-		rm -f $@
-	export
+	return $(array $(ML), $(MLI), $(HEADER), $(STUB))
 
-$(SDLGL_GENERATED): gl_auto.idl
-	$(CAMLIDL) -no-include $<
-	.PHONY: clean
-	clean:
-		rm -f $@
-	export
+GLENUM_GENERATED = $(CamlIDLGenerate gl_enum, -header)
+SDLGL_GENERATED = $(CamlIDLGenerate gl_auto, -no-include)
 
 CFILES = $(removesuffix $(ls *.c))
 # They found no place first, so they need to add to dependencies.
@@ -119,6 +117,7 @@ CFILES = $(removesuffix $(ls *.c))
 # still add to dependencies.
 CFILES += $(if $(not $(file-exists gl_auto_stubs.c)), gl_auto_stubs)
 CFILES += $(if $(not $(file-exists gl_enum_stubs.c)), gl_enum_stubs)
+
 FILES = $(removesuffix $(ls *.ml))
 FILES += gl_auto gl_enum
 
@@ -138,4 +137,4 @@ MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall -cclib -lcamlidl, t
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
-.DEFAULT: $(SDLGL_GENERATED) $(GLENUM_GENERATED) ../lib/extlib.cmxa sdlcaml.cmxa $(RequireFiles $(CONFIG_GENERATED))
+.DEFAULT: $(SDLGL_GENERATED) $(GLENUM_GENERATED) ../lib/extlib.cmxa sdlcaml.cmxa

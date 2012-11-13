@@ -24,6 +24,7 @@
 
 # executable
 *.opt
+*.run
 
 # generated documents
 *.html
@@ -31,5 +32,6 @@
 *.css
 
 # generated header file:no tracking
-config/sdl_initflags.h
-config/sdl_generic_flags.h
+config/sdl_init_flags.h
+config/sdl_mixer_flags.h
+config/gl_flags.h

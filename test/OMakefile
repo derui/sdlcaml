@@ -23,6 +23,8 @@
 # variables.
 #
 
+open common/Util
+
 #
 # This project requires ocamlfind (default - false).
 #
@@ -54,10 +56,18 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot -thread
+OCAMLFLAGS    += -annot -thread -g
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
-OCAML_LINK_FLAGS += -cclib "$(shell sdl-config --libs --cflags) -logg -lSDL_mixer -DDEBUG -lGL"
+MY_LINK_FLAGS = $(shell sdl-config --cflags --libs) -logg -lSDL_mixer -DDEBUG
+if $(IsMac)
+	MY_LINK_FLAGS += -framework OpenGL
+	export
+else
+	MY_LINK_FLAGS += -lGL
+	export
+
+OCAML_LINK_FLAGS += -ccopt "$(MY_LINK_FLAGS)"
 #OCAML_LINK_FLAGS += -cclib "-L/usr/lib -lSDLmain -lSDL -mwindows"
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=
@@ -76,7 +86,9 @@ OCAML_LINK_FLAGS += -cclib "$(shell sdl-config --libs --cflags) -logg -lSDL_mixe
 
 FILES = $(removesuffix $(ls *.ml))
 
-PROGRAM = test
+PROGRAMS =
+	foreach(x, $(FILES))
+		value $(OCamlProgram $x, $x)
 
 #
 # OCAML_LIBS += ../src/sdlcaml
@@ -89,12 +101,15 @@ PROGRAM = test
 
 # need sdlcaml library
 
-test: $(OCamlProgram $(PROGRAM), $(FILES))
+test: $(PROGRAMS)
+
+run:
+	foreach(x, $(FILES))
+		./$x
 
 clean:
-	rm -f $(PROGRAM)$(EXE)
-	rm -f $(PROGRAM).opt
-	rm -f $(PROGRAM).run
+	foreach(x, $(PROGRAMS))
+		rm -rf $x
 	rm -f *o
 	rm -f *cmx
 	rm -f *cmo
@@ -102,9 +117,8 @@ clean:
 	rm -f *annot
 
 test-clean:
-	rm -f $(PROGRAM)$(EXE)
-	rm -f $(PROGRAM).opt
-	rm -f $(PROGRAM).run
+	foreach(x, $(PROGRAMS))
+		rm -rf $x
 	rm -f *o
 	rm -f *cmx
 	rm -f *cmo

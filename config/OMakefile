@@ -117,6 +117,8 @@ GENERATE += $(GenerateFlags gl_flags.h)
 
 .DEFAULT: $(GENERATE)
 
+prepare: .DEFAULT
+
 generator: $(OCamlProgram gl_enum_generator, gl_enum_generator) $(OCamlProgram gl_api_generator, gl_api_generator)
 
 .PHONY: clean
