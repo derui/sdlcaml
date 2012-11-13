@@ -269,7 +269,7 @@ val axis_state: info:input_info -> state:[< `Axis of Sdl_joystick.axis] -> int
 *)
 val force_update: unit -> unit
 
-(** Exit game loop arised by game_loop.
+(** Exit game loop is arised by {!game_loop}.
     Noted, this function exit game loop forcely, raise exception no wait.
 *)
 val force_exit_game_loop: unit -> unit

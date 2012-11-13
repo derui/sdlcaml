@@ -1,0 +1,106 @@
+(**
+   this module provide matrix type and operations for OpenGL.
+   3D coordinates style of OpenGL is 'right-handed coordinates
+   system'.
+   Therefore, matrix operation conjections needs to apply for 'right
+   to left' direction.
+   One more attention to matrix conjection, OpenGL is using 'column
+   vector' when apply matrix to vector.
+
+   vector multiplying by matrix as below.
+
+| 11 | 12 | 13 | 14 || x |
+| 21 | 22 | 23 | 24 || y |
+| 31 | 32 | 33 | 34 || z |
+| 41 | 42 | 43 | 44 || w |
+
+   type of matrix providing this module is able to convert between
+   array and it. User wouldn't careful inner implementation!
+   (Of course, you could look .ml file if you wish)
+*)
+
+(** precise 4x4 matrix definition.
+    all attributes are mutable but not usually use this.
+*)
+type t = {
+  mutable m11 : float; mutable m12 : float; mutable m13 : float; mutable m14 : float;
+  mutable m21 : float; mutable m22 : float; mutable m23 : float; mutable m24 : float;
+  mutable m31 : float; mutable m32 : float; mutable m33 : float; mutable m34 : float;
+  mutable m41 : float; mutable m42 : float; mutable m43 : float; mutable m44 : float;
+}
+
+(** given matrix convert to primitive array.
+    matrix of result is right hand coodinates and conjection right to
+    left, and most warning point is to only multiply by `column vector'!
+*)
+val to_array : t -> float array
+
+(** construct a identity matrix.
+    A identity matrix is unchanged matrix that multiply any matrix.
+*)
+val identity : unit -> t
+
+(**
+   construct a projection matrix for `ortho projection'.
+   given parameters of near and far are mostly equivalant of
+   perspective_projection arguments.
+   `width' and height are size of screen to render.
+*)
+val ortho_projection : width:int -> height:int -> near:float -> far:float -> t
+
+(**
+   construct a projection matrix.
+   `fov' is "Field Of View" that the trustrum is visible angle of
+   between left and right side.
+   `ratio` is screen ratio that width divide height.
+   near and far is clip that visible range along the Z axis.
+
+   @param fov Field Of View
+   @param ratio screen ratio that width devide height
+   @param near near clip
+   @param far far clip
+*)
+val perspective_projection :
+  fov:float ->
+  ratio:float ->
+  near:float ->
+  far:float -> t
+
+(** multiply two matrices.
+    To multiply direction is m1 to m2 that equal [m1][m2].
+
+    @param m1 first matrix to multiply
+    @param m2 second matrix to multiply.
+*)
+val multiply : m1:t -> m2:t -> t
+
+(** create a rotation matrix defined by a rotation axis and a rotation
+    angle.
+    created matrix from this function is `eular angle` based rotation
+    matrix.
+    if using quatanion rotation matrix, use module of `quatanion` module.
+*)
+val rotation_matrix_of_axis : dir:Gl_vector.t -> angle:float -> t
+
+(** create a translation matrix defined a vector is length of moving.  *)
+val translation : Gl_vector.t -> t
+
+(** create a scaling matrix defined a vector that each values are
+    what scaling is along the axis.
+*)
+val scaling : Gl_vector.t -> t
+
+(** construct inverse matrix.
+    inverse matrix is usually used to unprojection matrix that
+    translate position translated by projection matrix to  world
+    position.
+
+    inverse matrix isn't exists always. if inverse matrix haven't ,
+    return None.
+*)
+val inverse : t -> t option
+
+(** construct transpose matrix of given.
+    One more transpose transposed matrix, it is equlivalence original one.
+*)
+val transpose : t -> t
