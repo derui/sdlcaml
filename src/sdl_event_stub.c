@@ -21,15 +21,10 @@ CAMLprim value sdlcaml_poll_event(value unit) {
   CAMLparam1(unit);
 
   SDL_Event event;
-  if (SDL_PollEvent(&event) == 1) {
-    CAMLlocal2(event_struct, option);
-    event_struct = caml_convert_event_c2m(&event);
-
-    option = caml_alloc(1,0);
-    Store_field(option, 0, event_struct);
-    CAMLreturn(option);
+  if (SDL_PollEvent(&event)) {
+    CAMLreturn(Val_some(caml_convert_event_c2m(&event)));
   } else {
-    CAMLreturn(Val_int(0));
+    CAMLreturn(Val_none);
   }
 }
 
@@ -38,14 +33,9 @@ CAMLprim value sdlcaml_wait_event(value unit) {
 
   SDL_Event event;
   if (SDL_WaitEvent(&event) >= 0) {
-    CAMLlocal2(event_struct, option);
-    event_struct = caml_convert_event_c2m(&event);
-
-    option = caml_alloc(1,0);
-    Store_field(option, 0, event_struct);
-    CAMLreturn(option);
+    CAMLreturn(Val_some(caml_convert_event_c2m(&event)));
   } else {
-    CAMLreturn(Val_int(0));
+    CAMLreturn(Val_none);
   }
 }
 
@@ -64,10 +54,7 @@ CAMLprim value sdlcaml_event_state(value etype, value state) {
   /* responce only return if event_state is only SDL_QUERY */
   int response = SDL_EventState(event_type, event_state);
   if (event_state == SDL_QUERY) {
-    CAMLlocal1(responce_val);
-    responce_val = caml_alloc(1,0);
-    Store_field(responce_val, 0, Val_int(response));
-    CAMLreturn(responce_val);
+    CAMLreturn(Val_some(Int_val(response)));
   } else {
     CAMLreturn(Val_none);
   }

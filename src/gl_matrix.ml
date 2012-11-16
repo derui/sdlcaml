@@ -1,3 +1,5 @@
+module V = Gl_vector
+
 (* precise 4x4 matrix definition. *)
 type t = {
   mutable m11 : float; mutable m12 : float; mutable m13 : float; mutable m14 : float;
@@ -81,7 +83,7 @@ let multiply ~m1 ~m2 =
 
 let rotation_matrix_of_axis ~dir ~angle =
   let angle = angle *. 0.5 in
-  let vn_x, vn_y, vn_z = Vector.normalise dir in
+  let vn_x, vn_y, vn_z = V.of_vec (V.normalize dir) in
   let sinAngle = sin angle in
   let qx = vn_x *. sinAngle
   and qy = vn_y *. sinAngle
@@ -104,14 +106,16 @@ let rotation_matrix_of_axis ~dir ~angle =
   }
 
 
-let translation (x,y,z) =
+let translation v =
+  let x, y, z = V.of_vec v in
   { m11 = 1.0; m12 = 0.0; m13 = 0.0; m14 = 0.0;
     m21 = 0.0; m22 = 1.0; m23 = 0.0; m24 = 0.0;
     m31 = 0.0; m32 = 0.0; m33 = 1.0; m34 = 0.0;
     m41 =   x; m42 =   y; m43 =   z; m44 = 1.0;
   }
 
-let scaling (x,y,z) =
+let scaling v =
+  let x, y, z = V.of_vec v in
   { m11 =   x; m12 = 0.0; m13 = 0.0; m14 = 0.0;
     m21 = 0.0; m22 =   y; m23 = 0.0; m24 = 0.0;
     m31 = 0.0; m32 = 0.0; m33 =   z; m34 = 0.0;

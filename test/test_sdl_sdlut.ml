@@ -41,8 +41,8 @@ let tmp_bracket f = bracket test_set_up f test_tear_down
 let suite = "SDL Utility Toolkit basically specs" >:::
   [
     "SDLUT basic usage" >:: (tmp_bracket test_sdl_sdlut_basic_usage);
-    "SDLUT integrate input" >:: (tmp_bracket test_sdl_sdlut_integrate_let);
+    "SDLUT integrate input" >:: (tmp_bracket test_sdl_sdlut_integrate_input);
   ]
 
-run _ =
-  input_test_tt_main suite
+let _ =
+  run_test_tt_main suite

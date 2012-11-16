@@ -56,7 +56,7 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot -thread -g
+OCAMLFLAGS    += -annot -thread
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
 MY_LINK_FLAGS = $(shell sdl-config --cflags --libs) -logg -lSDL_mixer -DDEBUG
@@ -67,7 +67,7 @@ else
 	MY_LINK_FLAGS += -lGL
 	export
 
-OCAML_LINK_FLAGS += -ccopt "$(MY_LINK_FLAGS)"
+OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS)"
 #OCAML_LINK_FLAGS += -cclib "-L/usr/lib -lSDLmain -lSDL -mwindows"
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=

@@ -20,15 +20,19 @@
     Occurred events by SDL subsystem dispatch each functions in game loop at one time,
     and event loop is not loop in other thread.
 
-    This module can't register function to Quit event, so
-    if occur Quit event, end game loop and exit {!game_loop} function.
+    First of all, all events without Quit ignored. If youenable some event with
+    calling {!Sdl_event.event_state} or register callback function,
+    targeted event enable and is able to dispatch to callback functions.
+    If you unregister callback function, correspondent event disable same time.
+    But, whenever Quit event enable because it need to quit SDL system.
+
     To need finalization, you add some code to after {!game_loop}.
 
     Event callback and game loop are integrated into single thread.
 
     Example)
 
-    Sdl.Init.init [`VIDEO];
+    Sdlut.init [`VIDEO];
     Sdl.Video.set_video_mode ~width:640 ~height:800 ~depth:32 ~flags:[Sdl.Video.SDL_SWSURFACE];
 
     (* add display callback *)
@@ -49,6 +53,7 @@ type callback_type =
   | Expose
   | Display
   | Move
+  | Quit
 
 (** Use mapping axis of joystick and some key of keyboard.
     Integrated axis and key perform as follows.
@@ -93,6 +98,18 @@ type input_state = [
 | `Axis of Sdl_joystick.axis
 ]
 
+(** Initialize SDL and SDLUT system.
+    This function work as wrapper for {!Sdl_init.init} and
+    disable all events.
+
+    @param auto_clean auto_clean setting up auto cleanup with sdl_quit if give
+    this true. defaults, sdl_init doesn't set up it.
+    @param flags Targets of initializing systems and mode flags.
+    @raise SDL_init_exception raise it when initialization failed.
+*)
+val init : ?auto_clean:bool ->
+  flags:[< Sdl_init.subsystem | `EVENTTHREAD | `NOPARACHUTE | `EVERYTHING] list -> unit
+
 (** Unregister callback function from given event and
     get back default function for given event.
     If any funciton haven't registered for given event,
@@ -134,7 +151,7 @@ val mouse_callback:
     @param func callback function for {!Sdl_event.Motion}
 *)
 val motion_callback:
-  func:(x:int -> y:int -> xrel:int -> yrel:int -> unit) -> unit
+  func:(x:int -> y:int -> xrel:int -> yrel:int -> states:Sdl_mouse.mouse_button_state list -> unit) -> unit
 
 (** Register function for Joystick polling event.
     Details equal {!active_callback}.
@@ -196,6 +213,14 @@ val display_callback:func:(unit -> unit) -> unit
 *)
 val move_callback:func:(unit -> unit) -> unit
 
+(** Register function for event of Quit.
+    Unless registered function return true, do not quit game loop.
+    If you want to end game loop and system, return false when registered function is called.
+
+    @param func callback function for Quit event
+*)
+val quit_callback: func:(unit -> bool) -> unit
+
 (** Integrate Keyboard and Joystick input infomations.
     Integrated input provide to be mapping keyboard keystroke to joystick axis and joystick button.
 
@@ -227,6 +252,10 @@ val input_close: input_info -> unit
 
     If another input_info and callback function registered,
     call them same timing then end of event handling with given {!input_info}
+
+    This function do not enable any events unless already enabled, so
+    function registered by this function is called every loop
+    regardless of what event raise or not.
 
     @param info A input_info to give callback-function
     @param func callback function when end of event handling
@@ -273,3 +302,10 @@ val force_update: unit -> unit
     Noted, this function exit game loop forcely, raise exception no wait.
 *)
 val force_exit_game_loop: unit -> unit
+
+(** Get current frame per second  when you call this function.
+    Frame per second managed Sdlut update each second.
+
+    @return fps when call this function
+*)
+val current_fps: unit -> int

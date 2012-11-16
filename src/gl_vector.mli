@@ -34,7 +34,7 @@ val normal_axis : [< `X |`Y |`Z ] -> t
    normalising is defined given vector to unit vector that
    vector's norm is 1.
 *)
-val normalise : t -> t
+val normalize : t -> t
 
 (** return norm of given vector.
    returned norm from this function apply square root to norm of

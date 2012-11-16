@@ -4,6 +4,7 @@ module Event = Sdl_event
 module Key = Sdl_key
 module Mouse = Sdl_mouse
 module Timer = Sdl_timer
+module Window = Sdl_window
 
 exception Game_loop_exit
 
@@ -17,6 +18,7 @@ type callback_type =
   | Expose
   | Display
   | Move
+  | Quit
 
 type axis_mapping = {
   axis:Joystick.axis;
@@ -68,23 +70,25 @@ type input_callback_func_type = (info:input_info -> unit)
 type active_func_type   = state:Event.app_state list -> gain:bool -> unit
 type keyboard_func_type = key:Key.key_info -> state:bool -> unit
 type mouse_func_type    = button:Mouse.button -> x:int -> y:int -> state:bool -> unit
-type motion_func_type   = x:int -> y:int -> xrel:int -> yrel:int -> unit
+type motion_func_type   = x:int -> y:int -> xrel:int -> yrel:int -> states:Mouse.mouse_button_state list -> unit
 type joystick_func_type = num:int -> x:int -> y:int -> z:int -> masks:Joystick.button list -> unit
 type resize_func_type   = width:int -> height:int -> unit
 type expose_func_type   = unit -> unit
 type display_func_type  = unit -> unit
 type move_func_type     = unit -> unit
+type quit_func_type     = unit -> bool
 
 (* default callback functions *)
 let default_active_func:active_func_type   = (fun ~state ~gain -> ())
 let default_keyboard_func:keyboard_func_type = (fun ~key ~state -> ())
 let default_mouse_func:mouse_func_type    = (fun ~button ~x ~y ~state -> ())
-let default_motion_func:motion_func_type   = (fun ~x ~y ~xrel ~yrel -> ())
+let default_motion_func:motion_func_type   = (fun ~x ~y ~xrel ~yrel ~states -> ())
 let default_joystick_func:joystick_func_type = (fun ~num ~x ~y ~z ~masks -> ())
 let default_resize_func:resize_func_type   = (fun ~width ~height -> ())
 let default_expose_func:expose_func_type   = (fun _ -> ())
 let default_display_func:display_func_type  = (fun _ -> ())
 let default_move_func:move_func_type     = (fun _ -> ())
+let default_quit_func:quit_func_type     = (fun _ -> true)
 
 (* callback function warehouse *)
 let active_callback_func   = ref default_active_func
@@ -96,45 +100,96 @@ let resize_callback_func   = ref default_resize_func
 let expose_callback_func   = ref default_expose_func
 let display_callback_func  = ref default_display_func
 let move_callback_func     = ref default_move_func
+let quit_callback_func     = ref default_quit_func
 
 let input_callback_funcs:(int, input_callback_func_type * input_info) IntMap.t ref
     = ref IntMap.empty
+
+(* Counting fps for to managed by Sdlut *)
+let global_fps = ref 0
+
+(* initialize Sdlut *)
+let ignore_events etypes =
+  let func etype = ignore (Event.event_state ~etype ~state:Event.IGNORE) in
+  List.iter func etypes
+
+let enable_events etypes =
+  let func etype = ignore (Event.event_state ~etype ~state:Event.ENABLE) in
+  List.iter func etypes
+
+let init ?auto_clean:(auto_clean=true) ~flags =
+  Sdl_init.init ~auto_clean ~flags;
+  ignore_events [
+    Event.ACTIVEEVENT;
+    Event.KEYDOWN;
+    Event.KEYUP;
+    Event.MOUSEMOTION;
+    Event.MOUSEBUTTONDOWN;
+    Event.MOUSEBUTTONUP;
+    Event.JOYAXISMOTION;
+    Event.JOYBALLMOTION;
+    Event.JOYHATMOTION;
+    Event.JOYBUTTONDOWN;
+    Event.JOYBUTTONUP;
+    Event.VIDEORESIZE;
+    Event.VIDEOEXPOSE;
+  ]
 
 (* callback functions register and unregister *)
 
 let unregister_callback ~callback =
   let remove_function = function
-    | Active -> active_callback_func := default_active_func
-    | Keyboard -> keyboard_callback_func := default_keyboard_func
-    | Mouse -> mouse_callback_func := default_mouse_func
-    | Motion -> motion_callback_func := default_motion_func
-    | Joystick -> joystick_callback_func := default_joystick_func
-    | Resize -> resize_callback_func := default_resize_func
-    | Expose -> expose_callback_func := default_expose_func
+    | Active -> active_callback_func := default_active_func;
+      ignore_events [Event.ACTIVEEVENT]
+    | Keyboard -> keyboard_callback_func := default_keyboard_func;
+      ignore_events [Event.KEYDOWN;Event.KEYUP];
+    | Mouse -> mouse_callback_func := default_mouse_func;
+      ignore_events [Event.MOUSEBUTTONDOWN;Event.MOUSEBUTTONUP];
+    | Motion -> motion_callback_func := default_motion_func;
+      ignore_events [Event.MOUSEMOTION];
+    | Joystick -> joystick_callback_func := default_joystick_func;
+      ignore_events [Event.JOYAXISMOTION;Event.JOYBALLMOTION;
+                     Event.JOYHATMOTION; Event.JOYBUTTONDOWN;
+                     Event.JOYBUTTONDOWN];
+    | Resize -> resize_callback_func := default_resize_func;
+      ignore_events [Event.VIDEORESIZE];
+    | Expose -> expose_callback_func := default_expose_func;
+      ignore_events [Event.VIDEOEXPOSE];
     | Display -> display_callback_func := default_display_func
     | Move -> move_callback_func := default_move_func
+    | Quit -> quit_callback_func := default_quit_func
   in
   List.iter remove_function callback
 
-let active_callback ~func = active_callback_func := func
-let keyboard_callback ~func = keyboard_callback_func := func
-let mouse_callback ~func = mouse_callback_func := func
-let motion_callback ~func = motion_callback_func := func
-let joystick_callback ~func = joystick_callback_func := func
-let resize_callback ~func = resize_callback_func := func
-let expose_callback ~func = expose_callback_func := func
+let active_callback ~func = active_callback_func := func;
+  enable_events [Event.ACTIVEEVENT]
+let keyboard_callback ~func = keyboard_callback_func := func;
+  enable_events [Event.KEYDOWN; Event.KEYUP]
+let mouse_callback ~func = mouse_callback_func := func;
+  enable_events [Event.MOUSEBUTTONDOWN; Event.MOUSEBUTTONUP]
+let motion_callback ~func = motion_callback_func := func;
+  enable_events [Event.MOUSEMOTION]
+let joystick_callback ~func = joystick_callback_func := func;
+  enable_events [Event.JOYAXISMOTION;Event.JOYBALLMOTION;
+                 Event.JOYHATMOTION; Event.JOYBUTTONDOWN;
+                 Event.JOYBUTTONDOWN]
+let resize_callback ~func = resize_callback_func := func;
+  enable_events [Event.VIDEORESIZE]
+let expose_callback ~func = expose_callback_func := func;
+  enable_events [Event.VIDEOEXPOSE]
 let display_callback ~func = display_callback_func := func
 let move_callback ~func = move_callback_func := func
+let quit_callback ~func = quit_callback_func := func
 
 (* update input informations for all current input_info *)
 let update_input_infos () =
-  let key_states = Input.get_key_state () in
   let update_hashtbl_with_list tbl list =
     List.iter (fun (key, state) ->
       if not (Hashtbl.mem tbl key) then
         Hashtbl.replace tbl key state) list
   in
   let update_info (func, info) =
+    let key_states = Input.get_key_state () in
     begin
       (* update keys *)
       Sdl_key.StateMap.iter (fun key state ->
@@ -197,15 +252,14 @@ let event_dispatch () =
         | KeyDown {keysym;key_state} -> !keyboard_callback_func ~key:keysym ~state:key_state
         | KeyUp {keysym;key_state} -> !keyboard_callback_func ~key:keysym ~state:key_state
         | Motion ev -> !motion_callback_func ~x:ev.motion_x ~y:ev.motion_y
-          ~xrel:ev.motion_xrel ~yrel:ev.motion_yrel
+          ~xrel:ev.motion_xrel ~yrel:ev.motion_yrel ~states:ev.motion_states
         | ButtonDown ev -> !mouse_callback_func ~x:ev.mouse_x ~y:ev.mouse_y
-                             ~button:ev.mouse_button ~state:ev.mouse_state
+          ~button:ev.mouse_button ~state:ev.mouse_state
         | ButtonUp ev -> !mouse_callback_func ~x:ev.mouse_x ~y:ev.mouse_y
-                           ~button:ev.mouse_button ~state:ev.mouse_state
-        | Resize {width;height} ->
-          !resize_callback_func width height
+          ~button:ev.mouse_button ~state:ev.mouse_state
+        | Resize {width;height} -> !resize_callback_func width height
         | Expose -> !expose_callback_func ()
-        | Quit -> raise Game_loop_exit
+        | Quit -> if !quit_callback_func () then raise Game_loop_exit else ()
         | _ -> ();
         polling (Event.poll_event ());
       end
@@ -303,32 +357,47 @@ let force_update = update_input_infos
 
 let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
   let ms_per_sec = 1000 * 100 / (fps)
-  and reminder_of_loop = ref 0 in
+  and reminder_of_loop = ref 0
+  and count_a_second = ref 0
+  and count_frame = ref 0 in
 
   let rec mainloop skip_this_loop =
     let start = Timer.get_ticks () in
     begin
+
+      if !count_a_second > 1000 then begin
+        global_fps := !count_frame;
+        count_frame := 0;
+        count_a_second := 0;
+      end;
+
       event_dispatch ();
 
       !move_callback_func ();
 
-      if not skip_this_loop then
+      if not skip_this_loop then begin
+        count_frame := succ !count_frame;
         !display_callback_func ();
+      end;
 
       (* wait fps *)
       let diff = (Timer.get_ticks ()) - start in
-      if diff * 100 > ms_per_sec then
+      if diff * 100 > ms_per_sec then begin
+        count_a_second := !count_a_second + diff;
         mainloop true
-      else begin
+      end else begin
         reminder_of_loop := !reminder_of_loop + ms_per_sec;
-        let this_time_delay = !reminder_of_loop / 100 in
+        let this_time_delay = !reminder_of_loop / 100 - diff in
         reminder_of_loop := (!reminder_of_loop mod 100);
         Timer.delay this_time_delay;
+        count_a_second := !count_a_second + diff + this_time_delay;
         mainloop false;
       end
     end in
   try
     mainloop false
-   with Game_loop_exit -> ()
+  with Game_loop_exit -> ()
 
 let force_exit_game_loop () = raise Game_loop_exit
+
+let current_fps () = !global_fps
