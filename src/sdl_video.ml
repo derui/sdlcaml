@@ -252,3 +252,24 @@ external get_attribute : gl_attr -> int = "sdlcaml_video_gl_get_attribute"
    Swap OpenGL framebuffer/update Display, if double-buffering is supported.
 *)
 external gl_swap : unit -> unit = "sdlcaml_video_gl_swap_buffer"
+
+(** Initialize OpenGL attributes to use with SDL.
+    You must call this function before call {!set_video_mode} if want to use OpenGL with SDL.
+
+    @param red size of red value as byte
+    @param blue size of blue value as byte
+    @param green size of green value as byte
+    @param depth size of depth buffer
+    @param doublebuffer give true if want to enable GL_DOUBLEBUFFER. Default is true.
+    @param unit dummy argument
+*)
+let gl_init ~red -> ~blue -> ~green -> ~depth -> ?doublebuffer:(dbuffer=true) () =
+  ignore (Video.set_attribute ~attr:Video.GL_RED_SIZE ~value:red);
+  ignore (Video.set_attribute ~attr:Video.GL_BLUE_SIZE ~value:blue);
+  ignore (Video.set_attribute ~attr:Video.GL_GREEN_SIZE ~value:green);
+  ignore (Video.set_attribute ~attr:Video.GL_DEPTH_SIZE ~value:depth);
+
+  if dbuffer then
+    ignore (Video.set_attribute ~attr:Video.GL_DOUBLEBUFFER ~value:1)
+  else
+    ignore (Video.set_attribute ~attr:Video.GL_DOUBLEBUFFER ~value:0)
