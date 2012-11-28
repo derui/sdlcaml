@@ -1,6 +1,4 @@
-module E = Gl_enum
-module Matrix = Gl_matrix
-module Vector = Gl_vector
-module Quaternion = Gl_quaternion
-include Gl_auto
+module M = Gl_matrix
+module V = Gl_vector
+module Q = Gl_quaternion
 include Gl_api

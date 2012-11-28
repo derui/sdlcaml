@@ -90,7 +90,7 @@ PROGRAMS =
 	foreach(x, $(FILES))
 		.PHONY: run-$(removeprefix test_sdl_, $x)
 		run-$(removeprefix test_sdl_, $x):
-			./$x
+			./$x$(EXE)
 		export
 		value $(OCamlProgram $x, $x)
 

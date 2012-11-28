@@ -35,3 +35,5 @@
 config/sdl_init_flags.h
 config/sdl_mixer_flags.h
 config/gl_flags.h
+
+*.inc

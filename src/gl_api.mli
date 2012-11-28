@@ -21,7 +21,9 @@ external glClearIndex : float -> unit = "gl_api_glClearIndex"
 external glClearColor : red:float -> green:float -> blue:float -> alpha:float -> unit
   = "gl_api_glClearColor"
 
-module Clear = Enums.Clear
+module Clear : sig
+  include module type of Enums.Clear
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glClear.xml}
     manual pages on opengl.org}
@@ -39,7 +41,9 @@ external glIndexMask : int -> unit = "gl_api_glIndexMask"
 external glColorMask : red:bool -> green:bool -> blue:bool -> alpha:bool -> unit
   = "gl_api_glColorMask"
 
-module Func = Enums.Func
+module Func : sig
+  include module type of Enums.Func
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glNormalPointer.xml}
     manual pages on opengl.org}
@@ -51,19 +55,25 @@ external glAlphaFunc : func:Func.compare_func -> clamp:float -> unit = "gl_api_g
 *)
 external glBlendFunc : src:Func.blend_src_func -> dest:Func.blend_dst_func -> unit = "gl_api_glBlendFunc"
 
-module Op = Enums.Op
+module Op : sig
+  include module type of Enums.Op
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLogicOp.xml}
     manual pages on opengl.org}
 *)
 external glLogicOp : Op.logic_opcode -> unit = "gl_api_glLogicOp"
 
-module CullFace = Enums.CullFace
+module CullFace : sig
+  include module type of Enums.CullFace
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCullFace.xml}
     manual pages on opengl.org}
 *)
 external glCullFace : CullFace.cull_face_mode -> unit = "gl_api_glCullFace"
 
-module FrontFace = Enums.FrontFace
+module FrontFace : sig
+  include module type of Enums.FrontFace
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFrontFace.xml}
     manual pages on opengl.org}
 *)
@@ -84,7 +94,9 @@ external glLineWidth : float -> unit = "gl_api_glLineWidth"
 *)
 external glLineStipple : factor:int -> pattern:int -> unit = "gl_api_glLineStipple"
 
-module Poly = Enums.Poly
+module Poly : sig
+  include module type of Enums.Poly
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPolygonMode.xml}
     manual pages on opengl.org}
 *)
@@ -120,7 +132,9 @@ external glEdgeFlag : bool -> unit = "gl_api_glEdgeFlag"
 external glScissor : x:int -> y:int -> width:int -> height:int -> unit
   = "gl_api_glScissor"
 
-module ClipPlane = Enums.ClipPlane
+module ClipPlane : sig
+  include module type of Enums.ClipPlane
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glClipPlane.xml}
     manual pages on opengl.org}
@@ -131,20 +145,17 @@ external glClipPlane : plane:ClipPlane.clip_plane ->
 
 type clip_plane_i = GL_CLIP_PLANE of int
 
-external _glClipPlanei : plane:int ->
+val glClipPlanei: plane:clip_plane_i ->
   equaltion:(float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit
-    = "gl_api_glClipPlanei"
-
-let glClipPlanei ~plane ~equaltion =
-  match plane with
-  | GL_CLIP_PLANE i -> _glClipPlanei ~plane:i ~equaltion
 
 external glGetClipPlane : ClipPlane.clip_plane ->
   (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit
-  = "gl_api_glGetClipPlane"
+    = "gl_api_glGetClipPlane"
 
 type aux_buffer = GL_AUX of int
-module Buffer = Enums.Buffer
+module Buffer : sig
+  include module type of Enums.Buffer
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawBuffer.xml}
     manual pages on opengl.org}
 *)
@@ -157,7 +168,9 @@ external glDrawBuffer_aux : aux_buffer -> unit = "gl_api_glDrawBuffer_aux"
 external glReadBuffer : Buffer.read_buffer_mode -> unit = "gl_api_glReadBuffer"
 external glReadBuffer_aux : aux_buffer -> unit = "gl_api_glReadBuffer_aux"
 
-module Enable = Enums.Enable
+module Enable : sig
+  include module type of Enums.Enable
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml}
     manual pages on opengl.org}
 *)
@@ -173,7 +186,9 @@ external glEnableClientState : Enable.client_state_mode -> unit
 external glDisableClientState : Enable.client_state_mode -> unit
   = "gl_api_glDisableClientState"
 
-module Get = Enums.Get
+module Get : sig
+  include module type of Enums.Get
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGet.xml}
     manual pages on opengl.org}
 *)
@@ -197,7 +212,9 @@ external glGetMatrix : Get.get_matrix -> float array = "gl_api_glGetMatrix"
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPushAttrib.xml}
     manual pages on opengl.org}
 *)
-module Attrib = Enums.Attrib
+module Attrib : sig
+  include module type of Enums.Attrib
+end
 external glPushAttrib : Attrib.attrib_mask -> unit = "gl_api_glPushAttrib"
 external glPopAttrib : unit -> unit = "gl_api_glPopAttrib"
 
@@ -209,7 +226,9 @@ external glPushClientAttrib : Attrib.client_attrib_mask -> unit
   = "gl_api_glPushClientAttrib"
 external glPopClientAttrib : unit -> unit = "gl_api_glPopClientAttrib"
 
-module Render = Enums.Render
+module Render : sig
+  include module type of Enums.Render
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glRenderMode.xml}
     manual pages on opengl.org}
 *)
@@ -235,7 +254,9 @@ external glFinish : unit -> unit = "gl_api_glFinish"
 *)
 external glFlush : unit -> unit = "gl_api_glFlush"
 
-module Hint = Enums.Hint
+module Hint : sig
+  include module type of Enums.Hint
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glHint.xml}
     manual pages on opengl.org}
 *)
@@ -268,13 +289,17 @@ external glDepthRange : near:float -> far:float -> unit = "gl_api_glDepthRange"
 external glClearAccum : red:float -> green:float -> blue:float -> alpha:float -> unit
   = "gl_api_external"
 
-module Accum = Enums.Accum
+module Accum : sig
+  include module type of Enums.Accum
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glAccum.xml}
     manual pages on opengl.org}
 *)
 external glAccum : op:Accum.accum_op -> value:float -> unit = "gl_api_glAccum"
 
-module Matrix = Enums.Matrix
+module Matrix : sig
+  include module type of Enums.Matrix
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMatrixMode.xml}
     manual pages on opengl.org}
 *)
@@ -352,7 +377,9 @@ external glDeleteLists : list:int -> range:int -> unit = "gl_api_glDeleteLists"
 *)
 external glGenLists : int -> int = "gl_api_glGenLists"
 
-module NewList = Enums.NewList
+module NewList : sig
+  include module type of Enums.NewList
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glNewList.xml}
     manual pages on opengl.org}
 *)
@@ -370,7 +397,9 @@ external glCallList : int -> unit = "gl_api_glCallList"
 *)
 external glListBase : int -> unit = "gl_api_glListBase"
 
-module Begin = Enums.Begin
+module Begin : sig
+  include module type of Enums.Begin
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBegin.xml}
     manual pages on opengl.org}
 *)
@@ -429,14 +458,18 @@ external glRect : x1:float -> y1:float -> x2:float -> y2:float -> unit = "gl_api
 *)
 external glArrayElement : int -> unit = "gl_api_glArrayElement"
 
-module DrawArrays = Enums.DrawArrays
+module DrawArrays : sig
+  include module type of Enums.DrawArrays
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawArrays.xml}
     manual pages on opengl.org}
 *)
 external glDrawArrays : mode:DrawArrays.draw_mode -> first:int -> count:int -> unit
   = "gl_api_glDrawArrays"
 
-module Shade = Enums.Shade
+module Shade : sig
+  include module type of Enums.Shade
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glShadeModel.xml}
     manual pages on opengl.org}
 *)
@@ -445,8 +478,12 @@ external glShadeModel : Shade.shade_mode -> unit = "gl_api_glShadeModel"
 (** type of number of light  *)
 type gl_light = GL_LIGHT of int
 
-module Light = Enums.Light
-module SetLight = Enums.SetLight
+module Light : sig
+  include module type of Enums.Light
+end
+module SetLight : sig
+  include module type of Enums.SetLight
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLight.xml}
     manual pages on opengl.org}
@@ -465,7 +502,9 @@ type float_array = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Arr
 external glLightModel : pname:Light.light_model -> value:float_array -> unit = "gl_api_glLightModel"
 external glLightModelControl :Light.light_model_control -> unit = "gl_api_glLightModelControl"
 
-module Material = Enums.Material
+module Material : sig
+  include module type of Enums.Material
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml}
     manual pages on opengl.org}
 *)
@@ -485,12 +524,14 @@ external glPixelZoom : xfactor:float -> yfactor:float -> unit = "gl_api_glPixelZ
 
 (* Alignment for requirements for the start of each pixel row in memroy  *)
 type pixel_alignment =
-| GL_ALIGN_1
-| GL_ALIGN_2
-| GL_ALIGN_4
-| GL_ALIGN_8
+  | GL_ALIGN_1
+  | GL_ALIGN_2
+  | GL_ALIGN_4
+  | GL_ALIGN_8
 
-module Pixels = Enums.Pixels
+module Pixels : sig
+  include module type of Enums.Pixels
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPixelStore.xml}
     manual pages on opengl.org}
 *)
@@ -549,7 +590,9 @@ external glStencilFunc : func:Func.compare_func -> func_ref:int -> mask:int -> u
 *)
 external glStencilMask : int -> unit = "gl_api_glStencilMask"
 
-module Stencil = Enums.Stencil
+module Stencil : sig
+  include module type of Enums.Stencil
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glStencilOp.xml}
     manual pages on opengl.org}
 *)
@@ -561,7 +604,9 @@ external glStencilOp : fail:Stencil.stencil_op -> zfail:Stencil.stencil_op
 *)
 external glClearStencil : int -> unit = "gl_api_glClearStencil"
 
-module Tex = Enums.Tex
+module Tex : sig
+  include module type of Enums.Tex
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexGen.xml}
     manual pages on opengl.org}
 *)
@@ -627,7 +672,7 @@ external glGenTextures : int -> (int, Bigarray.int32_elt, Bigarray.c_layout) Big
 *)
 external glDeleteTextures : size:int ->
   textures:(int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit
-  = "gl_api_glDeleteTextures"
+    = "gl_api_glDeleteTextures"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml}
     manual pages on opengl.org}
@@ -687,7 +732,9 @@ external glCopyTexSubImage3D : level:int -> xoffset:int -> yoffset:int -> zoffse
   x:int -> y:int -> width:int -> height:int -> unit
     = "gl_api_glCopyTexSubImage3D_bytecode" "gl_api_glCopyTexSubImage3D"
 
-module Eval = Enums.Eval
+module Eval : sig
+  include module type of Enums.Eval
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMap.xml}
     manual pages on opengl.org}
 *)
@@ -748,7 +795,9 @@ external glEvalMesh1 : mode:Eval.mesh_mode_1 -> i1:int -> i2:int -> unit
 external glEvalMesh2 : mode:Eval.mesh_mode_2 -> i1:int -> i2:int -> j1:int -> j2:int -> unit
   = "gl_api_glEvalMesh2"
 
-module Fog = Enums.Fog
+module Fog : sig
+  include module type of Enums.Fog
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFog.xml}
     manual pages on opengl.org}
 *)
@@ -797,7 +846,9 @@ external glBlendEquation : Func.blend_func -> unit = "gl_api_glBlendEquation"
 external glBlendColor : red:float -> green:float -> blue:float -> alpha:float -> unit
   = "gl_api_glBlendColor"
 
-module Histogram = Enums.Histogram
+module Histogram : sig
+  include module type of Enums.Histogram
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glHistogram.xml}
     manual pages on opengl.org}
 *)
@@ -810,13 +861,15 @@ external glHistogram : target:Histogram.histogram -> width:int ->
 *)
 external glResetHistogram : unit -> unit = "gl_api_glResetHistogram"
 
-module Convolution = Enums.Convolution
+module Convolution : sig
+  include module type of Enums.Convolution
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glConvolutionParameter.xml}
     manual pages on opengl.org}
 *)
 external glConvolutionParameter_border : target:Convolution.convolution_target ->
   mode:Convolution.convolution_border_mode -> unit
-  = "gl_api_glConvolutionParameter_border"
+    = "gl_api_glConvolutionParameter_border"
 external glConvolutionParameter : target:Convolution.convolution_target ->
   pname:Convolution.convolution_pname -> param:float * float * float * float -> unit
     = "gl_api_glConvolutionParameter"
@@ -869,7 +922,9 @@ external glMultTransposeMatrix : (float, Bigarray.float32_elt, Bigarray.c_layout
 external glSampleCoverage : value:float -> invert:bool -> unit
   = "gl_api_glSampleCoverage"
 
-module CallList = Enums.CallList
+module CallList : sig
+  include module type of Enums.CallList
+end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCallLists.xml}
     manual pages on opengl.org}
 *)
@@ -878,7 +933,9 @@ external glCallLists : size:int ->
   -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
     -> unit = "gl_api_glCallLists"
 
-module Vertex = Enums.Vertex
+module Vertex : sig
+  include module type of Enums.Vertex
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glVertexPointer.xml}
     manual pages on opengl.org}
@@ -890,7 +947,9 @@ external glVertexPointer3 : pointer_type:Vertex.vertex_pointer_type ->
 external glVertexPointer4 : pointer_type:Vertex.vertex_pointer_type ->
   stride:int -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit = "gl_api_glVertexPointer4"
 
-module Normal = Enums.Normal
+module Normal : sig
+  include module type of Enums.Normal
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glNormalPointer.xml}
     manual pages on opengl.org}
@@ -899,7 +958,9 @@ external glNormalPointer : pointer_type:Normal.normal_pointer_type ->
   stride:int -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit
     = "gl_api_glNormalPointer"
 
-module Color = Enums.Color
+module Color : sig
+  include module type of Enums.Color
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glColorPointer.xml}
     manual pages on opengl.org}
@@ -908,7 +969,9 @@ external glColorPointer : pointer_type:Color.color_pointer_type ->
   stride:int -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit
     = "gl_api_glColorPointer3"
 
-module Index = Enums.Index
+module Index : sig
+  include module type of Enums.Index
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIndexPointer.xml}
     manual pages on opengl.org}
@@ -917,7 +980,9 @@ external glIndexPointer : pointer_type:Index.index_pointer_type ->
   stride:int ->
     list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit = "gl_api_glIndexPointer"
 
-module TexCoord = Enums.TexCoord
+module TexCoord : sig
+  include module type of Enums.TexCoord
+end
 
 external glTexCoordPointer1 : pointer_type:TexCoord.texcoord_pointer_type
   -> stride:int
@@ -942,7 +1007,9 @@ external glTexCoordPointer4 : pointer_type:TexCoord.texcoord_pointer_type
 external glEdgeFlagPointer : stride:int -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
   -> unit = "gl_api_glEdgeFlagPointer"
 
-module DrawElements = Enums.DrawElements
+module DrawElements : sig
+  include module type of Enums.DrawElements
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml}
     manual pages on opengl.org}
@@ -952,33 +1019,14 @@ external glDrawElements : mode:DrawElements.draw_mode ->
     = "gl_api_glDrawElements"
 
 type tuple_type =
-| Tuple1 of float
-| Tuple3 of (float * float * float)
-| Tuple4 of (float * float * float * float)
+  | Tuple1 of float
+  | Tuple3 of (float * float * float)
+  | Tuple4 of (float * float * float * float)
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetLight.xml}
     manual pages on opengl.org}
 *)
-external _glGetLightf1 : light_i:int -> int -> float = "gl_api_glGetLightf1"
-external _glGetLightf3 : light_i:int -> float * float * float = "gl_api_glGetLightf3"
-external _glGetLightf4 : light_i:int -> int -> float * float * float * float = "gl_api_glGetLightf4"
-
-let glGetLight ~light ~(pname:Light.get_light) =
-  let light_i = match light with GL_LIGHT i -> i in
-  match pname with
-  (* four value of tuple *)
-  | Light.GL_AMBIENT -> Tuple4 (_glGetLightf4 ~light_i 0)
-  | Light.GL_DIFFUSE -> Tuple4 (_glGetLightf4 ~light_i 1)
-  | Light.GL_SPECULAR -> Tuple4 (_glGetLightf4 ~light_i 2)
-  | Light.GL_POSITION -> Tuple4 (_glGetLightf4 ~light_i 3)
-  (* three value of tuple *)
-  | Light.GL_SPOT_DIRECTION -> Tuple3 (_glGetLightf3 ~light_i)
-  (* a value  *)
-  | Light.GL_SPOT_EXPONENT -> Tuple1 (_glGetLightf1 ~light_i 5)
-  | Light.GL_SPOT_CUTOFF -> Tuple1 (_glGetLightf1 ~light_i 6)
-  | Light.GL_CONSTANT_ATTENUATION -> Tuple1 (_glGetLightf1 ~light_i 7)
-  | Light.GL_LINEAR_ATTENUATION -> Tuple1 (_glGetLightf1 ~light_i 8)
-  | Light.GL_QUADRATIC_ATTENUATION -> Tuple1 (_glGetLightf1 ~light_i 9)
+val glGetLight: light:gl_light -> pname:Light.get_light -> tuple_type
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetMaterial.xml}
     manual pages on opengl.org}
@@ -1059,7 +1107,9 @@ external glTexImage3D: image_type:Tex.image_3d_type -> level:int ->
 external glGetTexImage: target:Tex.texture_image_type -> level:int -> format:Tex.texture_format ->
   texture_type:Tex.texture_type -> image_type -> unit = "gl_api_glGetTexImage"
 
-module TexSub = Enums.TexSub
+module TexSub : sig
+  include module type of Enums.TexSub
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexSubImage1D.xml}
     manual pages on opengl.org}
@@ -1090,7 +1140,9 @@ external glTexSubImage3D: level:int -> xoffset:int -> yoffset:int -> zoffset:int
     "gl_api_glTexSubImage3D_bytecode"
 
 type control_points = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
-module GetMap = Enums.GetMap
+module GetMap : sig
+  include module type of Enums.GetMap
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetMap.xml}
     manual pages on opengl.org}
@@ -1099,7 +1151,9 @@ external glGetMap: target:GetMap.map_target -> query:GetMap.map_query ->
   points:control_points -> unit = "gl_api_glGetMap"
 
 type index_data = (int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
-module DrawRange = Enums.DrawRange
+module DrawRange : sig
+  include module type of Enums.DrawRange
+end
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawRangeElements.xml}
     manual pages on opengl.org}

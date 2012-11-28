@@ -263,13 +263,13 @@ external gl_swap : unit -> unit = "sdlcaml_video_gl_swap_buffer"
     @param doublebuffer give true if want to enable GL_DOUBLEBUFFER. Default is true.
     @param unit dummy argument
 *)
-let gl_init ~red -> ~blue -> ~green -> ~depth -> ?doublebuffer:(dbuffer=true) () =
-  ignore (Video.set_attribute ~attr:Video.GL_RED_SIZE ~value:red);
-  ignore (Video.set_attribute ~attr:Video.GL_BLUE_SIZE ~value:blue);
-  ignore (Video.set_attribute ~attr:Video.GL_GREEN_SIZE ~value:green);
-  ignore (Video.set_attribute ~attr:Video.GL_DEPTH_SIZE ~value:depth);
+let gl_init ~red ~blue ~green ~depth ?doublebuffer:(dbuffer=true) () =
+  ignore (set_attribute ~attr:GL_RED_SIZE ~value:red);
+  ignore (set_attribute ~attr:GL_BLUE_SIZE ~value:blue);
+  ignore (set_attribute ~attr:GL_GREEN_SIZE ~value:green);
+  ignore (set_attribute ~attr:GL_DEPTH_SIZE ~value:depth);
 
   if dbuffer then
-    ignore (Video.set_attribute ~attr:Video.GL_DOUBLEBUFFER ~value:1)
+    ignore (set_attribute ~attr:GL_DOUBLEBUFFER ~value:1)
   else
-    ignore (Video.set_attribute ~attr:Video.GL_DOUBLEBUFFER ~value:0)
+    ignore (set_attribute ~attr:GL_DOUBLEBUFFER ~value:0)
