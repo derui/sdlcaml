@@ -114,11 +114,10 @@ GenerateFlags(output) =
 GENERATE = $(GenerateFlags sdl_initflags.h)
 GENERATE += $(GenerateFlags sdl_mixer_flags.h)
 
-.PHONY: clean prepare
+.DEFAULT: all
+all: prepare
 
-.DEFAULT: $(GENERATE)
-
-prepare: .DEFAULT
+prepare: $(GENERATE)
 
 generator: $(OCamlProgram gl_enum_generator, gl_enum_generator) $(OCamlProgram gl_api_generator, gl_api_generator)
 

@@ -768,9 +768,10 @@
   </section>
 
   <section name="clear_mask">
-    <pname version="GL_VERSION_0_0">GL_UNSIGNED_BYTE</pname>
-    <pname version="GL_VERSION_0_0">GL_UNSIGNED_SHORT</pname>
-    <pname version="GL_VERSION_0_0">GL_UNSIGNED_INT</pname>
+    <pname version="GL_VERSION_0_0">GL_COLOR_BUFFER_BIT</pname>
+    <pname version="GL_VERSION_0_0">GL_DEPTH_BUFFER_BIT</pname>
+    <pname version="GL_VERSION_0_0">GL_ACCUM_BUFFER_BIT</pname>
+    <pname version="GL_VERSION_0_0">GL_STENCIL_BUFFER_BIT</pname>
   </section>
 
   <section name="compare_func">

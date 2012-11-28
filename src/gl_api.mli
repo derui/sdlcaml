@@ -276,7 +276,7 @@ external glDepthFunc : Func.compare_func -> unit = "gl_api_glDepthFunc"
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDepthMask.xml}
     manual pages on opengl.org}
 *)
-external glDepthMask : bool -> unit = "camlidl_gl_api_glDepthMask"
+external glDepthMask : bool -> unit = "gl_api_glDepthMask"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDepthRange.xml}
     manual pages on opengl.org}
@@ -287,7 +287,7 @@ external glDepthRange : near:float -> far:float -> unit = "gl_api_glDepthRange"
     manual pages on opengl.org}
 *)
 external glClearAccum : red:float -> green:float -> blue:float -> alpha:float -> unit
-  = "gl_api_external"
+  = "gl_api_glClearAccum"
 
 module Accum : sig
   include module type of Enums.Accum
@@ -412,16 +412,20 @@ external glEnd : unit -> unit = "gl_api_glEnd"
 external glVertex2 : x:float -> y:float -> unit = "gl_api_glVertex2"
 external glVertex3 : x:float -> y:float -> z:float -> unit = "gl_api_glVertex3"
 external glVertex4 : x:float -> y:float -> z:float -> w:float -> unit = "gl_api_glVertex4"
+external glVertex2v : float * float -> unit = "gl_api_glVertex2v"
+external glVertex3v : float * float * float -> unit = "gl_api_glVertex3v"
+external glVertex4v : float * float * float * float-> unit = "gl_api_glVertex4v"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glNormal.xml}
     manual pages on opengl.org}
 *)
 external glNormal : x:float -> y:float -> z:float -> unit = "gl_api_glNormal"
+external glNormalv : float * float * float -> unit = "gl_api_glNormalv"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIndex.xml}
     manual pages on opengl.org}
 *)
-external glIndexf : float -> unit = "gl_api_glIndex"
+external glIndex : float -> unit = "gl_api_glIndex"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glColor.xml}
     manual pages on opengl.org}
@@ -429,6 +433,8 @@ external glIndexf : float -> unit = "gl_api_glIndex"
 external glColor3 : red:float -> green:float -> blue:float -> unit = "gl_api_glColor3"
 external glColor4 : red:float -> green:float -> blue:float -> alpha:float -> unit
   = "gl_api_glColor4"
+external glColor3v : float * float * float -> unit = "gl_api_glColor3v"
+external glColor4v : float * float * float * float -> unit = "gl_api_glColor4v"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexCoord.xml}
     manual pages on opengl.org}
@@ -902,7 +908,7 @@ external glMultiTexCoord2 : texture:int -> s:float -> t:float -> unit
 external glMultiTexCoord3 : texture:int -> s:float -> t:float -> r:float -> unit
   = "gl_api_glMultiTexCoord3"
 external glMultiTexCoord4 : texture:int -> s:float -> t:float -> r:float -> q:float -> unit
-  = "gl_api_glMultiTexCoord4d"
+  = "gl_api_glMultiTexCoord4"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLoadTransposeMatrix.xml}
     manual pages on opengl.org}
@@ -967,7 +973,7 @@ end
 *)
 external glColorPointer : pointer_type:Color.color_pointer_type ->
   stride:int -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit
-    = "gl_api_glColorPointer3"
+    = "gl_api_glColorPointer"
 
 module Index : sig
   include module type of Enums.Index
@@ -1056,7 +1062,7 @@ external glDrawPixels : width:int -> height:int ->
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetTexGen.xml}
     manual pages on opengl.org}
 *)
-external glGetTexGen1 : coord:Tex.coord -> Tex.texgen_func = "gl_api_glGetTexGenf1"
+external glGetTexGen1 : coord:Tex.coord -> Tex.texgen_func = "gl_api_glGetTexGen1"
 external glGetTexGen4 : coord:Tex.coord -> pname:Tex.texgen_plane ->
   float * float * float * float = "gl_api_glGetTexGen4"
 

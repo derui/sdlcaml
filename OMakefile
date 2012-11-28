@@ -102,7 +102,7 @@ OCAMLOPTFLAGS +=
 # OCAML_LIB_FLAGS +=
 #
 
-.DEFAULT: src/sdlcaml.cmxa
+.DEFAULT: all enums
 
 install:
 	CreateInstalled(sdlcaml, $(glob i, src/*ml) $(glob i, src/*c))

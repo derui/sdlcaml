@@ -71,8 +71,7 @@ LIB = extlib
 MyOCamlPackage($(LIB), $(FILES), $(EMPTY), $(EMPTY), false)
 OCamlInstallParentPackage(sdlcaml, $(OCamlPackageGeneratedFiles $(LIB), $(EMPTY)))
 
-.PHONY: lib
+all: $(LIB).cmxa
+.DEFAULT: all
 
-.DEFAULT: $(LIB).cmxa
-
-lib: $(LIB).cmxa
+lib: all

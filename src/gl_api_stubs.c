@@ -439,6 +439,21 @@ t_prim gl_api_glGetInteger4(value _v_pname) {
   CAMLreturn(res);
 }
 
+t_prim gl_api_glGetMatrix(value _v_pname) {
+  CAMLparam1(_v_pname);
+  CAMLlocal1(res);
+  int params[16]; /*out*/
+#include "enums/get_value_4.inc"
+
+  glGetIntegerv(get_value_4[Int_val(_v_pname)], params);
+  res = caml_alloc(16, 0);
+  for (int i = 0; i < 16; ++i) {
+    Store_field(res, i, Val_int(params[i]));
+  }
+
+  CAMLreturn(res);
+}
+
 t_prim gl_api_glPushAttrib(value _v_mask) {
   CAMLparam1(_v_mask);
 #include "enums/attrib_mask.inc"
@@ -720,7 +735,7 @@ t_prim gl_api_glScale(value _v_x, value _v_y, value _v_z) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glTranslatef(value _v_x, value _v_y, value _v_z) {
+t_prim gl_api_glTranslate(value _v_x, value _v_y, value _v_z) {
   CAMLparam3(_v_x, _v_y, _v_z);
   float x; /*in*/
   float y; /*in*/
@@ -814,6 +829,16 @@ t_prim gl_api_glVertex2(value _v_x, value _v_y) {
   CAMLreturn(Val_unit);
 }
 
+t_prim gl_api_glVertex2v(value _v_x) {
+  CAMLparam1(_v_x);
+  float x; /*in*/
+  float y; /*in*/
+  x = Double_val(Field(_v_x, 0));
+  y = Double_val(Field(_v_x, 1));
+  glVertex2f(x, y);
+  CAMLreturn(Val_unit);
+}
+
 t_prim gl_api_glVertex3(value _v_x, value _v_y, value _v_z) {
   CAMLparam3(_v_x, _v_y, _v_z);
   float x; /*in*/
@@ -822,6 +847,18 @@ t_prim gl_api_glVertex3(value _v_x, value _v_y, value _v_z) {
   x = Double_val(_v_x);
   y = Double_val(_v_y);
   z = Double_val(_v_z);
+  glVertex3f(x, y, z);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glVertex3v(value _v_x) {
+  CAMLparam1(_v_x);
+  float x; /*in*/
+  float y; /*in*/
+  float z; /*in*/
+  x = Double_val(Field(_v_x, 0));
+  y = Double_val(Field(_v_x, 1));
+  z = Double_val(Field(_v_x, 2));
   glVertex3f(x, y, z);
   CAMLreturn(Val_unit);
 }
@@ -840,7 +877,21 @@ t_prim gl_api_glVertex4(value _v_x, value _v_y, value _v_z, value _v_w) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glNormal3(value _v_nx, value _v_ny, value _v_nz) {
+t_prim gl_api_glVertex4v(value _v_x) {
+  CAMLparam1(_v_x);
+  float x; /*in*/
+  float y; /*in*/
+  float z; /*in*/
+  float w; /*in*/
+  x = Double_val(Field(_v_x, 0));
+  y = Double_val(Field(_v_x, 1));
+  z = Double_val(Field(_v_x, 2));
+  w = Double_val(Field(_v_x, 3));
+  glVertex4f(x, y, z, w);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glNormal(value _v_nx, value _v_ny, value _v_nz) {
   CAMLparam3(_v_nx, _v_ny, _v_nz);
   float nx; /*in*/
   float ny; /*in*/
@@ -852,7 +903,19 @@ t_prim gl_api_glNormal3(value _v_nx, value _v_ny, value _v_nz) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glIndexf(value _v_c) {
+t_prim gl_api_glNormalv(value _v_nx) {
+  CAMLparam1(_v_nx);
+  float nx; /*in*/
+  float ny; /*in*/
+  float nz; /*in*/
+  nx = Double_val(Field(_v_nx, 0));
+  ny = Double_val(Field(_v_nx, 1));
+  nz = Double_val(Field(_v_nx, 2));
+  glNormal3f(nx, ny, nz);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glIndex(value _v_c) {
   CAMLparam1(_v_c);
   float c; /*in*/
   c = Double_val(_v_c);
@@ -872,7 +935,19 @@ t_prim gl_api_glColor3(value _v_red, value _v_green, value _v_blue) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glColor4f(value _v_red, value _v_green, value _v_blue,
+t_prim gl_api_glColor3v(value _v_col) {
+  CAMLparam1(_v_col);
+  float red; /*in*/
+  float green; /*in*/
+  float blue; /*in*/
+  red = Double_val(Field(_v_col, 0));
+  green = Double_val(Field(_v_col, 1));
+  blue = Double_val(Field(_v_col, 2));
+  glColor3f(red, green, blue);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glColor4(value _v_red, value _v_green, value _v_blue,
                                  value _v_alpha) {
   CAMLparam4(_v_red, _v_green, _v_blue, _v_alpha);
   float red; /*in*/
@@ -883,6 +958,20 @@ t_prim gl_api_glColor4f(value _v_red, value _v_green, value _v_blue,
   green = Double_val(_v_green);
   blue = Double_val(_v_blue);
   alpha = Double_val(_v_alpha);
+  glColor4f(red, green, blue, alpha);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glColor4v(value _v_col) {
+  CAMLparam1(_v_col);
+  float red; /*in*/
+  float green; /*in*/
+  float blue; /*in*/
+  float alpha; /*in*/
+  red = Double_val(Field(_v_col, 0));
+  green = Double_val(Field(_v_col, 1));
+  blue = Double_val(Field(_v_col, 2));
+  alpha = Double_val(Field(_v_col, 3));
   glColor4f(red, green, blue, alpha);
   CAMLreturn(Val_unit);
 }
@@ -1161,7 +1250,7 @@ t_prim gl_api_glPixelMap(value _v_map, value _v_values) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glGetPixelMapfv(value _v_map, value _v_values) {
+t_prim gl_api_glGetPixelMap(value _v_map, value _v_values) {
   CAMLparam2(_v_map, _v_values);
 #include "enums/pixel_map.inc"
 
@@ -1898,7 +1987,7 @@ t_prim gl_api_glMapGrid1(value _v_un, value _v_u1, value _v_u2) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glMapGrid2f(value _v_un, value _v_u1, value _v_u2,
+t_prim gl_api_glMapGrid2(value _v_un, value _v_u1, value _v_u2,
                                    value _v_vn, value _v_v1, value _v_v2) {
   CAMLparam5(_v_un, _v_u1, _v_u2, _v_vn, _v_v1);
   CAMLxparam1(_v_v2);
@@ -1918,8 +2007,8 @@ t_prim gl_api_glMapGrid2f(value _v_un, value _v_u1, value _v_u2,
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glMapGrid2f_bytecode(value * argv, int argn) {
-  return gl_api_glMapGrid2f(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+t_prim gl_api_glMapGrid2_bytecode(value * argv, int argn) {
+  return gl_api_glMapGrid2(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
 }
 
 t_prim gl_api_glEvalPoint1(value _v_i) {
@@ -2213,7 +2302,7 @@ t_prim gl_api_glLoadTransposeMatrix(value _v_m) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glMultTransposeMatrixf(value _v_m) {
+t_prim gl_api_glMultTransposeMatrix(value _v_m) {
   CAMLparam1(_v_m);
   float const *m; /*in*/
   m = Caml_ba_data_val(_v_m);

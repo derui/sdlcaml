@@ -75,10 +75,13 @@ OCAMLFLAGS    += -g
 PROGRAMS = $(OCamlProgram make_enums, make_enums)
 PROGRAM = make_enums$(EXE)
 
-enums.ml : $(PROGRAM)
+enums.ml ../enums.ml: $(PROGRAM) enum_list.xml
 	./$< enum_list.xml
 	cp ./enums.ml ../
 
+%.inc: $(PROGRAM) enum_list.xml
+	./$< enum_list.xml
+	cp ./enums.ml ../
 
 #
 # OCAML_LIBS += ../lib/extlib -custom
@@ -86,14 +89,15 @@ enums.ml : $(PROGRAM)
 # OCAML_OTHER_LIBS += camlidl
 # OCAML_LIB_FLAGS += -cclib -lsdlcaml
 #
-.PHONY: enums
 
-# As gl_enum.h is referenced by already existed .c file,
-# need to add generated files by camlidl to adependency for .DEFAULT.
-enums: $(PROGRAMS) enums.ml
+all: $(PROGRAMS) enums.ml ../enums.ml
+
+.DEFAULT: all
+
+enums: all
 
 clean:
 	rm -f *.inc
 	rm -f enums.ml
-	rm -f ../enums.ml
+	rm -f ../enums.*
 	rm -f $(PROGRAMS)

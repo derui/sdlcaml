@@ -36,132 +36,124 @@ let make_vertex_array arrayt vertex =
 let test_sdl_gl_basic surface =
   let open Gl in
   begin
-    let v0 = make_vertex_array Bigarray.float32 [| -1.0; -1.0;  1.0 |]
-    and v1 = make_vertex_array Bigarray.float32 [|  1.0; -1.0;  1.0 |]
-    and v2 = make_vertex_array Bigarray.float32 [|  1.0;  1.0;  1.0 |]
-    and v3 = make_vertex_array Bigarray.float32 [| -1.0;  1.0;  1.0 |]
-    and v4 = make_vertex_array Bigarray.float32 [| -1.0; -1.0; -1.0 |]
-    and v5 = make_vertex_array Bigarray.float32 [|  1.0; -1.0; -1.0 |]
-    and v6 = make_vertex_array Bigarray.float32 [|  1.0;  1.0; -1.0 |]
-    and v7 = make_vertex_array Bigarray.float32 [| -1.0;  1.0; -1.0 |]
-    and red    = make_vertex_array Bigarray.char
-      [| char_of_int 255; char_of_int   0; char_of_int   0; char_of_int 255 |]
-    and green  = make_vertex_array Bigarray.char
-      [| char_of_int   0; char_of_int 255; char_of_int   0; char_of_int 255 |]
-    and blue   = make_vertex_array Bigarray.char
-      [| char_of_int   0; char_of_int   0; char_of_int 255; char_of_int 255 |]
-    and white  = make_vertex_array Bigarray.char
-      [| char_of_int 255; char_of_int 255; char_of_int 255; char_of_int 255 |]
-    and yellow = make_vertex_array Bigarray.char
-      [| char_of_int   0; char_of_int 255; char_of_int 255; char_of_int 255 |]
-    and black  = make_vertex_array Bigarray.char
-      [| char_of_int   0; char_of_int   0; char_of_int   0; char_of_int 255 |]
-    and orange = make_vertex_array Bigarray.char
-      [| char_of_int 255; char_of_int 255; char_of_int   0; char_of_int 255 |]
-    and purple = make_vertex_array Bigarray.char
-      [| char_of_int 255; char_of_int   0; char_of_int 255; char_of_int   0 |] in
+    let v0 = ( -1.0, -1.0,  1.0 )
+    and v1 = (  1.0, -1.0,  1.0 )
+    and v2 = (  1.0,  1.0,  1.0 )
+    and v3 = ( -1.0,  1.0,  1.0 )
+    and v4 = ( -1.0, -1.0, -1.0 )
+    and v5 = (  1.0, -1.0, -1.0 )
+    and v6 = (  1.0,  1.0, -1.0 )
+    and v7 = ( -1.0,  1.0, -1.0 )
+    and red    = ( 1.0, 0.0, 0.0, 1.0 )
+    and green  = ( 0.0, 1.0, 0.0, 1.0 )
+    and blue   = ( 0.0, 0.0, 1.0, 1.0 )
+    and white  = ( 1.0, 1.0, 1.0, 1.0 )
+    and yellow = ( 0.0, 1.0, 1.0, 1.0 )
+    and black  = ( 0.0, 0.0, 0.0, 1.0 )
+    and orange = ( 1.0, 1.0, 0.0, 1.0 )
+    and purple = ( 1.0, 0.0, 1.0, 0.0 ) in
 
-    glShadeModel E.GSmooth;
-    glCullFace E.GBack;
-    glFrontFace E.GCcw;
-    glEnable E.GCullFace;
+    glShadeModel Shade.GL_SMOOTH;
+    glCullFace CullFace.GL_BACK;
+    glFrontFace FrontFace.GL_CCW;
+    glEnable Enable.GL_CULL_FACE;
     glClearColor 0.5 0.5 0.0 1.0;
     glViewport 0 0 640 480;
-    glMatrixMode E.GProjection;
+    glMatrixMode Matrix.GL_PROJECTION;
     glLoadIdentity ();
     glOrtho (-1.0) 1.0 (-1.0) 1.0 1.0 1024.0;
 
-    glClear [E.GColorBufferBit;E.GDepthBufferBit];
-    glMatrixMode E.GModelview;
+    glClear [Clear.GL_COLOR_BUFFER_BIT;Clear.GL_DEPTH_BUFFER_BIT];
+    glMatrixMode Matrix.GL_MODELVIEW;
     glLoadIdentity ();
-    glTranslatef 0.0 0.0 (-5.0);
-    glRotatef 10.0 0.0 1.0 0.0;
+    glTranslate 0.0 0.0 (-5.0);
+    glRotate 10.0 0.0 1.0 0.0;
 
-    glBegin E.GTriangles;
+    glBegin Begin.GL_TRIANGLES;
 
-    glColor4ubv( red );
-    glVertex3fv( v0 );
-    glColor4ubv( green );
-    glVertex3fv( v1 );
-    glColor4ubv( blue );
-    glVertex3fv( v2 );
+    glColor4v red;
+    glVertex3v v0;
+    glColor4v green;
+    glVertex3v v1;
+    glColor4v blue;
+    glVertex3v( v2 );
 
-    glColor4ubv( red );
-    glVertex3fv( v0 );
-    glColor4ubv( blue );
-    glVertex3fv( v2 );
-    glColor4ubv( white );
-    glVertex3fv( v3 );
+    glColor4v( red );
+    glVertex3v( v0 );
+    glColor4v( blue );
+    glVertex3v( v2 );
+    glColor4v( white );
+    glVertex3v( v3 );
 
-    glColor4ubv( green );
-    glVertex3fv( v1 );
-    glColor4ubv( black );
-    glVertex3fv( v5 );
-    glColor4ubv( orange );
-    glVertex3fv( v6 );
+    glColor4v( green );
+    glVertex3v( v1 );
+    glColor4v( black );
+    glVertex3v( v5 );
+    glColor4v( orange );
+    glVertex3v( v6 );
 
-    glColor4ubv( green );
-    glVertex3fv( v1 );
-    glColor4ubv( orange );
-    glVertex3fv( v6 );
-    glColor4ubv( blue );
-    glVertex3fv( v2 );
+    glColor4v( green );
+    glVertex3v( v1 );
+    glColor4v( orange );
+    glVertex3v( v6 );
+    glColor4v( blue );
+    glVertex3v( v2 );
 
-    glColor4ubv( black );
-    glVertex3fv( v5 );
-    glColor4ubv( yellow );
-    glVertex3fv( v4 );
-    glColor4ubv( purple );
-    glVertex3fv( v7 );
+    glColor4v( black );
+    glVertex3v( v5 );
+    glColor4v( yellow );
+    glVertex3v( v4 );
+    glColor4v( purple );
+    glVertex3v( v7 );
 
-    glColor4ubv( black );
-    glVertex3fv( v5 );
-    glColor4ubv( purple );
-    glVertex3fv( v7 );
-    glColor4ubv( orange );
-    glVertex3fv( v6 );
+    glColor4v( black );
+    glVertex3v( v5 );
+    glColor4v( purple );
+    glVertex3v( v7 );
+    glColor4v( orange );
+    glVertex3v( v6 );
 
-    glColor4ubv( yellow );
-    glVertex3fv( v4 );
-    glColor4ubv( red );
-    glVertex3fv( v0 );
-    glColor4ubv( white );
-    glVertex3fv( v3 );
+    glColor4v( yellow );
+    glVertex3v( v4 );
+    glColor4v( red );
+    glVertex3v( v0 );
+    glColor4v( white );
+    glVertex3v( v3 );
 
-    glColor4ubv( yellow );
-    glVertex3fv( v4 );
-    glColor4ubv( white );
-    glVertex3fv( v3 );
-    glColor4ubv( purple );
-    glVertex3fv( v7 );
+    glColor4v( yellow );
+    glVertex3v( v4 );
+    glColor4v( white );
+    glVertex3v( v3 );
+    glColor4v( purple );
+    glVertex3v( v7 );
 
-    glColor4ubv( white );
-    glVertex3fv( v3 );
-    glColor4ubv( blue );
-    glVertex3fv( v2 );
-    glColor4ubv( orange );
-    glVertex3fv( v6 );
+    glColor4v( white );
+    glVertex3v( v3 );
+    glColor4v( blue );
+    glVertex3v( v2 );
+    glColor4v( orange );
+    glVertex3v( v6 );
 
-    glColor4ubv( white );
-    glVertex3fv( v3 );
-    glColor4ubv( orange );
-    glVertex3fv( v6 );
-    glColor4ubv( purple );
-    glVertex3fv( v7 );
+    glColor4v( white );
+    glVertex3v( v3 );
+    glColor4v( orange );
+    glVertex3v( v6 );
+    glColor4v( purple );
+    glVertex3v( v7 );
 
-    glColor4ubv( green );
-    glVertex3fv( v1 );
-    glColor4ubv( red );
-    glVertex3fv( v0 );
-    glColor4ubv( yellow );
-    glVertex3fv( v4 );
+    glColor4v( green );
+    glVertex3v( v1 );
+    glColor4v( red );
+    glVertex3v( v0 );
+    glColor4v( yellow );
+    glVertex3v( v4 );
 
-    glColor4ubv( green );
-    glVertex3fv( v1 );
-    glColor4ubv( yellow );
-    glVertex3fv( v4 );
-    glColor4ubv( black );
-    glVertex3fv( v5 );
+    glColor4v( green );
+    glVertex3v( v1 );
+    glColor4v( yellow );
+    glVertex3v( v4 );
+    glColor4v( black );
+    glVertex3v( v5 );
 
     glEnd ();
 
