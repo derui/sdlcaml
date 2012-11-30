@@ -314,7 +314,7 @@ external glLoadIdentity : unit -> unit = "gl_api_glLoadIdentity"
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLoadMatrix.xml}
     manual pages on opengl.org}
 *)
-external glLoadMatrixf : float array -> unit = "gl_api_glLoadMatrixf"
+external glLoadMatrix : float array -> unit = "gl_api_glLoadMatrix"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMultMatrix.xml}
     manual pages on opengl.org}

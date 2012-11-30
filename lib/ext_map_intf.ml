@@ -97,7 +97,7 @@ module type Creator = sig
   (** map with single pair, value and key  *)
   val singleton: ('a, 'comparator, 'a key -> 'v -> ('a, 'v, 'comparator) t) create
 
-  (** convert {Map} to key-value alist.
+  (** convert Map to key-value alist.
       if given map include duplicated key, raise exception
 
       TODO: Being customizable include duplicate key in map...

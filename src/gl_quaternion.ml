@@ -12,18 +12,16 @@ let epsilon = 0.00001
 
 let identity _ =
   {quat_angle = 1.0;
-   quat_axis = V.to_vec_tuple (0.0, 0.0, 0.0)
+   quat_axis = V.zero
   }
 
 let make ~angle ~vector =
   let angle = angle /. 2.0 in
   let radian = pi /. 180.0 *. angle in
   let base_sin = sin radian  in
-  let (x, y, z) = V.of_vec (V.normalize vector) in
+  let normal = V.normalize vector in
   {quat_angle = cos radian;
-   quat_axis = V.to_vec ~x:(x *. base_sin)
-      ~y:(y *. base_sin)
-      ~z:(z *. base_sin)
+   quat_axis = V.scale ~v:normal ~scale:base_sin
   }
 
 let norm {quat_axis;quat_angle} =
@@ -33,14 +31,11 @@ let norm {quat_axis;quat_angle} =
 
 let normalize quat =
   let normed = norm quat in
-  let (x, y, z) = V.of_vec quat.quat_axis in
   (* norm should be over 0.0 *)
   if normed > 0.0 then
     let mangle = 1.0 /. normed in
     {quat_angle = quat.quat_angle *. mangle;
-     quat_axis = V.to_vec ~x:(x *. mangle)
-        ~y:(y *. mangle)
-        ~z:(z *. mangle)
+     quat_axis = V.scale ~v:quat.quat_axis ~scale:mangle
     }
   else
     identity ()
@@ -51,11 +46,11 @@ let multiply first second =
   and w2 = second.quat_angle
   and (x2, y2, z2) = V.of_vec second.quat_axis in
   { quat_angle = w1 *. w2 -. x1 *. x2 -. y1 *. y2 -. z1 *. z2;
-    quat_axis = V.to_vec_tuple
-      ( w1 *. x2 +. x1 *. w2 +. y1 *. z2 -. z1 *. y2,
-        w1 *. y2 +. y1 *. w2 +. z1 *. x2 -. x1 *. z2,
-        w1 *. z2 +. z1 *. w2 +. x1 *. y2 -. y1 *. x2
-      )
+    quat_axis =
+      { V.x = w1 *. x2 +. x1 *. w2 +. y1 *. z2 -. z1 *. y2;
+        y = w1 *. y2 +. y1 *. w2 +. z1 *. x2 -. x1 *. z2;
+        z =w1 *. z2 +. z1 *. w2 +. x1 *. y2 -. y1 *. x2;
+      }
   }
 
 let ( *> ) first second = multiply first second
@@ -68,11 +63,8 @@ let axis {quat_axis;quat_angle} =
   if sin_theta_sq <= 0.0 then
     (identity ()).quat_axis
   else
-    let (x,y,z) = V.of_vec quat_axis in
     let over_sin = 1.0 /. sqrt sin_theta_sq in
-    V.to_vec ~x:(x *. over_sin)
-      ~y:(y *. over_sin)
-      ~z:(z *. over_sin)
+    V.scale ~v:quat_axis ~scale:over_sin
 
 let convert_matrix quat =
   let w = quat.quat_angle
@@ -110,9 +102,8 @@ let dot q1 q2 =
 *)
 let minimum_angle q1 q2 =
   let dotted = dot q1 q2 in
-  let (x, y, z) = V.of_vec q1.quat_axis in
   if dotted < 0.0 then
-    ({quat_angle = -.dotted; quat_axis = V.to_vec_tuple (-.x, -.y, -.z)}, q2)
+    ({quat_angle = -.dotted; quat_axis = V.scale ~v:q1.quat_axis ~scale:(-1.0)}, q2)
   else
     (q1, q2)
 
@@ -141,7 +132,7 @@ let slerp ~from_quat ~to_quat ~freq =
   and (x1,y1,z1) = V.of_vec to_quat.quat_axis
   in
   {quat_angle = w0 *. k0 +. w1 *. k1;
-   quat_axis = V.to_vec_tuple ( x0 *. k0 +. x1 *. k1,
-                                y0 *. k0 +. y1 *. k1,
-                                z0 *. k0 +. z1 *. k1)
+   quat_axis = {V.x = x0 *. k0 +. x1 *. k1;
+                y = y0 *. k0 +. y1 *. k1;
+                z = z0 *. k0 +. z1 *. k1}
   }

@@ -1,6 +1,6 @@
 open build/Common
 open configure/Configure
-open common/Function
+open MyFunction
 
 public.USE_OCAMLFIND = false
 

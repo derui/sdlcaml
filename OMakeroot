@@ -32,7 +32,7 @@
 open configure/Configure
 open build/Common
 
-OMAKEPATH += $(dir ./omakescripts)
+OMAKEPATH += $(dir ./MyOMake)
 
 #
 # The command-line variables are defined *after* the

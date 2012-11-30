@@ -10,10 +10,10 @@ type t = {
 
 let to_array mat =
   [|
-    mat.m11; mat.m12; mat.m13; mat.m14;
-    mat.m21; mat.m22; mat.m23; mat.m24;
-    mat.m31; mat.m32; mat.m33; mat.m34;
-    mat.m41; mat.m42; mat.m43; mat.m44;
+    mat.m11; mat.m21; mat.m31; mat.m41;
+    mat.m12; mat.m22; mat.m32; mat.m42;
+    mat.m13; mat.m23; mat.m33; mat.m43;
+    mat.m14; mat.m24; mat.m34; mat.m44;
   |]
 
 let identity _ =
@@ -36,12 +36,12 @@ let ortho_projection ~width ~height ~near ~far =
   }
 
 let perspective_projection ~fov ~ratio ~near ~far =
-
   let pi = 3.14159265358979323846 in
-  let maxY = near *. tan (fov *. pi /. 360.0) in
+  let cot l = 1.0 /. tan (fov *. pi /. 360.0) in
+  let maxY = cot (fov /. 2.0) in
   let minY = -. maxY in
-  let minX = minY *. ratio
-  and maxX = maxY *. ratio in
+  let minX = minY /. ratio
+  and maxX = maxY /. ratio in
 
   let x_diff = maxX -. minX in
   let y_diff = maxY -. minY in
@@ -55,10 +55,10 @@ let perspective_projection ~fov ~ratio ~near ~far =
   and e = -. (far +. near) /. z_diff
   and f = -. (near_twice *. far) /. z_diff
   in
-  { m11 = a;   m12 = 0.0; m13 = 0.0; m14 =  0.0;
-    m21 = 0.0; m22 = b;   m23 = 0.0; m24 =  0.0;
-    m31 = c;   m32 = d;   m33 = e;   m34 = -1.0;
-    m41 = 0.0; m42 = 0.0; m43 = f;   m44 =  0.0;
+  { m11 = a;   m12 = 0.0; m13 = c; m14 =  0.0;
+    m21 = 0.0; m22 = b;   m23 = d; m24 =  0.0;
+    m31 = 0.0; m32 = 0.0; m33 = e;   m34 = f;
+    m41 = 0.0; m42 = 0.0; m43 = -1.0;   m44 =  0.0;
   }
 
 let multiply ~m1 ~m2 =
@@ -132,3 +132,9 @@ let transpose mat =
     m31 = mat.m13; m32 = mat.m23; m33 = mat.m33; m34 = mat.m43;
     m41 = mat.m14; m42 = mat.m24; m43 = mat.m34; m44 = mat.m44;
   }
+
+let to_string mat =
+  Printf.sprintf "| %f | %f | %f | %f |\n" mat.m11 mat.m12 mat.m13 mat.m14 ^
+    Printf.sprintf "| %f | %f | %f | %f |\n" mat.m21 mat.m22 mat.m23 mat.m24 ^
+    Printf.sprintf "| %f | %f | %f | %f |\n" mat.m31 mat.m32 mat.m33 mat.m34 ^
+    Printf.sprintf "| %f | %f | %f | %f |\n" mat.m41 mat.m42 mat.m43 mat.m44

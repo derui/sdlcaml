@@ -75,7 +75,8 @@ CAMLprim value sdlcaml_cd_status(value cd) {
 CAMLprim value sdlcaml_cd_indrive(value cd) {
   CAMLparam1(cd);
 
-  int ret = CD_INDRIVE(CD_val(cd));
+  CDstatus status = SDL_CDStatus(CD_val(cd));
+  int ret = CD_INDRIVE(status);
   CAMLreturn(ret == 1 ? Val_true : Val_false);
 }
 

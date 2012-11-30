@@ -23,7 +23,7 @@
 # variables.
 #
 
-open common/Util
+open MyUtil
 
 #
 # This project requires ocamlfind (default - false).

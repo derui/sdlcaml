@@ -1,4 +1,4 @@
-module M = Gl_matrix
-module V = Gl_vector
-module Q = Gl_quaternion
+module Mat = Gl_matrix
+module Vec = Gl_vector
+module Qua = Gl_quaternion
 include Gl_api

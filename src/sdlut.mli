@@ -84,6 +84,12 @@ type button = int
 *)
 type key_mapping = Sdl_key.key_synonym * button
 
+(** To return from function that are {!get_pressed} and {!get_released}
+    are types as mapped key and button.
+    Null* is no key or button mapping it.
+*)
+type integrated = Button of button | Key of Sdl_key.key_synonym
+
 (** Container for input mapping infomations.
     User don't need nessesary to know details of this struct,
     this is only used to system.
@@ -268,22 +274,46 @@ val add_input_callback: info:input_info -> func:(info:input_info -> unit) -> uni
 *)
 val remove_input_callback: input_info -> unit
 
+(** Get current all input statements whether state is pressed or released.
+    These functions return mapped key and button. If pressed key or button
+    do not be contained via {!integrate_input}, returning list contain
+    them as (some key, null_button) or (null_key, some button).
+
+    For instance, to be used to input handling, you can use pattern match
+    returned them.
+
+    Note: this function always return {b all key and button states}, so
+          returning list is often as big as 200 elements...
+          To need only few key and key states, you should use {!get_pressed} and
+          {!get_pressed}.
+
+    @param info target integrated input infomation structure
+    @return all current button and key state
+*)
+val get_all_pressed: input_info -> integrated list
+val get_all_released: input_info -> integrated list
+
 (** Get current input statements whether pressed or released any keys or buttons.
     If given key alreadly binding some buttons, result in equivalent when this function call with
     binding button to given key.
     you have to call {!axis_state} with same {!input_info}.
 
+    If you was only registered some keys and call this function with not registered key or button,
+    returning list contain them as whether (key, null_button) or (null_key, button).
+
     Note: To get newest state should call {!force_update} before,
           but these are usually used in callback-function registered by {!add_input_callback}.
 
     @param info target input info
-    @param state Key or button is to get current state
+    @param states Keys or buttons are to get current state
     @return current button or key state.
 *)
-val is_pressed: info:input_info ->
-  state:[< `Key of Sdl_key.key_synonym | `Button of button] -> bool
-val is_released: info:input_info ->
-  state:[< `Key of Sdl_key.key_synonym | `Button of button] -> bool
+val get_pressed: info:input_info ->
+  states:[< `Key of Sdl_key.key_synonym | `Button of button] list ->
+  integrated list
+val get_released: info:input_info ->
+  states:[< `Key of Sdl_key.key_synonym | `Button of button] list ->
+  integrated list
 
 (** Get current state of given axis that is a signed integer representing
     the current position of the axis.

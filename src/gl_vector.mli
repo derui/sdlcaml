@@ -6,23 +6,10 @@
 *)
 
 (** type of vector  *)
-type t
+type t = {x:float; y:float; z:float}
 
-(** Construct Vector with each value of axis.
-
-    @param x value of x axis
-    @param y value of y axis
-    @param z value of z axis
-    @return constructed vector
-*)
-val to_vec: x:float -> y:float -> z:float -> t
-
-(** Construct Vector with tuple contain each value of x, y, z axis.
-
-    @param tuple (x, y, z)
-    @return constructed vector
-*)
-val to_vec_tuple: float * float * float -> t
+(** return new zero vector.  *)
+val zero:t
 
 (** Extract each axis value from {!t}.   *)
 val of_vec: t -> float * float * float
@@ -59,7 +46,7 @@ val dot : t -> t -> float
 val cross : t -> t -> t
 
 (** scale vector with scaling scalar. *)
-val scaling : vec:t -> scale:float -> t
+val scale : v:t -> scale:float -> t
 
 (** return added vector between two vectors. *)
 val add : t -> t -> t
@@ -69,3 +56,5 @@ val sub : t -> t -> t
 
 (** is vectors between angle square.  *)
 val is_square : t -> t -> bool
+
+include Extlib.Comparable.Type with type t := t

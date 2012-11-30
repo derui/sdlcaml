@@ -17,6 +17,14 @@
    type of matrix providing this module is able to convert between
    array and it. User wouldn't careful inner implementation!
    (Of course, you could look .ml file if you wish)
+
+   Matrix provided this module is able to convert to string, converted
+   string format is as follows.
+   | 11 | 12 | 13 | 14 |
+   | 21 | 22 | 23 | 24 |
+   | 31 | 32 | 33 | 34 |
+   | 41 | 42 | 43 | 44 |
+   Therefore, sorry to above format can not change from user...
 *)
 
 (** precise 4x4 matrix definition.
@@ -50,13 +58,12 @@ val ortho_projection : width:int -> height:int -> near:float -> far:float -> t
 
 (**
    construct a projection matrix.
-   `fov' is "Field Of View" that the trustrum is visible angle of
-   between left and right side.
-   `ratio` is screen ratio that width divide height.
+   `fov' is that the field of view angle in the y direction.
+   `ratio` is screen ratio that determines the field of view in the x direction.
    near and far is clip that visible range along the Z axis.
 
    @param fov Field Of View
-   @param ratio screen ratio that width devide height
+   @param the ratio of x to y
    @param near near clip
    @param far far clip
 *)
@@ -104,3 +111,5 @@ val inverse : t -> t option
     One more transpose transposed matrix, it is equlivalence original one.
 *)
 val transpose : t -> t
+
+include Extlib.Stringable.Type with type t := t

@@ -30,6 +30,8 @@ type button = int
 
 type key_mapping = Sdl_key.key_synonym * button
 
+type integrated = Button of button | Key of Sdl_key.key_synonym
+
 module AxisMap = Map.Make (
   struct
     type t = Joystick.axis
@@ -181,66 +183,70 @@ let display_callback ~func = display_callback_func := func
 let move_callback ~func = move_callback_func := func
 let quit_callback ~func = quit_callback_func := func
 
+(* synchronize each states which are keys, buttons, and axes. *)
+let sync_bindings info =
+  let replace_if_exists tbl key v =
+    if Hashtbl.mem tbl key then Hashtbl.replace tbl key v else () in
+  let open Extlib.Std.Option.Open in
+
+  (* key states synchronize button states *)
+  Hashtbl.iter (fun key buttons ->
+    let state = try Some (Hashtbl.find info.key_state key) with Not_found -> None in
+    ignore (
+      state >>= (fun state ->
+        return (List.iter (fun x ->
+          let state = state || (try Hashtbl.find info.button_state x with _ -> false) in
+          replace_if_exists info.button_state x state) buttons))
+    )
+  ) info.key_maps;
+
+  (* button states synchronize key states *)
+  Hashtbl.iter (fun key keys ->
+    let state = try Some (Hashtbl.find info.button_state key) with Not_found -> None in
+    ignore (
+      state >>= (fun state ->
+        return (List.iter (fun x ->
+          let state = state || (try Hashtbl.find info.key_state x with _ -> false) in
+          replace_if_exists info.key_state x state) keys))
+    )
+  ) info.button_maps;
+
+  (* axis states synchronize key states *)
+  Hashtbl.iter (fun key mapping ->
+    let state = try Some (Hashtbl.find info.axis_state key) with Not_found -> None in
+    ignore (
+      state >>= (fun state ->
+        return (List.iter (fun x ->
+          if x.capacity < state then
+            replace_if_exists info.key_state x.key true
+          else ()) mapping))
+    )
+  ) info.axis_maps
+
+
 (* update input informations for all current input_info *)
 let update_input_infos () =
-  let update_hashtbl_with_list tbl list =
-    List.iter (fun (key, state) ->
-      if not (Hashtbl.mem tbl key) then
-        Hashtbl.replace tbl key state) list
-  in
   let update_info (func, info) =
     let key_states = Input.get_key_state () in
     begin
-      (* update keys *)
-      Sdl_key.StateMap.iter (fun key state ->
-        if not (Hashtbl.mem !info.key_state key) then
-          Hashtbl.replace !info.key_state key state) key_states;
-      (* update binding buttons to keys *)
-      Sdl_key.StateMap.iter (fun key state ->
-        try
-          let lst = Hashtbl.find !info.key_maps key in
-          List.iter (fun key ->
-            Hashtbl.replace !info.button_state key state) lst
-        with Not_found -> ()
-      ) key_states;
+      (* update keys that all state of keys by to get SDL *)
+      Sdl_key.StateMap.iter (Hashtbl.replace !info.key_state) key_states;
 
       (* update buttons *)
       let open Extlib.Std.Option.Open in
       (* runs monad with option *)
       ignore (!info.joy_struct >>= (fun joy ->
         let buttons = Joystick.get_button_all joy in
-        (update_hashtbl_with_list !info.button_state buttons);
-        Extlib.Std.Option.return buttons)
-
-        >>= (fun buttons ->       (* update binding keys to buttons *)
-          List.iter (fun (button, state) ->
-            try
-              let lst = Hashtbl.find !info.button_maps button in
-              List.iter (fun key ->
-                Hashtbl.replace !info.key_state key state) lst
-            with Not_found -> ()
-          ) buttons;
-          Extlib.Std.Option.return ()));
+        return (List.iter (fun (k,v) -> Hashtbl.replace !info.button_state k v) buttons)));
 
       (* update axes *)
       let open Extlib.Std.Option.Open in
       ignore (!info.joy_struct >>= (fun joy ->
-        Extlib.Std.Option.return (Joystick.get_axis_all joy))
-        >>= (fun axes ->
-          update_hashtbl_with_list !info.axis_state axes;
-          (* update bindings *)
-          Extlib.Std.Option.return (List.iter (fun (key, state) ->
-            try
-              let lst = Hashtbl.find !info.axis_maps key in
-              List.iter (fun {key;capacity;_} ->
-                let is_over = state >= capacity in
-                Hashtbl.replace !info.key_state key is_over
-              ) lst
-            with Not_found -> ()
-          ) axes)));
-      (func, info)
+        return (Joystick.get_axis_all joy)) >>= (fun axes ->
+          return (List.iter (fun (k, v) -> Hashtbl.replace !info.axis_state k v) axes)));
+      sync_bindings !info;
     end in
-  input_callback_funcs := IntMap.map !input_callback_funcs update_info
+  IntMap.iter !input_callback_funcs update_info
 
 let event_dispatch () =
   let rec polling = function
@@ -300,11 +306,7 @@ let integrate_inputs ~id ~num ~axis_map ~key_map =
     List.fold_left add_key (Hashtbl.create 10) keys in
 
   let make_hashtbl list init =
-    List.fold_left (fun tbl key ->
-        begin
-          Hashtbl.add tbl key init;
-          tbl;
-        end)
+    List.fold_left (fun tbl key -> Hashtbl.add tbl key init; tbl)
       (Hashtbl.create 10) list in
 
   let make_struct joy =
@@ -333,18 +335,51 @@ let add_input_callback ~info ~func =
 let remove_input_callback info =
   input_callback_funcs := IntMap.remove !input_callback_funcs !info.info_id
 
-let is_pressed ~info ~state =
-  match state with
-  | `Button (btn:int) ->
-    begin
-      try Hashtbl.find !info.button_state btn with Not_found -> false
-    end
-  | `Key key ->
-    begin
-      try Hashtbl.find !info.key_state key with Not_found -> false
-    end
+let correct_states ~info ~states ~pred =
+  let input_pressed state =
+    match state with
+    | `Button (btn:int) ->
+      begin
+        try
+          if pred (Hashtbl.find !info.button_state btn) then
+            Some (Button btn)
+          else None
+        with Not_found -> None
+      end
+    | `Key key ->
+      begin
+        try
+          if pred (Hashtbl.find !info.key_state key) then
+            Some (Key key)
+          else None
+        with Not_found -> None
+      end
+  in
+  let merge_state list = function
+    | Some x -> x :: list
+    | None -> list
+  in
+  List.fold_left merge_state [] (List.map input_pressed states)
 
-let is_released ~info ~state = not (is_pressed ~info ~state)
+let get_pressed ~info ~states =
+  correct_states ~info ~states ~pred:Extlib.Prelude.id
+
+let get_released ~info ~states =
+  correct_states ~info ~states ~pred:not
+
+let extract_all_states info pred =
+  let button_states =
+    let filter k e l = if pred e then (Button k) :: l else l in
+    Hashtbl.fold filter !info.button_state []
+  in
+  let key_states =
+    let filter k e l = if pred e then (Key k) :: l else l in
+    Hashtbl.fold filter !info.key_state []
+  in
+  button_states @ key_states
+
+let get_all_pressed info = extract_all_states info Extlib.Prelude.id
+let get_all_released info = extract_all_states info not
 
 let axis_state ~info ~state =
   match state with
@@ -359,17 +394,25 @@ let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
   let ms_per_sec = 1000 * 100 / (fps)
   and reminder_of_loop = ref 0
   and count_a_second = ref 0
-  and count_frame = ref 0 in
+  and count_frame = ref 0
+  and seconds_as_ms = 1000 in
+  let update_counts () =
+    if !count_a_second > seconds_as_ms then begin
+        global_fps := !count_frame;
+        count_frame := 0;
+        count_a_second := 0;
+    end
+  and waits_reminder diff =
+    reminder_of_loop := !reminder_of_loop + ms_per_sec;
+    let this_time_delay = !reminder_of_loop / 100 - diff in
+    reminder_of_loop := (!reminder_of_loop mod 100);
+    count_a_second := !count_a_second + diff + this_time_delay;
+    Timer.delay this_time_delay in
 
   let rec mainloop skip_this_loop =
     let start = Timer.get_ticks () in
     begin
-
-      if !count_a_second > 1000 then begin
-        global_fps := !count_frame;
-        count_frame := 0;
-        count_a_second := 0;
-      end;
+      update_counts ();
 
       event_dispatch ();
 
@@ -386,11 +429,7 @@ let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
         count_a_second := !count_a_second + diff;
         mainloop true
       end else begin
-        reminder_of_loop := !reminder_of_loop + ms_per_sec;
-        let this_time_delay = !reminder_of_loop / 100 - diff in
-        reminder_of_loop := (!reminder_of_loop mod 100);
-        Timer.delay this_time_delay;
-        count_a_second := !count_a_second + diff + this_time_delay;
+        waits_reminder diff;
         mainloop false;
       end
     end in
