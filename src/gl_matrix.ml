@@ -24,14 +24,17 @@ let identity _ =
     m41 = 0.0; m42 = 0.0; m43 = 0.0; m44 = 1.0;
   }
 
-let ortho_projection ~width ~height ~near ~far =
-  let ratio = float width /. float height in
-  let height_ratio = ratio *. 1.0 /. float height
-  and width_ratio = 1.0/. (ratio *. float width) in
+let ortho_projection ~left ~right ~top ~bottom ~near ~far =
+  let width_ratio = 2.0 /. (left -. right)
+  and height_ratio = 2.0 /. (top -. bottom)
+  and z_ratio = -2.0 /. (far -. near)
+  and tx = -1.0 *. (right +. left) /. (right -. left)
+  and ty = -1.0 *. (top +. bottom) /. (top -. bottom)
+  and tz = -1.0 *. (far +. near) /. (far -. near) in
 
-  { m11 = width_ratio ; m12 = 0.0;          m13 = 0.0; m14 = 0.0;
-    m21 = 0.0         ; m22 = height_ratio; m23 = 0.0; m24 = 0.0;
-    m31 = 0.0         ; m32 = 0.0;          m33 = 0.0; m34 = 0.0;
+  { m11 = width_ratio ; m12 = 0.0;          m13 = 0.0; m14 = tx;
+    m21 = 0.0         ; m22 = height_ratio; m23 = 0.0; m24 = ty;
+    m31 = 0.0         ; m32 = 0.0;          m33 = z_ratio; m34 = tz;
     m41 = 0.0         ; m42 = 0.0;          m43 = 0.0; m44 = 1.0;
   }
 

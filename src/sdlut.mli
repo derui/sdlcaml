@@ -88,21 +88,13 @@ type key_mapping = Sdl_key.key_synonym * button
     are types as mapped key and button.
     Null* is no key or button mapping it.
 *)
-type integrated = Button of button | Key of Sdl_key.key_synonym
+type input_state = Button of button | Key of Sdl_key.key_synonym
 
 (** Container for input mapping infomations.
     User don't need nessesary to know details of this struct,
     this is only used to system.
 *)
 type input_info
-
-(** To use current key or button status.
-*)
-type input_state = [
-| `Key of Sdl_key.key_synonym
-| `Button of button
-| `Axis of Sdl_joystick.axis
-]
 
 (** Initialize SDL and SDLUT system.
     This function work as wrapper for {!Sdl_init.init} and
@@ -137,6 +129,10 @@ val unregister_callback: callback:callback_type list -> unit
 val active_callback: func:(state:Sdl_event.app_state list -> gain:bool -> unit) -> unit
 
 (** Register function for KeyDown and KeyUp event.
+    Caution, callback function registered by this function is called by system
+    each {!KeyDown} or {!KeyUp} event, but each event raised one by one.
+    So input handling need to process realtime, use {!integrate_inputs} and
+    {!add_input_callback}. see document them.
     Details equal {!active_callback}.
 
     @param func callback function for {!Sdl_event.KeyDown} and {!Sdl_event.KeyUp}
@@ -290,8 +286,8 @@ val remove_input_callback: input_info -> unit
     @param info target integrated input infomation structure
     @return all current button and key state
 *)
-val get_all_pressed: input_info -> integrated list
-val get_all_released: input_info -> integrated list
+val get_all_pressed: input_info -> input_state list
+val get_all_released: input_info -> input_state list
 
 (** Get current input statements whether pressed or released any keys or buttons.
     If given key alreadly binding some buttons, result in equivalent when this function call with
@@ -310,10 +306,10 @@ val get_all_released: input_info -> integrated list
 *)
 val get_pressed: info:input_info ->
   states:[< `Key of Sdl_key.key_synonym | `Button of button] list ->
-  integrated list
+  input_state list
 val get_released: info:input_info ->
   states:[< `Key of Sdl_key.key_synonym | `Button of button] list ->
-  integrated list
+  input_state list
 
 (** Get current state of given axis that is a signed integer representing
     the current position of the axis.
@@ -322,7 +318,7 @@ val get_released: info:input_info ->
     @param state Key or button is to get current state
     @return current state of given axis
 *)
-val axis_state: info:input_info -> state:[< `Axis of Sdl_joystick.axis] -> int
+val axis_state: info:input_info -> state: Sdl_joystick.axis -> int
 
 (** Force update all {!input_info} already integrated.
 *)

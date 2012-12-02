@@ -30,7 +30,7 @@ type button = int
 
 type key_mapping = Sdl_key.key_synonym * button
 
-type integrated = Button of button | Key of Sdl_key.key_synonym
+type input_state = Button of button | Key of Sdl_key.key_synonym
 
 module AxisMap = Map.Make (
   struct
@@ -60,12 +60,6 @@ type input_info_real = {
 }
 
 type input_info = input_info_real ref
-
-type input_state = [
-| `Key of Sdl_key.key_synonym
-| `Button of int
-| `Axis of Joystick.axis
-]
 
 type input_callback_func_type = (info:input_info -> unit)
 
@@ -187,31 +181,26 @@ let quit_callback ~func = quit_callback_func := func
 let sync_bindings info =
   let replace_if_exists tbl key v =
     if Hashtbl.mem tbl key then Hashtbl.replace tbl key v else () in
-  let open Extlib.Std.Option.Open in
+  let sync_each_tbl fromtbl totbl map =
+    let open Extlib.Std.Option.Open in
+    Hashtbl.iter (fun key buttons ->
+      let state = try Some (Hashtbl.find fromtbl key) with Not_found -> None in
+      ignore (
+        state >>= (fun state ->
+          return (List.iter (fun x ->
+            let state = state || (try Hashtbl.find totbl x with _ -> false) in
+            replace_if_exists totbl x state) buttons))
+      )
+    ) map in
 
   (* key states synchronize button states *)
-  Hashtbl.iter (fun key buttons ->
-    let state = try Some (Hashtbl.find info.key_state key) with Not_found -> None in
-    ignore (
-      state >>= (fun state ->
-        return (List.iter (fun x ->
-          let state = state || (try Hashtbl.find info.button_state x with _ -> false) in
-          replace_if_exists info.button_state x state) buttons))
-    )
-  ) info.key_maps;
+  sync_each_tbl info.key_state info.button_state info.key_maps;
 
   (* button states synchronize key states *)
-  Hashtbl.iter (fun key keys ->
-    let state = try Some (Hashtbl.find info.button_state key) with Not_found -> None in
-    ignore (
-      state >>= (fun state ->
-        return (List.iter (fun x ->
-          let state = state || (try Hashtbl.find info.key_state x with _ -> false) in
-          replace_if_exists info.key_state x state) keys))
-    )
-  ) info.button_maps;
+  sync_each_tbl info.button_state info.key_state info.button_maps;
 
   (* axis states synchronize key states *)
+  let open Extlib.Std.Option.Open in
   Hashtbl.iter (fun key mapping ->
     let state = try Some (Hashtbl.find info.axis_state key) with Not_found -> None in
     ignore (
@@ -367,6 +356,7 @@ let get_pressed ~info ~states =
 let get_released ~info ~states =
   correct_states ~info ~states ~pred:not
 
+(* all status extract as key and button state *)
 let extract_all_states info pred =
   let button_states =
     let filter k e l = if pred e then (Button k) :: l else l in
@@ -382,14 +372,11 @@ let get_all_pressed info = extract_all_states info Extlib.Prelude.id
 let get_all_released info = extract_all_states info not
 
 let axis_state ~info ~state =
-  match state with
-  | `Axis axis ->
-    try Hashtbl.find !info.axis_state axis with Not_found -> 0
+  try Hashtbl.find !info.axis_state state with Not_found -> 0
 
 let force_update = update_input_infos
 
-(* main loop implementation *)
-
+(* implementation of main loop *)
 let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
   let ms_per_sec = 1000 * 100 / (fps)
   and reminder_of_loop = ref 0
@@ -408,6 +395,15 @@ let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
     reminder_of_loop := (!reminder_of_loop mod 100);
     count_a_second := !count_a_second + diff + this_time_delay;
     Timer.delay this_time_delay in
+  let delay_current_loop start =
+    let diff = (Timer.get_ticks ()) - start in
+    if diff * 100 > ms_per_sec then begin
+      count_a_second := !count_a_second + diff;
+      true
+    end else begin
+      waits_reminder diff;
+      false
+    end in
 
   let rec mainloop skip_this_loop =
     let start = Timer.get_ticks () in
@@ -418,20 +414,14 @@ let game_loop ?fps:(fps=60) ?skip:(skip=true) () =
 
       !move_callback_func ();
 
+      (* skip current calling display function if previous loop is too delay *)
       if not skip_this_loop then begin
         count_frame := succ !count_frame;
         !display_callback_func ();
       end;
 
-      (* wait fps *)
-      let diff = (Timer.get_ticks ()) - start in
-      if diff * 100 > ms_per_sec then begin
-        count_a_second := !count_a_second + diff;
-        mainloop true
-      end else begin
-        waits_reminder diff;
-        mainloop false;
-      end
+      let skip_next_loop = delay_current_loop start in
+      mainloop skip_next_loop;
     end in
   try
     mainloop false

@@ -52,9 +52,11 @@ val identity : unit -> t
    construct a projection matrix for `ortho projection'.
    given parameters of near and far are mostly equivalant of
    perspective_projection arguments.
-   `width' and height are size of screen to render.
+   Left and right specifies the coordinates for the left and right vertical clipping planes.
+   Bottom and top specifies the coodinates for the left and right horizontal clipping planes.
 *)
-val ortho_projection : width:int -> height:int -> near:float -> far:float -> t
+val ortho_projection : left:float -> right:float ->
+  top:float -> bottom:float -> near:float -> far:float -> t
 
 (**
    construct a projection matrix.

@@ -109,6 +109,6 @@ MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall -cclib -lcamlidl, t
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
-all: ../lib/extlib.cmxa sdlcaml.cmxa $(RequireBuild enums.ml)
+all: sdlcaml.cmxa $(RequireBuild enums.ml) $(RequireBuild extlib.cmxa)
 
 .DEFAULT: all
