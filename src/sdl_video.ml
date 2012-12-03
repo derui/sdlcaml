@@ -169,8 +169,7 @@ external blit_surface: src:surface -> dist:surface
  * @param drect filling space of rectanble
  *)
 external fill_rect: dist:surface -> fill:color -> ?drect:rect ->
-  unit ->
-  unit = "sdlcaml_fill_rect"
+  unit -> unit = "sdlcaml_fill_rect"
 
 (**
  * Return new surface created that of size is given width and height

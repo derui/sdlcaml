@@ -1,5 +1,6 @@
 #include "sdl_mixer_flags.h"
 
+#ifdef SDLCAML_MIXER_ENABLE
 #include <SDL_mixer.h>
 
 lookup_info ml_mixer_flag_table[] = {
@@ -12,3 +13,5 @@ lookup_info ml_mixer_flag_table[] = {
 {MLTAG_MP3, MIX_INIT_MP3},
 {MLTAG_OGG, MIX_INIT_OGG}
 };
+
+#endif

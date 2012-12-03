@@ -76,14 +76,24 @@ OCAMLFLAGS    += -annot
 
 # check that can sdl-config use.
 .STATIC:
-	SDL_CONFIG_FOUND = $(ConfMsgFound $(CheckProg sdl-config))
+	SDL_CONFIG_FOUND = $(CheckProg sdl-config)
 	SDL_CONFIG = $(if $(SDL_CONFIG_FOUND), sdl-config, "")
 
 	if $(not $(SDL_CONFIG_FOUND))
 		eprintln(can not build because sdl-config is not found. Please check to valid SDL installed)
 		$(exit 1)
 	SDL_CONFIGURE = $(shell $(SDL_CONFIG) --libs --cflags)
-	SDL_CONFIGURE += -lSDL_mixer -DDEBUG
+	SDL_MIXER_AVAILABLE = $(VerboseCheckCLib SDL_mixer, Mix_Init)
+	SDL_IMAGE_AVALIABLE = $(VerboseCheckCLib SDL_image, IMG_Init)
+
+	if $(SDL_MIXER_AVAILABLE)
+		SDL_CONFIGURE += -lSDL_mixer -DSDLCAML_MIXER_ENABLE
+		setenv("SDLCAML_MIXER_ENABLE", $(EMPTY))
+		export
+	if $(SDL_IMAGE_AVALIABLE)
+		SDL_CONFIGURE += -lSDL_image -DSDLCAML_IMAGE_ENABLE
+		setenv("SDLCAML_IMAGE_ENABLE", $(EMPTY))
+		export
 	export
 
 %$(EXT_OBJ): %.c :scanner: scan-c-%.c
