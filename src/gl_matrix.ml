@@ -16,7 +16,19 @@ let to_array mat =
     mat.m14; mat.m24; mat.m34; mat.m44;
   |]
 
-let identity _ =
+(* convert type of t to array have two dimension as 4 * 4.
+   The first index of the converted array is row, and
+   the two index of the converted array is column.
+*)
+let to_matrix_array mat =
+  [|
+    [|mat.m11; mat.m12; mat.m13; mat.m14;|];
+    [|mat.m21; mat.m22; mat.m23; mat.m24;|];
+    [|mat.m31; mat.m32; mat.m33; mat.m34;|];
+    [|mat.m41; mat.m42; mat.m43; mat.m44;|];
+  |]
+
+let identity () =
   {
     m11 = 1.0; m12 = 0.0; m13 = 0.0; m14 = 0.0;
     m21 = 0.0; m22 = 1.0; m23 = 0.0; m24 = 0.0;
@@ -125,7 +137,14 @@ let scaling v =
     m41 = 0.0; m42 = 0.0; m43 = 0.0; m44 = 1.0;
   }
 
-let inverse _ = None
+(* To use is only internal.  *)
+let divide m d =
+  {
+    m11 = m.m11 /. d; m12 = m.m12 /. d; m13 = m.m13 /. d; m14 = m.m14 /. d;
+    m21 = m.m21 /. d; m22 = m.m22 /. d; m23 = m.m23 /. d; m24 = m.m24 /. d;
+    m31 = m.m31 /. d; m32 = m.m32 /. d; m33 = m.m33 /. d; m34 = m.m34 /. d;
+    m41 = m.m41 /. d; m42 = m.m42 /. d; m43 = m.m43 /. d; m44 = m.m44 /. d;
+  }
 
 (* providing matrix from this module is always cator-cornred. *)
 let transpose mat =
@@ -135,6 +154,72 @@ let transpose mat =
     m31 = mat.m13; m32 = mat.m23; m33 = mat.m33; m34 = mat.m43;
     m41 = mat.m14; m42 = mat.m24; m43 = mat.m34; m44 = mat.m44;
   }
+
+(* calculate determinant of the matrix  *)
+let determine m =
+  let deter1_1 = m.m22 *. (m.m33 *. m.m44 -. m.m34 *. m.m43)
+  and deter1_2 = m.m32 *. (m.m23 *. m.m44 +. m.m24 *. m.m43)
+  and deter1_3 = m.m42 *. (m.m23 *. m.m34 -. m.m24 *. m.m33)
+  and deter2_1 = m.m12 *. (m.m33 *. m.m44 -. m.m34 *. m.m43)
+  and deter2_2 = m.m32 *. (m.m13 *. m.m44 +. m.m14 *. m.m43)
+  and deter2_3 = m.m42 *. (m.m13 *. m.m24 -. m.m14 *. m.m33)
+  and deter3_1 = m.m12 *. (m.m23 *. m.m44 -. m.m24 *. m.m43)
+  and deter3_2 = m.m22 *. (m.m13 *. m.m44 +. m.m14 *. m.m43)
+  and deter3_3 = m.m42 *. (m.m13 *. m.m24 -. m.m14 *. m.m23)
+  and deter4_1 = m.m12 *. (m.m23 *. m.m44 -. m.m24 *. m.m33)
+  and deter4_2 = m.m22 *. (m.m13 *. m.m34 +. m.m14 *. m.m33)
+  and deter4_3 = m.m32 *. (m.m13 *. m.m24 -. m.m14 *. m.m23) in
+  m.m11 *. (deter1_1 +. (-1.0 *. deter1_2) +. deter1_3) -.
+    m.m21 *. (deter2_1 +. (-1.0 *. deter2_2) +. deter2_3) +.
+    m.m31 *. (deter3_1 +. (-1.0 *. deter3_2) +. deter3_3) -.
+    m.m41 *. (deter4_1 +. (-1.0 *. deter4_2) +. deter4_3)
+
+(* calculate determinant of the matrix as 3 x 3 *)
+let determine3x3 m =
+  m.(1).(1) *. (m.(2).(2) *. m.(3).(3) -. m.(2).(3) *. m.(3).(2)) +.
+    m.(1).(2) *. (m.(2).(3) *. m.(3).(1) -. m.(2).(1) *. m.(3).(3)) +.
+    m.(1).(3) *. (m.(2).(1) *. m.(3).(2) -. m.(2).(2) *. m.(3).(1))
+
+(* calculate cofactor of the a element at specified row and column in the matrix *)
+let cofactor (m:float array array) row col =
+  let get_index n = List.filter (fun i -> i <> n) [1;2;3;4] in
+  let row_index = get_index row
+  and col_index = get_index col in
+  let pre_matrix = List.fold_left (fun l row ->
+    (List.fold_left (fun l col ->
+      m.(row).(col) :: l
+    ) [] col_index) :: l
+  ) [] row_index in
+  let matrix = Array.of_list (List.map Array.of_list pre_matrix) in
+
+  (-1.0) ** (float row +. float col) *. determine3x3 matrix
+
+(* create adjoint of the given 4x4 matrix *)
+let adjoint m =
+  let m = Array.copy m in
+  let indecies = [1;2;3;4] in
+  List.iter (fun row ->
+    List.iter (fun col ->
+      m.(row).(col) <- cofactor m row col
+    ) indecies
+  ) indecies;
+  let m =
+    {
+      m11 = m.(1).(1); m12 = m.(2).(1); m13 = m.(3).(1); m14 = m.(4).(1);
+      m21 = m.(1).(2); m22 = m.(2).(2); m23 = m.(3).(2); m24 = m.(4).(2);
+      m31 = m.(1).(3); m32 = m.(2).(3); m33 = m.(3).(3); m34 = m.(4).(3);
+      m41 = m.(1).(4); m42 = m.(2).(4); m43 = m.(3).(4); m44 = m.(4).(4);
+    } in
+  transpose m
+
+let inverse m =
+  let deter = determine m in
+  if deter = 0.0 then
+    None
+  else
+    let array_m = to_matrix_array m in
+    let adj = adjoint array_m in
+    Some (divide adj deter)
 
 let to_string mat =
   Printf.sprintf "| %f | %f | %f | %f |\n" mat.m11 mat.m12 mat.m13 mat.m14 ^

@@ -2,6 +2,7 @@ module Video = Sdl_video
 module Event = Sdl_event
 module Mouse = Sdl_mouse
 module Mixer = Sdl_mixer
+module Image = Sdl_image
 module Input = Sdl_input
 module Key = Sdl_key
 
