@@ -9,10 +9,10 @@
 
    vector multiplying by matrix as below.
 
-| 11 | 12 | 13 | 14 || x |
-| 21 | 22 | 23 | 24 || y |
-| 31 | 32 | 33 | 34 || z |
-| 41 | 42 | 43 | 44 || w |
+   | 11 | 12 | 13 | 14 || x |
+   | 21 | 22 | 23 | 24 || y |
+   | 31 | 32 | 33 | 34 || z |
+   | 41 | 42 | 43 | 44 || w |
 
    type of matrix providing this module is able to convert between
    array and it. User wouldn't careful inner implementation!

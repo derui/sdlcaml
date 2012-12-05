@@ -85,6 +85,7 @@ OCAMLFLAGS    += -annot
 	SDL_CONFIGURE = $(shell $(SDL_CONFIG) --libs --cflags)
 	SDL_MIXER_AVAILABLE = $(VerboseCheckCLib SDL_mixer, Mix_Init)
 	SDL_IMAGE_AVALIABLE = $(VerboseCheckCLib SDL_image, IMG_Init)
+	SDL_TTF_AVALIABLE = $(VerboseCheckCLib SDL_ttf, TTF_Init)
 
 	if $(SDL_MIXER_AVAILABLE)
 		SDL_CONFIGURE += -lSDL_mixer -DSDLCAML_MIXER_ENABLE
@@ -93,6 +94,10 @@ OCAMLFLAGS    += -annot
 	if $(SDL_IMAGE_AVALIABLE)
 		SDL_CONFIGURE += -lSDL_image -DSDLCAML_IMAGE_ENABLE
 		setenv("SDLCAML_IMAGE_ENABLE", $(EMPTY))
+		export
+	if $(SDL_TTF_AVALIABLE)
+		SDL_CONFIGURE += -lSDL_ttf -DSDLCAML_TTF_ENABLE
+		setenv("SDLCAML_TTF_ENABLE", $(EMPTY))
 		export
 	export
 
