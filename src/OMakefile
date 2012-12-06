@@ -55,7 +55,7 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot
+OCAMLFLAGS    += -annot -g
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
 # OCAML_LINK_FLAGS +=
@@ -109,6 +109,9 @@ CFILES = $(removesuffix $(ls *.c))
 FILES = $(removesuffix $(ls *.ml))
 FILES += enums
 
+# files for building extend libraries are contained to dependencies.
+SUB_FILES = $(ls *.inc)
+
 LIBRARY_NAME = sdlcaml
 #
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
@@ -124,6 +127,6 @@ MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall -cclib -lcamlidl, t
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
-all: sdlcaml.cmxa $(RequireBuild enums.ml) $(RequireBuild extlib.cmxa)
+all: sdlcaml.cmxa $(RequireBuild enums.ml) $(RequireBuild extlib.cmxa) $(SUB_FILES)
 
 .DEFAULT: all

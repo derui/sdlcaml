@@ -42,18 +42,26 @@
     <module name="Coord">
       <type>coord</type>
     </module>
+    <module name="Tex1D">
+      <type>image_1d_type</type>
+    </module>
+    <module name="Tex2D">
+      <type>image_2d_type</type>
+    </module>
+    <module name="Tex3D">
+      <type>image_3d_type</type>
+    </module>
+    <module name="TexLevel">
+      <type>texlevel_target</type>
+      <type>texlevel_pname</type>
+    </module>
+    <alone-type>internal_format</alone-type>
     <module name="Tex">
       <type>coord</type>
       <type>texgen_plane</type>
       <type>texgen_func</type>
       <type>texgen_env_func</type>
-      <type>texlevel_target</type>
-      <type>texlevel_pname</type>
-      <type>image_1d_type</type>
-      <type>image_2d_type</type>
-      <type>image_3d_type</type>
       <type>texture_image_type</type>
-      <type>internal_format</type>
       <type>texture_format</type>
       <type>texture_type</type>
       <type>tex_parameter_1</type>
@@ -67,13 +75,11 @@
       <type>texture_type</type>
     </module>
     <module name="Convolution">
-      <type>internal_format</type>
       <type>convolution_target</type>
       <type>convolution_border_mode</type>
       <type>convolution_pname</type>
     </module>
     <module name="Histogram">
-      <type>internal_format</type>
       <type>histogram</type>
     </module>
     <module name="GetMap">

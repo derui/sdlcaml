@@ -101,10 +101,9 @@ t_prim sdlcaml_image_load(value filename) {
 
   SDL_Surface* raw_surface = IMG_Load(String_val(filename));
   if (raw_surface == NULL) {
-    caml_raise_with_string(*caml_named_value("Sdl_image_exception"),
-                           IMG_GetError());
+    CAMLreturn(Val_none);
   }
-  CAMLreturn(alloc_surface(raw_surface));
+  CAMLreturn(Val_some(alloc_surface(raw_surface)));
 }
 
 t_prim sdlcaml_image_load_typed(value filename, value image_type) {
@@ -114,10 +113,9 @@ t_prim sdlcaml_image_load_typed(value filename, value image_type) {
       SDL_RWFromFile(String_val(filename), "rb"), 1,
       ml_image_type_table[Int_val(image_type)]);
   if (raw_surface) {
-    caml_raise_with_string(*caml_named_value("Sdl_image_exception"),
-                           IMG_GetError());
+    CAMLreturn(Val_none);
   }
-  CAMLreturn(alloc_surface(raw_surface));
+  CAMLreturn(Val_some(alloc_surface(raw_surface)));
 }
 
 t_prim sdlcaml_image_is_type(value filename, value image_type) {

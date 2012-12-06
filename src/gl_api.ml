@@ -10,6 +10,8 @@
 
 type image_type = (int, Bigarray.int8_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+type internal_format = Enums.internal_format
+
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glClearIndex.xml}
     manual pages on opengl.org}
 *)
@@ -663,14 +665,14 @@ external glIsTexture : int -> bool = "gl_api_glIsTexture"
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyTexImage1D.xml}
     manual pages on opengl.org}
 *)
-external glCopyTexImage1D : level:int -> format:Tex.internal_format ->
+external glCopyTexImage1D : level:int -> format:internal_format ->
   x:int -> y:int -> width:int -> border:int -> unit
     = "gl_api_glCopyTexImage1D_bytecode" "gl_api_glCopyTexImage1D"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyTexImage2D.xml}
     manual pages on opengl.org}
 *)
-external glCopyTexImage2D : level:int -> format:Tex.internal_format ->
+external glCopyTexImage2D : level:int -> format:internal_format ->
   x:int -> y:int -> width:int -> height:int -> border:int -> unit
     = "gl_api_glCopyTexImage2D_bytecode" "gl_api_glCopyTexImage2D"
 
@@ -809,7 +811,7 @@ module Histogram = Enums.Histogram
     manual pages on opengl.org}
 *)
 external glHistogram : target:Histogram.histogram -> width:int ->
-  internalformat:Histogram.internal_format -> sink:bool -> unit
+  internalformat:internal_format -> sink:bool -> unit
     = "gl_api_glHistogram"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glResetHistogram.xml}
@@ -831,14 +833,14 @@ external glConvolutionParameter : target:Convolution.convolution_target ->
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyConvolutionFilter1D.xml}
     manual pages on opengl.org}
 *)
-external glCopyConvolutionFilter1D : internalformat:Convolution.internal_format ->
+external glCopyConvolutionFilter1D : internalformat:internal_format ->
   x:int -> y:int -> width:int -> unit
     = "gl_api_glCopyConvolutionFilter1D"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyConvolutionFilter2D.xml}
     manual pages on opengl.org}
 *)
-external glCopyConvolutionFilter2D : internalformat:Convolution.internal_format ->
+external glCopyConvolutionFilter2D : internalformat:internal_format ->
   x:int -> y:int -> width:int -> height:int -> unit
     = "gl_api_glCopyConvolutionFilter2D"
 
@@ -1002,8 +1004,8 @@ external glGetMaterialf4 : Material.face_mode ->
 *)
 external glReadPixels : x:int -> y:int -> width:int -> height:int ->
   format:Pixels.read_pixel_format -> pixel_type:Pixels.read_pixel_type -> image:image_type ->
-    unit = "gl_api_glReadPixels_native"
-  "gl_api_glReadPixels_bytecode"
+    unit = "gl_api_glReadPixels_bytecode"
+  "gl_api_glReadPixels_native"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawPixels.xml}
     manual pages on opengl.org}
@@ -1025,40 +1027,44 @@ external glGetTexGen4 : coord:Tex.coord -> pname:Tex.texgen_plane ->
 external glGetTexEnv1 : unit -> Tex.texgen_env_func = "gl_api_glGetTexEnv1"
 external glGetTexEnv4 : unit -> float * float * float * float = "gl_api_glGetTexEnv4"
 
+module TexLevel = Enums.TexLevel
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetTexLevelParameter.xml}
     manual pages on opengl.org}
 *)
-external glGetTexLevelParameter_format: target:Tex.texlevel_target ->
-  level:int -> Tex.internal_format = "gl_api_glGetTexLevelParameter_format"
-external glGetTexLevelParameter: target:Tex.texlevel_target ->
-  level:int -> pname:Tex.texlevel_pname -> int = "gl_api_glGetTexLevelParameter"
+external glGetTexLevelParameter_format: target:TexLevel.texlevel_target ->
+  level:int -> internal_format = "gl_api_glGetTexLevelParameter_format"
+external glGetTexLevelParameter: target:TexLevel.texlevel_target ->
+  level:int -> pname:TexLevel.texlevel_pname -> int = "gl_api_glGetTexLevelParameter"
 
+module Tex1D = Enums.Tex1D
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml}
     manual pages on opengl.org}
 *)
-external glTexImage1D: image_type:Tex.image_1d_type -> level:int ->
-  internal_format:Tex.internal_format -> width:int -> border:bool ->
+external glTexImage1D: image_type:Tex1D.image_1d_type -> level:int ->
+  internal_format:internal_format -> width:int -> border:bool ->
     format:Tex.texture_format -> texture_type:Tex.texture_type -> image_type -> unit
-      = "gl_api_glTexImage1D_native"
-  "gl_api_glTexImage1D_bytecode"
+      = "gl_api_glTexImage1D_bytecode"
+  "gl_api_glTexImage1D_native"
 
+module Tex2D = Enums.Tex2D
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexImage2D.xml}
     manual pages on opengl.org}
 *)
-external glTexImage2D: image_type:Tex.image_2d_type -> level:int ->
-  internal_format:Tex.internal_format -> height:int -> width:int -> border:bool ->
+external glTexImage2D: image_type:Tex2D.image_2d_type -> level:int ->
+  internal_format:internal_format -> height:int -> width:int -> border:bool ->
     format:Tex.texture_format -> texture_type:Tex.texture_type -> image_type -> unit
-      = "gl_api_glTexImage2D_native"
-  "gl_api_glTexImage2D_bytecode"
+      = "gl_api_glTexImage2D_bytecode"
+  "gl_api_glTexImage2D_native"
 
+module Tex3D = Enums.Tex3D
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexImage3D.xml}
     manual pages on opengl.org}
 *)
-external glTexImage3D: image_type:Tex.image_3d_type -> level:int ->
-  internal_format:Tex.internal_format -> height:int -> width:int -> depth:int -> border:bool ->
+external glTexImage3D: image_type:Tex3D.image_3d_type -> level:int ->
+  internal_format:internal_format -> height:int -> width:int -> depth:int -> border:bool ->
     format:Tex.texture_format -> texture_type:Tex.texture_type -> image_type -> unit
-      = "gl_api_glTexImage3D_native"
-  "gl_api_glTexImage3D_bytecode"
+      = "gl_api_glTexImage3D_bytecode"
+  "gl_api_glTexImage3D_native"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetTexImage.xml}
     manual pages on opengl.org}
@@ -1074,8 +1080,8 @@ module TexSub = Enums.TexSub
 external glTexSubImage1D: level:int ->
   xoffset:int -> width:int ->  format:TexSub.texture_format ->
     texture_type:TexSub.texture_type -> image_type -> unit =
-  "gl_api_glTexSubImage1D_native"
-    "gl_api_glTexSubImage1D_bytecode"
+  "gl_api_glTexSubImage1D_bytecode"
+    "gl_api_glTexSubImage1D_native"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexSubImage2D.xml}
     manual pages on opengl.org}
@@ -1083,8 +1089,8 @@ external glTexSubImage1D: level:int ->
 external glTexSubImage2D: level:int -> xoffset:int -> yoffset:int -> width:int ->
   height:int ->  format:TexSub.texture_format ->
     type_format:TexSub.texture_type -> image_type -> unit =
-  "gl_api_glTexSubImage2D_native"
-    "gl_api_glTexSubImage2D_bytecode"
+  "gl_api_glTexSubImage2D_bytecode"
+    "gl_api_glTexSubImage2D_native"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexSubImage3D.xml}
     manual pages on opengl.org}
@@ -1093,8 +1099,8 @@ external glTexSubImage3D: level:int -> xoffset:int -> yoffset:int -> zoffset:int
   width:int -> height:int -> depth:int ->
     format:TexSub.texture_format ->
       texture_type:TexSub.texture_type -> image_type -> unit =
-  "gl_api_glTexSubImage3D_native"
-    "gl_api_glTexSubImage3D_bytecode"
+  "gl_api_glTexSubImage3D_bytecode"
+    "gl_api_glTexSubImage3D_native"
 
 type control_points = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 module GetMap = Enums.GetMap

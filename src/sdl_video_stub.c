@@ -1,6 +1,7 @@
 #include <SDL.h>
 
 #include <caml/alloc.h>
+#include <caml/bigarray.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/fail.h>
@@ -267,6 +268,28 @@ CAMLprim value sdlcaml_clear(value fill, value dist) {
 
   SDL_FillRect(Surface_val(dist), NULL, color);
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value sdlcaml_video_get_pixels(value surface) {
+  CAMLparam1(surface);
+  CAMLlocal1(res);
+  SDL_Surface* surf = Surface_val(surface);
+
+  res = alloc_bigarray_dims(
+      BIGARRAY_UINT8 | BIGARRAY_C_LAYOUT | BIGARRAY_MANAGED,
+      1, (unsigned char*)surf->pixels, surf->pitch * surf->h);
+  CAMLreturn(res);
+}
+
+CAMLprim value sdlcaml_video_get_size(value surface) {
+  CAMLparam1(surface);
+  CAMLlocal1(res);
+  SDL_Surface* surf = Surface_val(surface);
+
+  res = caml_alloc(2, 0);
+  Store_field(res, 0, Val_int(surf->w));
+  Store_field(res, 1, Val_int(surf->h));
+  CAMLreturn(res);
 }
 
 CAMLprim value sdlcaml_video_gl_set_attribute(value attr, value v) {

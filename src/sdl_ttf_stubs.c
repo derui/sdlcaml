@@ -1,4 +1,3 @@
-#include <SDL_ttf.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>
@@ -7,8 +6,6 @@
 #include <caml/fail.h>
 
 #include "common.h"
-#include "sdl_ttf_flags.h"
-
 
 #ifdef SDLCAML_TTF_ENABLE
 #include "sdl_ttf_stubs.enable.inc"

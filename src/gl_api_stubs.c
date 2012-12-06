@@ -1,6 +1,8 @@
 /*
   Implenmenting function for Sdlcaml of OpenGL bindings.
 */
+#include <stdio.h>
+
 #include "gl.afx.h"
 
 #include <caml/mlvalues.h>
@@ -1524,7 +1526,7 @@ t_prim gl_api_glGenTextures(value _v_n) {
   _vres = alloc_bigarray_dims(
       BIGARRAY_INT32 | BIGARRAY_C_LAYOUT | BIGARRAY_MANAGED,
       1, textures, n);
-  return _vres;
+  CAMLreturn(_vres);
 }
 
 t_prim gl_api_glDeleteTextures(value _v_n, value _v_textures) {
@@ -2099,9 +2101,9 @@ t_prim gl_api_glFog4(value _v_param) {
 
 t_prim gl_api_glSelectBuffer(value _v_size) {
   CAMLparam1(_v_size);
+  CAMLlocal1(_vres);
   int size; /*in*/
   unsigned int *buffer; /*out*/
-  value _vres;
 
   size = Int_val(_v_size);
   buffer = stat_alloc(size * sizeof(unsigned int ));
@@ -2109,7 +2111,7 @@ t_prim gl_api_glSelectBuffer(value _v_size) {
   _vres = alloc_bigarray_dims(
       BIGARRAY_INT32 | BIGARRAY_C_LAYOUT | BIGARRAY_MANAGED,
       1, buffer, size);
-  return _vres;
+  CAMLreturn(_vres);
 }
 
 t_prim gl_api_glInitNames(value _unit) {

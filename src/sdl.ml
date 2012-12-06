@@ -5,6 +5,7 @@ module Mixer = Sdl_mixer
 module Image = Sdl_image
 module Input = Sdl_input
 module Key = Sdl_key
+module TTF = Sdl_ttf
 
 module Timer = Sdl_timer
 module Init = Sdl_init

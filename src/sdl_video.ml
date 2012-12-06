@@ -11,6 +11,9 @@
  * @since 0.1
  *)
 
+(** array of image pixels on the surface  *)
+type image_type = (int, Bigarray.int8_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
+
 (**
  * Binding of {b SDL_Surface}'s flags.
  *)
@@ -251,6 +254,22 @@ external get_attribute : gl_attr -> int = "sdlcaml_video_gl_get_attribute"
    Swap OpenGL framebuffer/update Display, if double-buffering is supported.
 *)
 external gl_swap : unit -> unit = "sdlcaml_video_gl_swap_buffer"
+
+(** Get the array of image pixels on the surface.
+    If you apply {!free_surface} to this surface, must not
+    use returned array!
+
+    @param surface the surface to get image pixels
+    @return the array of image pixels
+*)
+external get_pixels: surface -> image_type = "sdlcaml_video_get_pixels"
+
+(** Get the width and height of the loaded surface.
+
+    @param surface the loaded surface to get width and height
+    @return width * height of the loaded surface
+*)
+external get_size: surface -> int * int = "sdlcaml_video_get_size"
 
 (** Initialize OpenGL attributes to use with SDL.
     You must call this function before call {!set_video_mode} if want to use OpenGL with SDL.

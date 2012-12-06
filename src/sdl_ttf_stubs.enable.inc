@@ -1,3 +1,6 @@
+#include <SDL_ttf.h>
+#include "sdl_ttf_flags.h"
+
 /* Encapsulation of opaque SDL surface (of type SDL_Surface *)
    as Caml custom blocks
  */

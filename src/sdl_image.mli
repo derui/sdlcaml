@@ -35,7 +35,7 @@ type image_type =
     @return returning tuple as (major, minor, patch)
 *)
 external linked_version: unit -> int * int * int = "sdlcaml_image_linked_version"
-external image_version: unit -> int * int * int = "sdlcaml_image_version"
+external compile_version: unit -> int * int * int = "sdlcaml_image_version"
 
 (** Initialize by loading support as indicated by the flags.
     see details {{:http://jcatki.no-ip.org:8080/SDL_image/SDL_image_frame.html}
@@ -63,7 +63,7 @@ external quit: unit -> unit = "sdlcaml_image_quit"
     @return image as a new surface.
     @exception Sdl_image_exception raise if image can not load
 *)
-external load: string -> Sdl_video.surface = "sdlcaml_image_load"
+external load: string -> Sdl_video.surface option = "sdlcaml_image_load"
 
 (** Load file for use as an image in a new surface.
     Compared to {!load}, this function have to specify type for image to load.
@@ -73,7 +73,7 @@ external load: string -> Sdl_video.surface = "sdlcaml_image_load"
     @return image as a new surface
     @exception Sdl_image_exception raise if image can not load or type is not equivalence.
 *)
-external load_typed: string -> image_type -> Sdl_video.surface = "sdlcaml_image_load_typed"
+external load_typed: string -> image_type -> Sdl_video.surface option = "sdlcaml_image_load_typed"
 
 (** The image is tested to see if it is readable as each format.
     When TGA format is given, always return false from this function.

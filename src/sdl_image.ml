@@ -22,15 +22,15 @@ type image_type =
   | XV
 
 external linked_version: unit -> int * int * int = "sdlcaml_image_linked_version"
-external image_version: unit -> int * int * int = "sdlcaml_image_version"
+external compile_version: unit -> int * int * int = "sdlcaml_image_version"
 
 external init: imageinit list -> (unit, string) Extlib.Std.Either.t = "sdlcaml_image_init"
 
 external quit: unit -> unit = "sdlcaml_image_quit"
 
-external load: string -> Sdl_video.surface = "sdlcaml_image_load"
+external load: string -> Sdl_video.surface option = "sdlcaml_image_load"
 
-external load_typed: string -> image_type -> Sdl_video.surface = "sdlcaml_image_load_typed"
+external load_typed: string -> image_type -> Sdl_video.surface option = "sdlcaml_image_load_typed"
 
 external is_type: string -> image_type -> bool = "sdlcaml_image_is_type"
 

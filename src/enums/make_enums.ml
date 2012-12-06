@@ -11,6 +11,10 @@
 let (|>) f g = g f
 let (<|) f g = f g
 
+type output_type =
+  | Module of string * string list
+  | Alone of string
+
 let output_module_name = "enums.ml"
 
 let xml_file = ref ""
@@ -29,9 +33,15 @@ let child elements name =
 let extract_modules xml =
   let mods = child xml "modules" in
   let extract x =
-    List.iter (fun x -> let name = Xml.attrib x "name" in
-                        let types = List.concat <| Xml.map (fun x -> Xml.map Xml.pcdata x) x in
-                        modules := (name, types) :: !modules)
+    List.iter (fun x ->
+      match Xml.tag x with
+      | "module" -> let name = Xml.attrib x "name" in
+                    let types = List.concat <| Xml.map (fun x -> Xml.map Xml.pcdata x) x in
+                    modules := Module (name, types) :: !modules
+      | "alone-type" ->
+        let name = Xml.fold (fun s x -> s ^ Xml.to_string x) "" x in
+        modules := Alone name :: !modules
+      | _ -> ())
       (Xml.children x)
   in
   List.iter extract mods
@@ -67,20 +77,23 @@ let common_construct name func =
   close_out file
 
 let construct_modules () =
-  let construct file (name, types) =
-    let per_type t =
-      let pnames = List.assoc t !sections in begin
-        output_string file (Printf.sprintf "type %s = \n" t);
-        List.iter (fun p -> output_string file (Printf.sprintf "| %s \n" p)) pnames;
-      end
-    in
-    begin
-      output_string file (Printf.sprintf "module %s : sig\n" name);
-      List.iter per_type types;
-      output_string file "end = struct\n";
-      List.iter per_type types;
-      output_string file "end\n"
+  let per_type file t =
+    let pnames = List.assoc t !sections in begin
+      output_string file (Printf.sprintf "type %s = \n" t);
+      List.iter (fun p -> output_string file (Printf.sprintf "| %s \n" p)) pnames;
     end in
+  let construct file = function
+    | Module (name, types) ->
+      begin
+        output_string file (Printf.sprintf "module %s : sig\n" name);
+        List.iter (per_type file) types;
+        output_string file "end = struct\n";
+        List.iter (per_type file) types;
+        output_string file "end\n"
+      end;
+    | Alone name -> per_type file name
+  in
+
   common_construct output_module_name construct
 
 let () =
