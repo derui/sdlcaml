@@ -12,6 +12,7 @@ type ('a, 'unique_id) t = ('a -> 'a -> int)
 (** avoid circular reference, only using inner this module.  *)
 type ('a, 'unique_id) t_ = ('a, 'unique_id) t
 
+(** Provide type-specific function to compare  *)
 module type Type =
 sig
   type t
@@ -22,6 +23,7 @@ sig
   val compare : t -> t -> int
 end
 
+(** Signature of some functions to compare each specified type *)
 module type S =
 sig
   type t
@@ -42,6 +44,7 @@ sig
 
 end
 
+(** Signature of some functions to compare to have a variable type. *)
 module type S1 =
 sig
   (** element type of this signature. this is had to overwrite when
@@ -71,6 +74,8 @@ module Poly : S1 with type 'a t = 'a
 
 (** using this module when need order functions. *)
 module Make (T : Type) : S with type t = T.t
+
+(** Use this module to get type-specified comparable module  *)
 module Make1 (T : sig
   type 'a t
   val compare : 'a t -> 'a t -> int

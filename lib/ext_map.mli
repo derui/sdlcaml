@@ -18,7 +18,6 @@ type ('k, +'v, 'comparator) t
 type 'k key = 'k
 type ('a, 'comparator, 'z) create = ('a, 'comparator, 'z) create_options_with_comparator
 
-(** inherit {!Creator} and {!Accessor} *)
 include Creator with type ('k, 'v, 'comparator) t := ('k, 'v, 'comparator) t
                 and type 'k key := 'k key
                 and type ('a, 'comparator, 'z) create := ('a, 'comparator, 'z) create
@@ -54,4 +53,4 @@ module Poly : sig
   include Accessor with type ('a, 'b, 'c) t := ('a, 'b, 'c) t_
                    and type 'a key := 'a key
 end
-  with type ('a, 'b, 'c) map := ('a, 'b, 'c) t
+  with type ('a, 'b, 'c) map = ('a, 'b, 'c) t

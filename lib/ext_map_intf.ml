@@ -26,14 +26,14 @@ module type Accessor = sig
   (** Get minimum key-value pair, if empty Map is given, return None.
       when use *_exn, raise {!Invalid_argument} if empty tree is given.
   *)
-  (* val minimum: ('k, 'v, 'c) t -> ('k * 'v) option *)
-  (* val minimum_exn: ('k, 'v, 'c) t -> 'k * 'v *)
+  val minimum: ('k, 'v, 'c) t -> ('k key * 'v) option
+  val minimum_exn: ('k, 'v, 'c) t -> 'k key * 'v
 
-  (* (\** Get maximum key-value pair, if empty Map is given, return None. *)
-  (*     when use *_exn, raise {!Invalid_argument} if empty tree is given. *)
-  (* *\) *)
-  (* val maximum: ('k, 'v, 'c) t -> ('k * 'v) option *)
-  (* val maximum_exn: ('k, 'v, 'c) t -> 'k * 'v *)
+  (** Get maximum key-value pair, if empty Map is given, return None.
+      when use *_exn, raise {!Invalid_argument} if empty tree is given.
+  *)
+  val maximum: ('k, 'v, 'c) t -> ('k key * 'v) option
+  val maximum_exn: ('k, 'v, 'c) t -> 'k key * 'v
 
   (** Search element is related to given key, *_exn raise {!Not_found} if
       key not found.
@@ -76,7 +76,7 @@ module type Accessor = sig
   val data: (_, 'v, _) t -> 'v list
 end
 
-(** When create map by Creator with comparator, use {!create_options_with_comparator}.
+(** When create map by {!Creator} with comparator, use {!create_options_with_comparator}.
     But don't need to use comparator given type parameter,
     use {!create_options_without_comparator}.
 *)
@@ -84,6 +84,7 @@ type ('a, 'comparator, 'z) create_options_without_comparator = 'z
 type ('a, 'comparator, 'z) create_options_with_comparator =
     comparator:('a, 'comparator) Comparable.t -> 'z
 
+(** contains some ways to create map. *)
 module type Creator = sig
 
   (** type of map to create or conversion  *)
@@ -105,6 +106,7 @@ module type Creator = sig
   val of_alist: ('a, 'comparator, ('a, 'v, 'comparator) t -> ('a key * 'v) list) create
 end
 
+(** This is signature to make type-specified Map module. *)
 module type S = sig
   module Key : Comparable.S
 
