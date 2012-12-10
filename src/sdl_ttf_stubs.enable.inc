@@ -47,6 +47,11 @@ static value alloc_font(TTF_Font* font) {
 
 #define t_prim CAMLprim value
 
+t_prim sdlcaml_ttf_is_linked(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_true);
+}
+
 t_prim sdlcaml_ttf_linked_version(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(version);

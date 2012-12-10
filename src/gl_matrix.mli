@@ -76,7 +76,7 @@ val perspective_projection :
   far:float -> t
 
 (** multiply two matrices.
-    To multiply direction is m1 to m2 that equal [m1][m2].
+    To multiply direction is m1 to m2 that is equal to [m1][m2].
 
     @param m1 first matrix to multiply
     @param m2 second matrix to multiply.

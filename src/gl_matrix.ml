@@ -37,7 +37,7 @@ let identity () =
   }
 
 let ortho_projection ~left ~right ~top ~bottom ~near ~far =
-  let width_ratio = 2.0 /. (left -. right)
+  let width_ratio = 2.0 /. (right -. left)
   and height_ratio = 2.0 /. (top -. bottom)
   and z_ratio = -2.0 /. (far -. near)
   and tx = -1.0 *. (right +. left) /. (right -. left)

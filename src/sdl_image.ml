@@ -21,6 +21,8 @@ type image_type =
   | XPM
   | XV
 
+external is_linked: unit -> bool = "sdlcaml_image_is_linked"
+
 external linked_version: unit -> int * int * int = "sdlcaml_image_linked_version"
 external compile_version: unit -> int * int * int = "sdlcaml_image_version"
 

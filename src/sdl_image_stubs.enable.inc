@@ -38,6 +38,11 @@ static value alloc_surface(SDL_Surface* surface) {
 
 #define t_prim CAMLprim value
 
+t_prim sdlcaml_image_is_linked(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_true);
+}
+
 t_prim sdlcaml_image_linked_version(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(version);

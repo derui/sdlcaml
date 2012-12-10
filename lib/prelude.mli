@@ -24,7 +24,15 @@ val (|>) : 'a -> ('a -> 'b ) -> 'b
 *)
 val (<|) : ('a -> 'b) -> 'a -> 'b
 
+(** Combine two functions *)
+val (@@) : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c)
+
 (** comparing floats that if one float has difference lesser than
   `epsilon`, result of comparing is `0` as true.
 *)
 val cmp_float : epsilon:float -> float -> float -> int
+
+(** curry converts an uncurried function to a curried function *)
+val curry: ('a * 'b -> 'c) -> 'a -> 'b -> 'c
+(** convertes an curried function to an uncirried function *)
+val uncurry: ('a -> 'b -> 'c) -> 'a * 'b -> 'c

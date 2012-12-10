@@ -84,7 +84,7 @@ let default_resize_func:resize_func_type   = (fun ~width ~height -> ())
 let default_expose_func:expose_func_type   = (fun _ -> ())
 let default_display_func:display_func_type  = (fun _ -> ())
 let default_move_func:move_func_type     = (fun _ -> ())
-let default_quit_func:quit_func_type     = (fun _ -> true)
+let default_quit_func:quit_func_type     = (fun _ -> false)
 
 (* callback function warehouse *)
 let active_callback_func   = ref default_active_func

@@ -63,6 +63,12 @@ type chunk
 (** Covering up Mix_Music from OCaml  *)
 type music
 
+(** Return status SDL_mixer is linked.
+
+    @return true if SDL_mixer linked, false if did not linked.
+*)
+external is_linked: unit -> bool = "sdlcaml_mixer_is_linked"
+
 (**
    Return SDL Mixer version when it compiled.
 

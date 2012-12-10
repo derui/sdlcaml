@@ -275,9 +275,15 @@ CAMLprim value sdlcaml_video_get_pixels(value surface) {
   CAMLlocal1(res);
   SDL_Surface* surf = Surface_val(surface);
 
-  res = alloc_bigarray_dims(
+  long dims[3] = {
+    surf->w,
+    surf->h,
+    surf->format->BytesPerPixel
+  };
+
+  res = caml_ba_alloc(
       BIGARRAY_UINT8 | BIGARRAY_C_LAYOUT,
-      1, (unsigned char*)surf->pixels, surf->pitch * surf->h);
+      3, (unsigned char*)surf->pixels, dims);
   CAMLreturn(res);
 }
 

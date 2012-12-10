@@ -1,3 +1,8 @@
+CAMLprim value sdlcaml_mixer_is_linked(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_true);
+}
+
 /* Encapsulation of opaque SDL_mixer Chunk (of type Mix_Chunk *)
    as Caml custom blocks
  */

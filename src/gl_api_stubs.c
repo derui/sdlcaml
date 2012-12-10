@@ -511,7 +511,7 @@ t_prim gl_api_glGetError(value _unit) {
 #include "enums/get_error.inc"
 
   _res = glGetError();
-  for (int i = 0; i < sizeof(get_error); ++i) {
+  for (int i = 0; i < sizeof(get_error) / sizeof(get_error[0]); ++i) {
     if (get_error[i] == _res) {
       CAMLreturn(Val_int(_res));
     }
@@ -1521,21 +1521,29 @@ t_prim gl_api_glGenTextures(value _v_n) {
   unsigned int *textures; /*out*/
 
   n = Int_val(_v_n);
-  textures = stat_alloc(n * sizeof(unsigned int ));
+  textures = malloc(n * sizeof(unsigned int ));
   glGenTextures(n, textures);
-  _vres = alloc_bigarray_dims(
-      BIGARRAY_INT32 | BIGARRAY_C_LAYOUT | BIGARRAY_MANAGED,
-      1, textures, n);
+
+  _vres = caml_alloc(n, 0);
+  for (int i = 0; i < n; ++i) {
+    Store_field(_vres, i, Val_int(textures[i]));
+  }
+  free(textures);
+
   CAMLreturn(_vres);
 }
 
 t_prim gl_api_glDeleteTextures(value _v_n, value _v_textures) {
   CAMLparam2(_v_n, _v_textures);
   int n; /*in*/
-  unsigned int const *textures; /*in*/
   n = Int_val(_v_n);
-  textures = Caml_ba_data_val(_v_textures);
+  unsigned int *textures = malloc(n * sizeof (unsigned int));
+  for (int i = 0; i < n; ++i) {
+    textures[i] = Int_val(Field(_v_textures, i));
+  }
+
   glDeleteTextures(n, textures);
+  free(textures);
   CAMLreturn(Val_unit);
 }
 
@@ -2703,7 +2711,8 @@ t_prim gl_api_glTexImage1D_native(value target, value level, value internalforma
                Int_val(level), internal_format[Int_val(internalformat)],
                Int_val(width), Int_val(border),
                texture_format[Int_val(format)],
-               texture_type[Int_val(type)], Caml_ba_data_val(data));
+               texture_type[Int_val(type)],
+               (const GLvoid*)Caml_ba_data_val(data));
   CAMLreturn(Val_unit);
 }
 
@@ -2727,7 +2736,9 @@ t_prim gl_api_glTexImage2D_native(value target, value level, value internalforma
                Int_val(width), Int_val(height),
                Int_val(border),
                texture_format[Int_val(format)],
-               texture_type[Int_val(type)], Caml_ba_data_val(data));
+               texture_type[Int_val(type)],
+               (const GLvoid*)Caml_ba_data_val(data));
+
   CAMLreturn(Val_unit);
 }
 
@@ -2751,7 +2762,8 @@ t_prim gl_api_glTexImage3D_native(value target, value level, value internalforma
                Int_val(width), Int_val(height), Int_val(depth),
                Int_val(border),
                texture_format[Int_val(format)],
-               texture_type[Int_val(type)], Caml_ba_data_val(data));
+               texture_type[Int_val(type)],
+               (const GLvoid*)Caml_ba_data_val(data));
   CAMLreturn(Val_unit);
 }
 

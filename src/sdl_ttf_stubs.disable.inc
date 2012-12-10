@@ -1,5 +1,10 @@
 #define t_prim CAMLprim value
 
+t_prim sdlcaml_ttf_is_linked(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_false);
+}
+
 t_prim sdlcaml_ttf_linked_version(value unit) {
   CAMLparam1(unit);
   caml_failwith("SDL_ttf is not available");

@@ -30,6 +30,12 @@ type image_type =
   | XPM
   | XV
 
+(** Return status SDL_image is linked.
+
+    @return true if SDL_image linked, false if did not linked.
+*)
+external is_linked: unit -> bool = "sdlcaml_image_is_linked"
+
 (** Get current version of SDL_image, Linked library and runtime it.
 
     @return returning tuple as (major, minor, patch)

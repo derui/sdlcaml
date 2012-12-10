@@ -1,3 +1,8 @@
+CAMLprim value sdlcaml_mixer_is_linked(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_false);
+}
+
 CAMLprim value sdlcaml_mixer_compile_version(value unit) {
   CAMLparam1(unit);
   caml_failwith("sdlcaml_mixer_compile_version: SDL_mixer is not available");

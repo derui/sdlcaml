@@ -12,7 +12,7 @@
  *)
 
 (** array of image pixels on the surface  *)
-type image_type = (int, Bigarray.int8_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
+type image_type = (int, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Genarray.t
 
 (**
  * Binding of {b SDL_Surface}'s flags.

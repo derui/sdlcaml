@@ -55,7 +55,9 @@
       <type>texlevel_target</type>
       <type>texlevel_pname</type>
     </module>
-    <alone-type>internal_format</alone-type>
+    <module name="InternalFormat">
+      <type>internal_format</type>
+    </module>
     <module name="Tex">
       <type>coord</type>
       <type>texgen_plane</type>
@@ -139,7 +141,11 @@
     <module name="Func">
       <type>compare_func</type>
       <type>blend_func</type>
+    </module>
+    <module name="SrcFunc">
       <type>blend_src_func</type>
+    </module>
+    <module name="DestFunc">
       <type>blend_dst_func</type>
     </module>
     <module name="Op">
@@ -802,12 +808,18 @@
   <section name="blend_src_func">
     <pname version="GL_VERSION_0_0">GL_ZERO</pname>
     <pname version="GL_VERSION_0_0">GL_ONE</pname>
+    <pname version="GL_VERSION_0_0">GL_SRC_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_ONE_MINUS_SRC_COLOR</pname>
     <pname version="GL_VERSION_0_0">GL_DST_COLOR</pname>
     <pname version="GL_VERSION_0_0">GL_ONE_MINUS_DST_COLOR</pname>
     <pname version="GL_VERSION_0_0">GL_SRC_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_ONE_MINUS_SRC_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_DST_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_ONE_MINUS_DST_ALPHA</pname>
+    <pname version="GL_VERSION_0_0">GL_CONSTANT_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_ONE_MINUS_CONSTANT_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_CONSTANT_ALPHA</pname>
+    <pname version="GL_VERSION_0_0">GL_ONE_MINUS_CONSTANT_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_SRC_ALPHA_SATURATE</pname>
   </section>
 
@@ -816,10 +828,16 @@
     <pname version="GL_VERSION_0_0">GL_ONE</pname>
     <pname version="GL_VERSION_0_0">GL_SRC_COLOR</pname>
     <pname version="GL_VERSION_0_0">GL_ONE_MINUS_SRC_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_DST_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_ONE_MINUS_DST_COLOR</pname>
     <pname version="GL_VERSION_0_0">GL_SRC_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_ONE_MINUS_SRC_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_DST_ALPHA</pname>
     <pname version="GL_VERSION_0_0">GL_ONE_MINUS_DST_ALPHA</pname>
+    <pname version="GL_VERSION_0_0">GL_CONSTANT_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_ONE_MINUS_CONSTANT_COLOR</pname>
+    <pname version="GL_VERSION_0_0">GL_CONSTANT_ALPHA</pname>
+    <pname version="GL_VERSION_0_0">GL_ONE_MINUS_CONSTANT_ALPHA</pname>
   </section>
 
   <section name="logic_opcode">

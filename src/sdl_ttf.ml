@@ -36,6 +36,12 @@ type hinting =
   | HINTING_MONO
   | HINTING_NONE
 
+(** Return status SDL_ttf is linked.
+
+    @return true if SDL_ttf linked, false if did not linked.
+*)
+external is_linked: unit -> bool = "sdlcaml_ttf_is_linked"
+
 (** Get current version of SDL_ttf, when it compiled and linked
 
     @reutrn tuple as (major, minor, patch)

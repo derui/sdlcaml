@@ -9,13 +9,12 @@ let normal_axis = function
   | `Y -> {x = 0.0; y = 1.0; z = 0.0}
   | `Z -> {x = 0.0; y = 0.0; z = 1.0}
 
-let normalize {x;y;z} =
-  let len = sqrt(x *. x +. y *. y +. z *. z) in
-  {x = x /. len; y = y /. len;z = z /. len}
-
+let norm_square {x;y;z} = x *. x +. y *. y +. z *. z
 let norm {x;y;z} = sqrt(x *. x +. y *. y +. z *. z)
 
-let norm_square {x;y;z} = x *. x +. y *. y +. z *. z
+let normalize {x;y;z} =
+  let len = norm {x;y;z} in
+  {x = x /. len; y = y /. len;z = z /. len}
 
 let dot v1 v2 =
   v1.x *. v2.x +. v1.y *. v2.y +. v1.z *. v2.z
@@ -23,7 +22,7 @@ let dot v1 v2 =
 let cross v1 v2 =
   {x = v1.y *. v2.z -. v2.y *. v1.z;
    y = v1.x *. v2.z -. v2.x *. v1.z;
-   z = v1.x *. v2.y -. v2.x *. v1.z;
+   z = v1.x *. v2.y -. v2.x *. v1.y;
   }
 
 let scale ~v ~scale =
