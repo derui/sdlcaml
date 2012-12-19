@@ -72,10 +72,10 @@ module Tree = struct
     | Empty -> Empty
     (* Node have two child both of leaf *)
     | Node (_, Empty, _, _, Empty) as n -> n
-    (* skew *)
-    | Node (level, Node (llevel, ll, lk, ld, lr), k, d, r) as n ->
-      if level = llevel then
-        Node (llevel, ll, lk, ld, Node (level, lr, k, d, r))
+    (* split *)
+    | Node (lvl, l, k, d, Node (rlevel, rl, rk, rd, rr)) as n ->
+      if lvl = level rr then
+        Node (rlevel + 1, Node (lvl, l, k, d, rl), rk, rd, rr)
       else
         n
     | _ as n -> n
@@ -230,35 +230,45 @@ module Tree = struct
     let removed = decrease_level removed in
     remove_fixup_balance removed
 
-  let fold tree ~f ~init =
-    let rec fold_ tree f current =
-      match tree with
-      | Empty -> current
-      | Node (_, l, k, d, r) ->
-        let current = fold_ l f current in
-        let current = f ~key:k ~data:d current in
-        fold_ r f current
-    in fold_ tree f init
+  let rec fold tree ~f ~init:accu =
+    match tree with
+    | Empty -> accu
+    | Node (_, l, k, d, r) ->
+      fold r ~f ~init:(f ~key:k ~data:d (fold l ~f ~init:accu))
 
-  let map tree ~f ~compare_key =
-    fold tree
-      ~f:(fun ~key ~data tree -> add tree ~key ~data:(f data) ~compare_key)
-      ~init:Empty
+  let rec map tree ~f ~compare_key =
+    match tree with
+    | Empty -> Empty
+    | Node (lvl, l, k, d, r) ->
+      let l = map l ~f ~compare_key in
+      let d = f d in
+      let r = map r ~f ~compare_key in
+      Node (lvl, l, k, d, r)
 
-  let mapi tree ~f ~compare_key =
-    fold tree
-      ~f:(fun ~key ~data tree -> add tree ~key ~data:(f ~key ~data) ~compare_key)
-      ~init:Empty
+  let rec mapi tree ~f ~compare_key =
+    match tree with
+    | Empty -> Empty
+    | Node (lvl, l, k, d, r) ->
+      let l = mapi l ~f ~compare_key in
+      let d = f ~key:k ~data:d in
+      let r = mapi r ~f ~compare_key in
+      Node (lvl, l, k, d, r)
 
-  let iter tree f compare_key =
-    fold tree
-      ~f:(fun ~key ~data _ -> f data)
-      ~init:()
+  let rec iter tree f compare_key =
+    match tree with
+    | Empty -> ()
+    | Node (lvl, l, k, d, r) ->
+      iter l f compare_key;
+      f d;
+      iter r f compare_key
 
-  let iteri tree f compare_key =
-    fold tree
-      ~f:(fun ~key ~data _ -> f ~key ~data)
-      ~init:()
+  let rec iteri tree f compare_key =
+    match tree with
+    | Empty -> ()
+    | Node (lvl, l, k, d, r) ->
+      iteri l f compare_key;
+      f ~key:k ~data:d;
+      iteri r f compare_key
 
   let keys tree =
     fold tree ~f:(fun ~key ~data lst -> key :: lst) ~init:[]
@@ -333,7 +343,7 @@ end
 module Accessor = struct
   let is_empty t = Tree.is_empty t.tree
   let add t ~key ~data = {t with tree = Tree.add t.tree ~key ~data ~compare_key:t.comparator;}
-  let remove t ~key = {t with tree = Tree.remove t.tree key t.comparator;}
+  let remove t key = {t with tree = Tree.remove t.tree key t.comparator;}
   let minimum t = try Some (Tree.min_binding t.tree) with Invalid_argument _ -> None
   let minimum_exn t = Tree.min_binding t.tree
   let maximum t = try Some (Tree.max_binding t.tree) with Invalid_argument _ -> None
@@ -358,7 +368,7 @@ end
 module Functor_accessor(Key:Comparable.S) = struct
   let is_empty t = Tree.is_empty t.tree
   let add t ~key ~data = {t with tree = Tree.add t.tree ~key ~data ~compare_key:t.comparator;}
-  let remove t ~key = {t with tree = Tree.remove t.tree key t.comparator;}
+  let remove t key = {t with tree = Tree.remove t.tree key t.comparator;}
   let minimum t = try Some (Tree.min_binding t.tree) with Invalid_argument _ -> None
   let minimum_exn t = Tree.min_binding t.tree
   let maximum t = try Some (Tree.max_binding t.tree) with Invalid_argument _ -> None

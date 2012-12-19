@@ -21,7 +21,7 @@ module type Accessor = sig
   val add: ('k, 'v, 'c) t -> key:'k key -> data:'v -> ('k, 'v, 'c) t
 
   (** Remove key and related data from given Map, and return removed Map *)
-  val remove: ('k, 'v, 'c) t -> key:'k key -> ('k, 'v, 'c) t
+  val remove: ('k, 'v, 'c) t -> 'k key -> ('k, 'v, 'c) t
 
   (** Get minimum key-value pair, if empty Map is given, return None.
       when use *_exn, raise {!Invalid_argument} if empty tree is given.

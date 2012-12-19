@@ -7,6 +7,7 @@ archive(native) = "sdlcaml.cmxa"
 exists_if = "sdlcaml.cma"
 package "extlib" (
   version = "0.1"
+  requires = "num"
   description = "sdlcaml internal library"
   archive(byte) = "extlib.cma"
   archive(byte, plugin) = "extlib.cma"

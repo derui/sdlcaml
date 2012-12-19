@@ -88,11 +88,11 @@ GenerateFlags(output) =
 				foreach(x, $(initflags))
 					println($x)
 				value
-			cp $@ ../src/$@
+			cp $@ ../$@
 
-	../src/$(output): $(output)
+	../$(output): $(output)
 		section
-			cp ../config/$(output) $@
+			cp $(output) $@
 
 	$(FLAG_GENERATE_PROG): outputflag.c $(FLAG_GENERATE_PROG_NAME).ml
 		section
@@ -102,7 +102,7 @@ GenerateFlags(output) =
 			$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $(TARGET))$(EXT_LIB))"
 	export
 
-	return $(array $(FLAG_GENERATE_PROG), $(output), ../src/$(output))
+	return $(array $(FLAG_GENERATE_PROG), $(output), ../$(output))
 
 #
 # OCAML_LIBS += ../lib/mylib
@@ -114,10 +114,8 @@ GenerateFlags(output) =
 GENERATE = $(GenerateFlags sdl_initflags.h)
 GENERATE += $(GenerateFlags sdl_mixer_flags.h)
 
+all: $(GENERATE)
 .DEFAULT: all
-all: prepare
-
-prepare: $(GENERATE)
 
 generator: $(OCamlProgram gl_enum_generator, gl_enum_generator) $(OCamlProgram gl_api_generator, gl_api_generator)
 

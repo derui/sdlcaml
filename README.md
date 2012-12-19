@@ -8,10 +8,18 @@ This library needs other libraries to build where your works:
   Better build system as compatible for make, created by OCaml.
 - SDL1.2
   SDL Library. The sdlcaml only support 1.2.*, not 1.3.* or higher.
-- SDL_mixer
-  Mixer library for SDL. This library certainly need to build.
 - ocamlfind
   Very useful library when build ocaml program/library.
+- xml-light
+  A light weight library to parse xml. must to need.
+
+follow libraries are optional.
+- SDL_mixer
+  Mixer library for SDL.
+- SDL_image
+  Image loading library for SDL.
+- SDL_ttf
+  Library to use TTF for SDL.
 
 However, building sdlcaml is very difficult... . If you cound not build this,
 please use compiled-library instead of it.

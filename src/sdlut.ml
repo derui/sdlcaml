@@ -85,6 +85,7 @@ let default_expose_func:expose_func_type   = (fun _ -> ())
 let default_display_func:display_func_type  = (fun _ -> ())
 let default_move_func:move_func_type     = (fun _ -> ())
 let default_quit_func:quit_func_type     = (fun _ -> false)
+let default_input_func:input_callback_func_type = (fun ~info -> ())
 
 (* callback function warehouse *)
 let active_callback_func   = ref default_active_func
@@ -269,6 +270,14 @@ let event_dispatch () =
 
 (* input management *)
 
+let add_input_callback ~info ~func =
+  input_callback_funcs := IntMap.add !input_callback_funcs !info.info_id (func, info);
+  keyboard_callback_func := default_keyboard_func;
+  joystick_callback_func := default_joystick_func
+
+let remove_input_callback info =
+  input_callback_funcs := IntMap.remove !input_callback_funcs !info.info_id
+
 let integrate_inputs ~id ~num ~axis_map ~key_map =
   let make_axis_map axis_map =
     let axes = List.map (fun {axis;_} -> axis) axis_map in
@@ -309,20 +318,14 @@ let integrate_inputs ~id ~num ~axis_map ~key_map =
       axis_state = make_hashtbl (List.map (fun {axis;_} -> axis) axis_map) 0;
       key_state = make_hashtbl (List.map fst key_map) false;
     } in
-  ref (make_struct (Joystick.joystick_open num))
+  let info = ref (make_struct (Joystick.joystick_open num)) in
+  add_input_callback ~info ~func:default_input_func;
+  info
 
 let input_close info =
   match !info.joy_struct with
   | Some joy -> Joystick.joystick_close joy
   | None -> ()
-
-let add_input_callback ~info ~func =
-  input_callback_funcs := IntMap.add !input_callback_funcs !info.info_id (func, info);
-  keyboard_callback_func := default_keyboard_func;
-  joystick_callback_func := default_joystick_func
-
-let remove_input_callback info =
-  input_callback_funcs := IntMap.remove !input_callback_funcs !info.info_id
 
 let correct_states ~info ~states ~pred =
   let input_pressed state =

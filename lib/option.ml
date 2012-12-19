@@ -21,6 +21,14 @@ let compare_with ?(comparator=compare) fst snd =
   | None , Some _ -> -1
   | Some x, Some y -> comparator x y
 
+let map f list =
+  let rec map_ f list build =
+    match list with
+    | [] -> build
+    | Some (x) :: rest -> map_ f rest (f x :: build)
+    | None :: rest -> map_ f rest build in
+  map_ f list []
+
 module Core =
 struct
   type 'a t = 'a option

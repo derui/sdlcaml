@@ -24,7 +24,7 @@
 #
 open build/C
 
-.SUBDIRS: enums
+.SUBDIRS: enums config
 #
 # This project requires ocamlfind (default - false).
 #
@@ -116,7 +116,6 @@ LIBRARY_NAME = sdlcaml
 #
 STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 
-CONFIG_GENERATED = sdl_initflags.h sdl_mixer_flags.h
 #
 # OCAML_LIBS += ../lib/extlib -custom
 # OCAML_CLIBS +=

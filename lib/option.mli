@@ -43,6 +43,12 @@ val is_some : 'a option -> bool
 *)
 val compare_with : ?comparator:('a -> 'a -> int) -> 'a option -> 'a option -> int
 
+(** this function applies given function to each element of list,
+    and builds the list with the results returned by given function.
+    But, appling given function only target Some variant. None is ignored.
+*)
+val map : ('a -> 'b) -> 'a option list -> 'b list
+
 (**
    Provide monadic operation with 'a option.
 
