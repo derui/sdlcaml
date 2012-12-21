@@ -187,7 +187,7 @@ module Compare : Extlib.Std.Comparable.Type with type t := key_synonym
 module Comparable : Extlib.Std.Comparable.S with type t := key_synonym
 
 (** Map for key and key state. *)
-module StateMap : Map.S with type key := key_synonym
+module StateMap : Extlib.Std.Map.S with type Key.t = key_synonym
 
 (**
    This function is provided to be used from C.

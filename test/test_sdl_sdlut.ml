@@ -22,8 +22,8 @@ let test_sdl_sdlut_basic_usage _ =
 
 let test_sdl_sdlut_integrate_input _ =
   let open Sdl in
-  let key_map = [(Key.SDLK_A, 1)] in
-  let input = Sdlut.integrate_inputs ~id:1 ~num:1 ~axis_map:[] ~key_map in begin
+  let mapping = [(Sdlut.BUTTON_1, Sdlut.Key Key.SDLK_A)] in
+  let input = Sdlut.integrate_inputs ~id:1 ~num:1 ~mapping in begin
     Sdlut.add_input_callback ~info:input ~func:(fun ~info -> ());
     let current = Timer.get_ticks () in
     Sdlut.display_callback (fun () ->

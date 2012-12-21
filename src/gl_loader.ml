@@ -50,6 +50,6 @@ let load fname =
   let open Extlib.Std.Option.Open in
   let open Extlib.Std.Prelude in
   if I.is_linked () then
-    I.load fname >>= return @@ correct_info
+    I.load fname >>= (return @< correct_info)
   else
     None

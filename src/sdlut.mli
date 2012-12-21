@@ -55,40 +55,68 @@ type callback_type =
   | Move
   | Quit
 
-(** Use mapping axis of joystick and some key of keyboard.
-    Integrated axis and key perform as follows.
-    - key pressed when current axis state is greater equal than {!capacity}
-    - key released when current axis state is lesser than {!capacity}
-    - axis state is full when key pressed
-    - axis state is zero when key released
-
-    When joystick axis and keyboard key operate simultaneously,
-    choice more big value between them.
+(** Manage axis infomation for virtualization of input to integrate.
+    Axis and capacity in this record are used to virtualize input, such as
+    some button is pushed.
 *)
-type axis_mapping = {
+type axis_info = {
   axis:Sdl_joystick.axis;
   (** target axis of joystick *)
 
   capacity:int;
   (** key pressed when axis state is greater than this value. *)
-
-  key:Sdl_key.key_synonym
-  (** mapping key as axis input of keyboard *)
 }
 
 (** type synonym for joystick button  *)
 type button = int
 
-(** Information to mapping keyboard key to joystick button.
-    Mapped key and button propagates when pressed either.
-*)
-type key_mapping = Sdl_key.key_synonym * button
+(* virtualized some inputs are buttons and keys *)
+type virtual_button =
+  BUTTON_1
+| BUTTON_2
+| BUTTON_3
+| BUTTON_4
+| BUTTON_5
+| BUTTON_6
+| BUTTON_7
+| BUTTON_8
+| BUTTON_9
+| BUTTON_10
+| BUTTON_11
+| BUTTON_12
+| BUTTON_13
+| BUTTON_14
+| BUTTON_15
+| BUTTON_16
+| BUTTON_17
+| BUTTON_18
+| BUTTON_19
+| BUTTON_20
+| BUTTON_21
+| BUTTON_22
+| BUTTON_23
+| BUTTON_24
+| BUTTON_25
+| BUTTON_26
+| BUTTON_27
+| BUTTON_28
+| BUTTON_29
+| BUTTON_30
+| BUTTON_31
+| BUTTON_32
+| BUTTON_OTHER of button
 
-(** To return from function that are {!get_pressed} and {!get_released}
-    are types as mapped key and button.
-    Null* is no key or button mapping it.
+(** Input methods from user. *)
+type input_method =
+  Key of Sdl_key.key_synonym
+| Button of button
+| Axis of axis_info
+
+(** Mapping button to some input method from user.
+    This type says that a virtual button is able to be mapped
+    some input method, such as keys, joysticks and axes of joysticks.
 *)
-type input_state = Button of button | Key of Sdl_key.key_synonym
+type input_mapping = virtual_button * input_method
 
 (** Container for input mapping infomations.
     User don't need nessesary to know details of this struct,
@@ -234,12 +262,11 @@ val quit_callback: func:(unit -> bool) -> unit
 
     @param id unique number to each integrated input_info.
     @param num the number of joystick.
-    @param axis_map the list of mapping joystick axis to some keyboard key. see {!axis_mapping}
-    @param key_map the list of mapping keyboard keys to joystick button. see {!key_mapping}
+    @param mapping the list to map virtual buttons to some input methods.
     @return integrated input information that contains mapping joystick to keyboard.
 *)
-val integrate_inputs: id:int -> num:int -> axis_map:axis_mapping list ->
-  key_map:key_mapping list -> input_info
+val integrate_inputs: id:int -> num:int -> mapping:input_mapping list
+  -> input_info
 
 (** Delete input information and release handle for joystick.
     This function must apply all {!input_info} made by {!integrate_inputs}.
@@ -270,55 +297,31 @@ val add_input_callback: info:input_info -> func:(info:input_info -> unit) -> uni
 *)
 val remove_input_callback: input_info -> unit
 
-(** Get current all input statements whether state is pressed or released.
-    These functions return mapped key and button. If pressed key or button
-    do not be contained via {!integrate_input}, returning list contain
-    them as (some key, null_button) or (null_key, some button).
-
-    For instance, to be used to input handling, you can use pattern match
-    returned them.
-
-    Note: this function always return {b all key and button states}, so
-          returning list is often as big as 200 elements...
-          To need only few key and key states, you should use {!get_pressed} and
-          {!get_pressed}.
-
-    @param info target integrated input infomation structure
-    @return all current button and key state
-*)
-val get_all_pressed: input_info -> input_state list
-val get_all_released: input_info -> input_state list
-
-(** Get current input statements whether pressed or released any keys or buttons.
+(** Get current input statements whether pressed or released at a button.
     If given key alreadly binding some buttons, result in equivalent when this function call with
     binding button to given key.
-    you have to call {!axis_state} with same {!input_info}.
+    you have to call {!axis_state} with same {!input_info} if you need a current axis statement.
 
-    If you was only registered some keys and call this function with not registered key or button,
-    returning list contain them as whether (key, null_button) or (null_key, button).
+    If you give a virtual button which did not be mapped, always return false.
 
     Note: To get newest state should call {!force_update} before,
           but these are usually used in callback-function registered by {!add_input_callback}.
 
     @param info target input info
-    @param states Keys or buttons are to get current state
-    @return current button or key state.
+    @param button a virtual button variant to get current state.
+    @return current state of a virtual button
 *)
-val get_pressed: info:input_info ->
-  states:[< `Key of Sdl_key.key_synonym | `Button of button] list ->
-  input_state list
-val get_released: info:input_info ->
-  states:[< `Key of Sdl_key.key_synonym | `Button of button] list ->
-  input_state list
+val get_pressed: input_info -> virtual_button -> bool
+val get_released: input_info -> virtual_button -> bool
 
 (** Get current state of given axis that is a signed integer representing
     the current position of the axis.
 
     @param info target input info
-    @param state Key or button is to get current state
+    @param axis Key or button is to get current state
     @return current state of given axis
 *)
-val axis_state: info:input_info -> state: Sdl_joystick.axis -> int
+val axis_state: info:input_info -> axis: Sdl_joystick.axis -> int
 
 (** Force update all {!input_info} already integrated.
 *)

@@ -10,12 +10,12 @@ let test_tear_down _ =
 let test_get_key_state _ =
   let open Sdl_input in
   let statemap = get_key_state () in
-  let key_check _ k =
+  let key_check k =
     match k with
     | false -> ()
     | true -> assert_failure "hoge"
   in
-  Sdl_key.StateMap.iter key_check statemap
+  Sdl_key.StateMap.iter statemap key_check
 
 let test_get_mod_state _ =
   let open Sdl_input in

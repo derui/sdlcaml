@@ -108,6 +108,7 @@ end
 
 (** This is signature to make type-specified Map module. *)
 module type S = sig
+  (** module which has type of the key of this module *)
   module Key : Comparable.S
 
   (** type of implementation of map *)

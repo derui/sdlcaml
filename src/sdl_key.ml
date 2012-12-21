@@ -302,10 +302,10 @@ module Compare =
 
 module Comparable = Extlib.Std.Comparable.Make(Compare)
 
-module StateMap = Map.Make (Compare)
+module StateMap = Extlib.Std.Map.Make (Compare)
 
 let to_state_map statelist =
-  let make_map (key, state) map = StateMap.add key state map in
+  let make_map (key, state) map = StateMap.add map ~key ~data:state in
   List.fold_right make_map statelist StateMap.empty
 
 let _ =

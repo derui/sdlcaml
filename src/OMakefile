@@ -122,7 +122,7 @@ STATICLIBS = $(add-wrapper lib, $(EXT_LIB), $(CFILES))
 # OCAML_OTHER_LIBS += camlidl
 # OCAML_LIB_FLAGS += -cclib -lsdlcaml
 #
-MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall -cclib, true)
+MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall, true)
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.

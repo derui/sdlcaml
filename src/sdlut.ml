@@ -9,35 +9,71 @@ module Window = Sdl_window
 exception Game_loop_exit
 
 type callback_type =
-  | Active
-  | Keyboard
-  | Mouse
-  | Motion
-  | Joystick
-  | Resize
-  | Expose
-  | Display
-  | Move
-  | Quit
+| Active
+| Keyboard
+| Mouse
+| Motion
+| Joystick
+| Resize
+| Expose
+| Display
+| Move
+| Quit
 
-type axis_mapping = {
-  axis:Joystick.axis;
+type axis_info = {
+  axis:Sdl_joystick.axis;
+  (** target axis of joystick *)
+
   capacity:int;
-  key:Sdl_key.key_synonym
+(** key pressed when axis state is greater than this value. *)
 }
 
 type button = int
 
-type key_mapping = Sdl_key.key_synonym * button
+type virtual_button =
+  BUTTON_1
+| BUTTON_2
+| BUTTON_3
+| BUTTON_4
+| BUTTON_5
+| BUTTON_6
+| BUTTON_7
+| BUTTON_8
+| BUTTON_9
+| BUTTON_10
+| BUTTON_11
+| BUTTON_12
+| BUTTON_13
+| BUTTON_14
+| BUTTON_15
+| BUTTON_16
+| BUTTON_17
+| BUTTON_18
+| BUTTON_19
+| BUTTON_20
+| BUTTON_21
+| BUTTON_22
+| BUTTON_23
+| BUTTON_24
+| BUTTON_25
+| BUTTON_26
+| BUTTON_27
+| BUTTON_28
+| BUTTON_29
+| BUTTON_30
+| BUTTON_31
+| BUTTON_32
+| BUTTON_OTHER of button
 
-type input_state = Button of button | Key of Sdl_key.key_synonym
+type input_method =
+  Key of Sdl_key.key_synonym
+| Button of button
+| Axis of axis_info
 
-module AxisMap = Map.Make (
-  struct
-    type t = Joystick.axis
-    let compare = compare
-  end
-)
+type input_mapping = virtual_button * input_method
+
+module VMap = Extlib.Std.Map.Poly
+type 'a virtual_map = (virtual_button, 'a) VMap.t
 
 module IntMap = Extlib.Std.Map.Poly
 
@@ -46,17 +82,11 @@ type input_info_real = {
   (* made joysticks by Sdl_joystick *)
   joy_struct:Joystick.joystick option;
 
-  (* map that key is axis and value is list of axis_mapping  *)
-  axis_maps:(Joystick.axis, axis_mapping list) Hashtbl.t;
-  (* map that key is keyboard key and value is joystick buttons *)
-  key_maps:(Sdl_key.key_synonym, button list) Hashtbl.t;
-  (* map that key is keyboard key and value is joystick buttons *)
-  button_maps:(button, Sdl_key.key_synonym list) Hashtbl.t;
+  (* mapping virtual button to input methods *)
+  virtual_mapping : input_method list virtual_map;
 
-  (* each states to save *)
-  button_state: (button, bool) Hashtbl.t;
-  axis_state: (Joystick.axis, int) Hashtbl.t;
-  key_state: (Sdl_key.key_synonym, bool) Hashtbl.t;
+  (* current state of each virtual buttons *)
+  virtual_state: (virtual_button, bool) Hashtbl.t
 }
 
 type input_info = input_info_real ref
@@ -178,64 +208,34 @@ let display_callback ~func = display_callback_func := func
 let move_callback ~func = move_callback_func := func
 let quit_callback ~func = quit_callback_func := func
 
-(* synchronize each states which are keys, buttons, and axes. *)
-let sync_bindings info =
-  let replace_if_exists tbl key v =
-    if Hashtbl.mem tbl key then Hashtbl.replace tbl key v else () in
-  let sync_each_tbl fromtbl totbl map =
-    let open Extlib.Std.Option.Open in
-    Hashtbl.iter (fun key buttons ->
-      let state = try Some (Hashtbl.find fromtbl key) with Not_found -> None in
-      ignore (
-        state >>= (fun state ->
-          return (List.iter (fun x ->
-            let state = state || (try Hashtbl.find totbl x with _ -> false) in
-            replace_if_exists totbl x state) buttons))
-      )
-    ) map in
-
-  (* key states synchronize button states *)
-  sync_each_tbl info.key_state info.button_state info.key_maps;
-
-  (* button states synchronize key states *)
-  sync_each_tbl info.button_state info.key_state info.button_maps;
-
-  (* axis states synchronize key states *)
-  let open Extlib.Std.Option.Open in
-  Hashtbl.iter (fun key mapping ->
-    let state = try Some (Hashtbl.find info.axis_state key) with Not_found -> None in
-    ignore (
-      state >>= (fun state ->
-        return (List.iter (fun x ->
-          if x.capacity < state then
-            replace_if_exists info.key_state x.key true
-          else ()) mapping))
-    )
-  ) info.axis_maps
-
-
 (* update input informations for all current input_info *)
 let update_input_infos () =
   let update_info (func, info) =
     let key_states = Input.get_key_state () in
-    begin
-      (* update keys that all state of keys by to get SDL *)
-      Sdl_key.StateMap.iter (Hashtbl.replace !info.key_state) key_states;
 
-      (* update buttons *)
-      let open Extlib.Std.Option.Open in
-      (* runs monad with option *)
-      ignore (!info.joy_struct >>= (fun joy ->
-        let buttons = Joystick.get_button_all joy in
-        return (List.iter (fun (k,v) -> Hashtbl.replace !info.button_state k v) buttons)));
-
-      (* update axes *)
-      let open Extlib.Std.Option.Open in
-      ignore (!info.joy_struct >>= (fun joy ->
-        return (Joystick.get_axis_all joy)) >>= (fun axes ->
-          return (List.iter (fun (k, v) -> Hashtbl.replace !info.axis_state k v) axes)));
-      sync_bindings !info;
-    end in
+    VMap.iteri !info.virtual_mapping (fun ~key ~data ->
+      List.iter (fun data ->
+        match data with
+        | Key synonym ->
+          let open Extlib.Std.Option.Open in
+          let open Extlib.Std.Prelude in
+          (Key.StateMap.find key_states synonym >>=
+            return @< Hashtbl.replace !info.virtual_state key) |> ignore
+        | Button button ->
+          let open Extlib.Std.Option.Open in
+          let open Extlib.Std.Prelude in
+          (!info.joy_struct >>= (fun js ->
+            Joystick.get_button ~button ~js |> (return @< Hashtbl.replace !info.virtual_state key)
+           )) |> ignore
+        | Axis {axis; capacity} ->
+          let open Extlib.Std.Option.Open in
+          let open Extlib.Std.Prelude in
+          ignore |< (!info.joy_struct >>= (fun js ->
+            let value = Joystick.get_axis ~js ~axis in
+            return |< Hashtbl.replace !info.virtual_state key
+              (abs value > abs capacity))))
+        data
+    ) in
   IntMap.iter !input_callback_funcs update_info
 
 let event_dispatch () =
@@ -278,45 +278,25 @@ let add_input_callback ~info ~func =
 let remove_input_callback info =
   input_callback_funcs := IntMap.remove !input_callback_funcs !info.info_id
 
-let integrate_inputs ~id ~num ~axis_map ~key_map =
-  let make_axis_map axis_map =
-    let axes = List.map (fun {axis;_} -> axis) axis_map in
-    let add_axis target axis =
-      let related = List.filter (fun s -> s.axis = axis) axis_map in
-      Hashtbl.add target axis related;
-      target in
-    List.fold_left add_axis (Hashtbl.create 10) axes in
+let integrate_inputs ~id ~num ~mapping =
+  let virtual_mapping =
+    List.fold_left (fun map (btn, input) ->
+      match VMap.find map btn with
+      | None -> VMap.add map ~key:btn ~data:[input]
+      | Some inputs -> VMap.add map ~key:btn ~data:(input :: inputs)
+    ) VMap.empty mapping in
 
-  let make_key_map key_map =
-    let keys = List.map fst key_map in
-    let add_key target key =
-      let related = List.map snd (List.filter (fun (k,_) -> k = key) key_map) in
-      Hashtbl.add target key related;
-      target in
-    List.fold_left add_key (Hashtbl.create 10) keys in
-
-  let make_button_map key_map =
-    let keys = List.map snd key_map in
-    let add_key target key =
-      let related = List.map fst (List.filter (fun (_,b) -> b = key) key_map) in
-      Hashtbl.add target key related;
-      target in
-    List.fold_left add_key (Hashtbl.create 10) keys in
-
-  let make_hashtbl list init =
+  let make_hashtbl keylist init =
     List.fold_left (fun tbl key -> Hashtbl.add tbl key init; tbl)
-      (Hashtbl.create 10) list in
+      (Hashtbl.create 10) keylist in
 
   let make_struct joy =
     { info_id = id;
       joy_struct = joy;
-      axis_maps = make_axis_map axis_map;
-      key_maps = make_key_map key_map;
-      button_maps = make_button_map key_map;
 
-      button_state = make_hashtbl (List.map snd key_map) false;
-      axis_state = make_hashtbl (List.map (fun {axis;_} -> axis) axis_map) 0;
-      key_state = make_hashtbl (List.map fst key_map) false;
+      virtual_mapping;
+
+      virtual_state = make_hashtbl (List.map fst mapping) false;
     } in
   let info = ref (make_struct (Joystick.joystick_open num)) in
   add_input_callback ~info ~func:default_input_func;
@@ -327,55 +307,21 @@ let input_close info =
   | Some joy -> Joystick.joystick_close joy
   | None -> ()
 
-let correct_states ~info ~states ~pred =
-  let input_pressed state =
-    match state with
-    | `Button (btn:int) ->
-      begin
-        try
-          if pred (Hashtbl.find !info.button_state btn) then
-            Some (Button btn)
-          else None
-        with Not_found -> None
-      end
-    | `Key key ->
-      begin
-        try
-          if pred (Hashtbl.find !info.key_state key) then
-            Some (Key key)
-          else None
-        with Not_found -> None
-      end
-  in
-  let merge_state list = function
-    | Some x -> x :: list
-    | None -> list
-  in
-  List.fold_left merge_state [] (List.map input_pressed states)
+let get_state info btn =
+  try Hashtbl.find !info.virtual_state btn with Not_found -> false
 
-let get_pressed ~info ~states =
-  correct_states ~info ~states ~pred:Extlib.Prelude.id
+let get_pressed = get_state
+let get_released info = let open Extlib.Std.Prelude in
+                        get_pressed info @> not
 
-let get_released ~info ~states =
-  correct_states ~info ~states ~pred:not
-
-(* all status extract as key and button state *)
-let extract_all_states info pred =
-  let button_states =
-    let filter k e l = if pred e then (Button k) :: l else l in
-    Hashtbl.fold filter !info.button_state []
-  in
-  let key_states =
-    let filter k e l = if pred e then (Key k) :: l else l in
-    Hashtbl.fold filter !info.key_state []
-  in
-  button_states @ key_states
-
-let get_all_pressed info = extract_all_states info Extlib.Prelude.id
-let get_all_released info = extract_all_states info not
-
-let axis_state ~info ~state =
-  try Hashtbl.find !info.axis_state state with Not_found -> 0
+let axis_state ~info ~axis =
+  let open Extlib.Std.Option.Open in
+  let axis = !info.joy_struct >>= (fun js ->
+    return (Joystick.get_axis ~js ~axis)
+  ) in
+  match axis with
+  | None -> 0
+  | Some axis -> axis
 
 let force_update = update_input_infos
 

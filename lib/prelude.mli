@@ -17,15 +17,18 @@ val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
    |> looks like monad bind (>>=) is reversed to apply argument of
    normal direction.
 *)
-val (+>) : 'a -> ('a -> 'b ) -> 'b
+val (|>) : 'a -> ('a -> 'b ) -> 'b
 
 (** control direction of to apply function to argument.
-   <| is alias of normal function application.
+   |< is alias of normal function application.
 *)
-val (+<) : ('a -> 'b) -> 'a -> 'b
+val (|<) : ('a -> 'b) -> 'a -> 'b
 
-(** Combine two functions *)
-val (@@) : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c)
+(** Combine two functions like from haskell's *)
+val (@<) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
+(** Combine two functions which direction to apply is forward *)
+val (@>) : ('a -> 'b)  -> ('b -> 'c) -> 'a -> 'c
+
 
 (** comparing floats that if one float has difference lesser than
   `epsilon`, result of comparing is `0` as true.
