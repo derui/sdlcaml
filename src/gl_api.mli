@@ -32,7 +32,7 @@ end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glClear.xml}
     manual pages on opengl.org}
 *)
-external glClear : Clear.clear_mask list -> unit = "gl_api_glClear"
+ external glClear : Clear.clear_mask list -> unit = "gl_api_glClear"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIndexMask.xml}
     manual pages on opengl.org}

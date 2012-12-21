@@ -494,7 +494,6 @@ t_prim gl_api_glPopClientAttrib(value _unit) {
 
 t_prim gl_api_glRenderMode(value _v_mode) {
   CAMLparam1(_v_mode);
-  int mode; /*in*/
   int _res;
   value _vres;
 #include "enums/render_mode.inc"
@@ -507,7 +506,6 @@ t_prim gl_api_glRenderMode(value _v_mode) {
 t_prim gl_api_glGetError(value _unit) {
   CAMLparam0();
   int _res;
-  value _vres;
 #include "enums/get_error.inc"
 
   _res = glGetError();
@@ -523,11 +521,11 @@ t_prim gl_api_glGetString(value _v_name) {
   CAMLparam1(_v_name);
 #include "enums/get_string.inc"
 
-  char const *_res;
+  unsigned char const *_res;
   value _vres;
 
   _res = glGetString(get_string[Int_val(_v_name)]);
-  _vres = copy_string(_res);
+  _vres = caml_copy_string((char const *)_res);
   CAMLreturn(_vres);
 }
 
@@ -2179,7 +2177,6 @@ t_prim gl_api_glHistogram(value _v_target, value _v_width,
 #include "enums/histogram.inc"
 #include "enums/internal_format.inc"
 
-  int target; /*in*/
   int width; /*in*/
   unsigned char sink; /*in*/
   width = Int_val(_v_width);
@@ -2494,7 +2491,6 @@ t_prim gl_api_glGetLight3(value light_i) {
   CAMLparam1(light_i);
   CAMLlocal1(ret);
   float array[3];
-#include "enums/get_light.inc"
 
   glGetLightfv(Int_val(light_i),
                GL_SPOT_DIRECTION,
@@ -2609,7 +2605,7 @@ t_prim gl_api_glGetTexGen1(value v_coord) {
 #include "enums/coord.inc"
 #include "enums/texgen_func.inc"
 
-  GLenum val;
+  GLint val;
   glGetTexGeniv(coord[Int_val(v_coord)],
                 GL_TEXTURE_GEN_MODE, &val);
   for (int i = 0; i < sizeof(texgen_func); ++i) {
@@ -2617,6 +2613,7 @@ t_prim gl_api_glGetTexGen1(value v_coord) {
       CAMLreturn(Val_int(i));
     }
   }
+  CAMLreturn(Val_int(-1));
 }
 
 t_prim gl_api_glGetTexGen4(value v_coord, value pname) {
@@ -2641,7 +2638,7 @@ t_prim gl_api_glGetTexEnv1(value unit) {
   CAMLparam0();
 #include "enums/texgen_env_func.inc"
 
-  GLenum val;
+  GLint val;
   glGetTexEnviv(GL_TEXTURE_ENV,
                 GL_TEXTURE_GEN_MODE, &val);
   for (int i = 0; i < sizeof(texgen_env_func); ++i) {
@@ -2649,6 +2646,7 @@ t_prim gl_api_glGetTexEnv1(value unit) {
       CAMLreturn(Val_int(i));
     }
   }
+  CAMLreturn(Val_int(-1));
 }
 
 t_prim gl_api_glGetTexEnv4(value unit) {
@@ -2672,16 +2670,17 @@ t_prim gl_api_glGetTexLevelParameter_format(value target, value level) {
 #include "enums/texlevel_target.inc"
 #include "enums/internal_format.inc"
 
-  GLenum val;
+  GLint val;
   glGetTexLevelParameteriv(texlevel_target[Int_val(target)],
                            Int_val(level),
                            GL_TEXTURE_INTERNAL_FORMAT,
                            &val);
   for (int i = 0; i < sizeof(internal_format); ++i) {
-      if (internal_format[i] == val) {
-        CAMLreturn(Val_int(i));
-      }
+    if (internal_format[i] == val) {
+      CAMLreturn(Val_int(i));
     }
+  }
+  CAMLreturn(Val_int(-1));
 }
 
 t_prim gl_api_glGetTexLevelParameter(value target, value level, value pname) {

@@ -109,7 +109,7 @@ t_prim sdlcaml_ttf_quit(value unit) {
 
   TTF_Quit();
 
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_open_font(value file, value ptsize) {
@@ -149,7 +149,7 @@ t_prim sdlcaml_ttf_close_font(value font) {
 
   TTF_CloseFont(Font_val(font));
 
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_byte_swapped(value swapped) {
@@ -161,7 +161,7 @@ t_prim sdlcaml_ttf_byte_swapped(value swapped) {
     TTF_ByteSwappedUNICODE(0);
   }
 
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_get_style(value font) {
@@ -209,7 +209,7 @@ t_prim sdlcaml_ttf_set_style(value font, value styles) {
     style |= Int_val(hd);
   }
   TTF_SetFontStyle(Font_val(font), style);
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_get_outline(value font) {
@@ -224,7 +224,7 @@ t_prim sdlcaml_ttf_set_outline(value font, value width) {
 
   TTF_SetFontOutline(Font_val(font), Int_val(width));
 
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_get_hinting(value font) {
@@ -239,7 +239,7 @@ t_prim sdlcaml_ttf_set_hinting(value font, value hinting) {
 
   TTF_SetFontHinting(Font_val(font),
                      ml_lookup_to_c(ml_ttf_hinting_table, hinting));
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_is_kerning(value font) {
@@ -256,7 +256,7 @@ t_prim sdlcaml_ttf_set_kerning(value font, value kerning) {
   int ker = kerning == Val_true ? 1 : 0;
 
   TTF_SetFontKerning(Font_val(font), ker);
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_ttf_height(value font) {

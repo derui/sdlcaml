@@ -17,12 +17,12 @@ val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
    |> looks like monad bind (>>=) is reversed to apply argument of
    normal direction.
 *)
-val (|>) : 'a -> ('a -> 'b ) -> 'b
+val (+>) : 'a -> ('a -> 'b ) -> 'b
 
 (** control direction of to apply function to argument.
    <| is alias of normal function application.
 *)
-val (<|) : ('a -> 'b) -> 'a -> 'b
+val (+<) : ('a -> 'b) -> 'a -> 'b
 
 (** Combine two functions *)
 val (@@) : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c)

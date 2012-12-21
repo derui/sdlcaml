@@ -50,6 +50,7 @@ int ml_convert_gl_attr_to_c(value attr) {
     case 10: CAMLreturnT(int, SDL_GL_ACCUM_BLUE_SIZE);
     case 11: CAMLreturnT(int, SDL_GL_ACCUM_ALPHA_SIZE);
   }
+  caml_failwith("Can not convert between attr of C and attr of Caml");
 }
 
 static int ml_make_video_setting_flag(value flags) {

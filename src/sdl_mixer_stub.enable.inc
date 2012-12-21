@@ -92,6 +92,7 @@ Uint16 ml_convert_audio_format_to_c(value format) {
     case 4: CAMLreturnT(Uint16, AUDIO_U16MSB);
     case 5: CAMLreturnT(Uint16, AUDIO_S16MSB);
   }
+  caml_failwith("There is no other audio format against given format");
 }
 
 /* binding implements */
@@ -420,6 +421,8 @@ CAMLprim value sdlcaml_mixer_fading_channel(value channel) {
       CAMLreturn(Val_some(Val_int(1)));
     case MIX_FADING_IN:
       CAMLreturn(Val_some(Val_int(2)));
+    default:
+      CAMLreturn(Val_none);
   }
 }
 
@@ -642,7 +645,9 @@ CAMLprim value sdlcaml_mixer_get_music_type(value music) {
     case MUS_MP3: CAMLreturn(Val_int(6));
     case MUS_MP3_MAD: CAMLreturn(Val_int(7));
     case MUS_FLAC: CAMLreturn(Val_int(8));
+    case MUS_MODPLUG: CAMLreturn(Val_int(9));
   }
+  caml_failwith("Can not detect music type of given music!");
 }
 
 CAMLprim value sdlcaml_mixer_playing_music(value unit) {
@@ -666,6 +671,8 @@ CAMLprim value sdlcaml_mixer_fading_music(value unit) {
       CAMLreturn(Val_some(Val_int(1)));
     case MIX_FADING_IN:
       CAMLreturn(Val_some(Val_int(2)));
+    default:
+      CAMLreturn(Val_none);
   }
 
 }

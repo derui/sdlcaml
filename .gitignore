@@ -18,6 +18,8 @@
 *.cmxa
 *.cma
 *.annot
+*.cmt
+*.cmti
 
 # compiled omake files
 *.omc
@@ -32,8 +34,8 @@
 *.css
 
 # generated header file:no tracking
-config/sdl_init_flags.h
-config/sdl_mixer_flags.h
-config/gl_flags.h
+src/config/sdl_init_flags.h
+src/config/sdl_mixer_flags.h
+src/config/gl_flags.h
 
 src/enums/*.inc

@@ -31,7 +31,6 @@ CAMLprim value sdlcaml_get_mouse_state(value unit) {
   int x = 0, y = 0;
   int current_buttons_state = SDL_GetMouseState(&x, &y);
 
-  const int MAX_BUTTON = 32;
   button_state = Val_emptylist;
 
   mouse_state = caml_alloc(3, 0);

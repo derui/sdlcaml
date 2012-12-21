@@ -83,7 +83,7 @@ t_prim sdlcaml_image_init(value flags) {
   }
 
   int initted = IMG_Init(real_flag);
-  if (initted & real_flag != real_flag) {
+  if ((initted & real_flag) != real_flag) {
     res = caml_alloc(1, 0);
     Store_field(res, 0, caml_copy_string(IMG_GetError()));
   } else {
@@ -98,7 +98,7 @@ t_prim sdlcaml_image_quit(value unit) {
   CAMLparam1(unit);
 
   IMG_Quit();
-  CAMLnoreturn;
+  CAMLreturn(Val_unit);
 }
 
 t_prim sdlcaml_image_load(value filename) {

@@ -21,5 +21,13 @@ module List = struct
   include Ext_list
 end
 
+module Array = struct
+  (* Inherits the original Array module *)
+  include Array
+
+  (* Inherits my extended Array *)
+  include Ext_array
+end
+
 (* Original Map module *)
 module Map = Ext_map

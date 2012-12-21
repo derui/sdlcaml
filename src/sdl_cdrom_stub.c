@@ -4,6 +4,8 @@
 #include <caml/alloc.h>
 #include <caml/callback.h>
 #include <caml/custom.h>
+#include <caml/fail.h>
+
 
 #include "common.h"
 
@@ -39,6 +41,7 @@ value ml_convert_cd_status_from_c(CDstatus stat) {
     case CD_PAUSED: CAMLreturn(Val_int(3));
     case CD_ERROR: CAMLreturn(Val_int(4));
   }
+  caml_failwith("Can not detect corresponding value against given CDstatus");
 }
 
 CAMLprim value sdlcaml_cd_num_drives(value unit) {

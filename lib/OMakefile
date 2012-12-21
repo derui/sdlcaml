@@ -53,7 +53,7 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot
+OCAMLFLAGS    += -annot -bin-annot
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
 # OCAML_LINK_FLAGS +=

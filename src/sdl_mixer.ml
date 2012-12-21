@@ -56,6 +56,7 @@ type music_type =
 | MUS_MP3
 | MUS_MP3_MAD
 | MUS_FLAC
+| MUS_MODPLUG
 
 (** Covering up Mix_Chunk from OCaml *)
 type chunk
