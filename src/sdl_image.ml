@@ -26,7 +26,7 @@ external is_linked: unit -> bool = "sdlcaml_image_is_linked"
 external linked_version: unit -> int * int * int = "sdlcaml_image_linked_version"
 external compile_version: unit -> int * int * int = "sdlcaml_image_version"
 
-external init: imageinit list -> (unit, string) Extlib.Std.Either.t = "sdlcaml_image_init"
+external init: imageinit list -> (unit, string) Baselib.Std.Either.t = "sdlcaml_image_init"
 
 external quit: unit -> unit = "sdlcaml_image_quit"
 

@@ -22,17 +22,18 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open build/C
 
-.SUBDIRS: enums config
+open MyUtil
+
 #
 # This project requires ocamlfind (default - false).
 #
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
-#    glMLite
-#    stdlib
+    threads
+    oUnit
+    sdlcaml.baselib
 #
 if $(not $(OCAMLFIND_EXISTS))
    eprintln(This project requires ocamlfind, but is was not found.)
@@ -42,7 +43,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += ../lib
+# OCAMLINCLUDES +=
 
 #
 # Compile native or byte code?
@@ -55,10 +56,12 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot -bin-annot -g
+OCAMLFLAGS    += -annot -thread
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
-# OCAML_LINK_FLAGS +=
+
+OCAML_LINK_FLAGS +=
+#OCAML_LINK_FLAGS += -cclib "-L/usr/lib -lSDLmain -lSDL -mwindows"
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=
 
@@ -74,56 +77,50 @@ OCAMLFLAGS    += -annot -bin-annot -g
 # Build bindings for OCaml to C.
 #
 
-# check that can sdl-config use.
-.STATIC:
-	SDL_CONFIG_FOUND = $(CheckProg sdl-config)
-	SDL_CONFIG = $(if $(SDL_CONFIG_FOUND), sdl-config, "")
-
-	if $(not $(SDL_CONFIG_FOUND))
-		eprintln(can not build because sdl-config is not found. Please check to valid SDL installed)
-		$(exit 1)
-	SDL_CONFIGURE = $(shell $(SDL_CONFIG) --libs --cflags)
-	SDL_MIXER_AVAILABLE = $(VerboseCheckCLib SDL_mixer, Mix_Init)
-	SDL_IMAGE_AVALIABLE = $(VerboseCheckCLib SDL_image, IMG_Init)
-	SDL_TTF_AVALIABLE = $(VerboseCheckCLib SDL_ttf, TTF_Init)
-
-	if $(SDL_MIXER_AVAILABLE)
-		SDL_CONFIGURE += -lSDL_mixer -DSDLCAML_MIXER_ENABLE
-		setenv("SDLCAML_MIXER_ENABLE", $(EMPTY))
-		export
-	if $(SDL_IMAGE_AVALIABLE)
-		SDL_CONFIGURE += -lSDL_image -DSDLCAML_IMAGE_ENABLE
-		setenv("SDLCAML_IMAGE_ENABLE", $(EMPTY))
-		export
-	if $(SDL_TTF_AVALIABLE)
-		SDL_CONFIGURE += -lSDL_ttf -DSDLCAML_TTF_ENABLE
-		setenv("SDLCAML_TTF_ENABLE", $(EMPTY))
-		export
-	export
-
-%$(EXT_OBJ): %.c :scanner: scan-c-%.c
-	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE)" -o $@ -c $<
-
-CFILES = $(removesuffix $(ls *.c))
-
 FILES = $(removesuffix $(ls *.ml))
-FILES += enums
 
-# files for building extend libraries are contained to dependencies.
-SUB_FILES = $(ls *.inc)
-
-LIBRARY_NAME = sdlcaml
+PROGRAMS =
+	foreach(x, $(FILES))
+		.PHONY: run-$(removeprefix test_sdl_, $x)
+		run-$(removeprefix test_sdl_, $x):
+			./$x$(EXE)
+		export
+		value $(OCamlProgram $x, $x)
 
 #
-# OCAML_LIBS += ../lib/extlib -custom
+# OCAML_LIBS += ../src/sdlcaml
 # OCAML_CLIBS +=
-# OCAML_OTHER_LIBS += camlidl
-# OCAML_LIB_FLAGS += -cclib -lsdlcaml
+# OCAML_OTHER_LIBS +=
+# OCAML_LIB_FLAGS += -cclib -lsdl
+# OCAML_LIB_FLAGS += -verbose
 #
-MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall, true)
 
-# As gl_enum.h is referenced by already existed .c file,
-# need to add generated files by camlidl to adependency for .DEFAULT.
-all: sdlcaml.cmxa $(RequireBuild enums.ml) $(RequireBuild extlib.cmxa) $(SUB_FILES)
+# need sdlcaml library
 
-.DEFAULT: all
+test: $(PROGRAMS)
+
+run-all:
+	foreach(x, $(FILES))
+		./$x
+
+clean:
+	foreach(x, $(PROGRAMS))
+		rm -rf $x
+	rm -f *o
+	rm -f *cmx
+	rm -f *cmo
+	rm -f *cmi
+	rm -f *annot
+	rm -f *cmt
+	rm -f *cmti
+
+test-clean:
+	foreach(x, $(PROGRAMS))
+		rm -rf $x
+	rm -f *o
+	rm -f *cmx
+	rm -f *cmo
+	rm -f *cmi
+	rm -f *annot
+	rm -f *cmt
+	rm -f *cmti

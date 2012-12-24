@@ -72,10 +72,10 @@ type input_method =
 
 type input_mapping = virtual_button * input_method
 
-module VMap = Extlib.Std.Map.Poly
+module VMap = Baselib.Std.Map.Poly
 type 'a virtual_map = (virtual_button, 'a) VMap.t
 
-module IntMap = Extlib.Std.Map.Poly
+module IntMap = Baselib.Std.Map.Poly
 
 type input_info_real = {
   info_id:int;
@@ -217,19 +217,19 @@ let update_input_infos () =
       List.iter (fun data ->
         match data with
         | Key synonym ->
-          let open Extlib.Std.Option.Open in
-          let open Extlib.Std.Prelude in
+          let open Baselib.Std.Option.Open in
+          let open Baselib.Std.Prelude in
           (Key.StateMap.find key_states synonym >>=
             return @< Hashtbl.replace !info.virtual_state key) |> ignore
         | Button button ->
-          let open Extlib.Std.Option.Open in
-          let open Extlib.Std.Prelude in
+          let open Baselib.Std.Option.Open in
+          let open Baselib.Std.Prelude in
           (!info.joy_struct >>= (fun js ->
             Joystick.get_button ~button ~js |> (return @< Hashtbl.replace !info.virtual_state key)
            )) |> ignore
         | Axis {axis; capacity} ->
-          let open Extlib.Std.Option.Open in
-          let open Extlib.Std.Prelude in
+          let open Baselib.Std.Option.Open in
+          let open Baselib.Std.Prelude in
           ignore |< (!info.joy_struct >>= (fun js ->
             let value = Joystick.get_axis ~js ~axis in
             return |< Hashtbl.replace !info.virtual_state key
@@ -311,11 +311,11 @@ let get_state info btn =
   try Hashtbl.find !info.virtual_state btn with Not_found -> false
 
 let get_pressed = get_state
-let get_released info = let open Extlib.Std.Prelude in
+let get_released info = let open Baselib.Std.Prelude in
                         get_pressed info @> not
 
 let axis_state ~info ~axis =
-  let open Extlib.Std.Option.Open in
+  let open Baselib.Std.Option.Open in
   let axis = !info.joy_struct >>= (fun js ->
     return (Joystick.get_axis ~js ~axis)
   ) in

@@ -7,6 +7,7 @@ module Prelude = Prelude
 module Stringable = Stringable
 module TypedCollection = TypedCollection
 module TypedStringable = TypedStringable
+module Binary_pack = Binary_pack
 
 module Either = Either
 

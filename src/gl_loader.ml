@@ -47,8 +47,8 @@ let correct_info img =
   }
 
 let load fname =
-  let open Extlib.Std.Option.Open in
-  let open Extlib.Std.Prelude in
+  let open Baselib.Std.Option.Open in
+  let open Baselib.Std.Prelude in
   if I.is_linked () then
     I.load fname >>= (return @< correct_info)
   else

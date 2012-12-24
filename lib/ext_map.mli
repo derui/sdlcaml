@@ -1,4 +1,4 @@
-(** This module define [Map] module for [Extlib.Std]. I named after {!Ext_map}
+(** This module define [Map] module for [Baselib.Std]. I named after {!Ext_map}
     because don't override Original Caml {!Map} module.
 
     Internal structure defined this module is based on 'red-black tree',
@@ -10,15 +10,15 @@
     Usage:
 
     1. want map to use Pervasive.compare
-         type map = ('a ,'b) Extlib.Std.Map.Poly.t
+         type map = ('a ,'b) Baselib.Std.Map.Poly.t
        or
-         module M = Extlib.Std.Map.Poly
+         module M = Baselib.Std.Map.Poly
     2. want map with using own comparable module.
-         module M = Extlib.Std.Map.Make(Type)
+         module M = Baselib.Std.Map.Make(Type)
     3. want module interface to write for .mli
-         module M : Extlib.Std.Map.S with type Key.t = {b key}
+         module M : Baselib.Std.Map.S with type Key.t = {b key}
        in ml,
-         module M = Extlib.Std.Map.Make(struct
+         module M = Baselib.Std.Map.Make(struct
            type t = {b key}
            let compare = ...
          end)

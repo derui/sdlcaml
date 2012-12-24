@@ -57,4 +57,4 @@ val sub : t -> t -> t
 (** is vectors between angle square.  *)
 val is_square : t -> t -> bool
 
-include Extlib.Comparable.Type with type t := t
+include Baselib.Comparable.Type with type t := t

@@ -1,6 +1,6 @@
 open Sdlcaml
 open OUnit
-open Extlib
+open Baselib
 
 let test_set_up _ =
   Sdl_init.init [`AUDIO]

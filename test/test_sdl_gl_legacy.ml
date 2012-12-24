@@ -1,7 +1,7 @@
 open Sdlcaml
 open Bigarray
 open OUnit
-module S = Extlib.Std
+module S = Baselib.Std
 
 let test_set_up _ =
   begin

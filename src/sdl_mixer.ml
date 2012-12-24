@@ -10,7 +10,7 @@
  * @since 0.1
  *)
 
-module S = Extlib.Std
+module S = Baselib.Std
 
 (** SDL_Mixer support libraries  *)
 type mixerinit = [

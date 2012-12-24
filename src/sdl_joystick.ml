@@ -180,7 +180,7 @@ external get_button: js:joystick -> button:int -> bool = "sdlcaml_joystick_get_b
    @return current state of all axes
 *)
 let get_axis_all ~js =
-  let open Extlib.Std.List in
+  let open Baselib.Std.List in
   let axis_list = 0 -- ((num_axis js) - 1) in
   List.map (fun axis ->
     match axis with
@@ -196,6 +196,6 @@ let get_axis_all ~js =
     @return current state of all buttons, values are tuple of number of button and state.
 *)
 let get_button_all ~js =
-  let open Extlib.Std.List in
+  let open Baselib.Std.List in
   let num_list = 0 -- ((num_buttons js) - 1) in
   List.map (fun button -> (button, get_button ~js ~button)) num_list

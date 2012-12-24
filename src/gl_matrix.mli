@@ -114,4 +114,4 @@ val inverse : t -> t option
 *)
 val transpose : t -> t
 
-include Extlib.Stringable.Type with type t := t
+include Baselib.Stringable.Type with type t := t

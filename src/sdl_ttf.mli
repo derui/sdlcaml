@@ -54,14 +54,14 @@ external compiled_version: unit -> int * int * int = "sdlcaml_ttf_compiled_versi
     @return unit if initialize successful,
     string as error string if fail initialization
 *)
-external init: unit -> (unit, string) Extlib.Std.Either.t = "sdlcaml_ttf_init"
+external init: unit -> (unit, string) Baselib.Std.Either.t = "sdlcaml_ttf_init"
 
 (** Query the initialization status of the SDL_ttf library.
 
     @return Left with true if initialized, and with false if initialized yet.
             Right with error string if some error occured
 *)
-external was_init: unit -> (bool, string) Extlib.Std.Either.t = "sdlcaml_ttf_was_init"
+external was_init: unit -> (bool, string) Baselib.Std.Either.t = "sdlcaml_ttf_was_init"
 
 (** Shutdown and cleanup the SDL_ttf library.
 *)
@@ -73,7 +73,7 @@ external quit: unit -> unit = "sdlcaml_ttf_quit"
     @param ptsize point size to load font as
     @return loaded font or error string
 *)
-external open_font: file:string -> ptsize:int -> (font, string) Extlib.Std.Either.t
+external open_font: file:string -> ptsize:int -> (font, string) Baselib.Std.Either.t
   = "sdlcaml_ttf_open_font"
 
 (** Load file, face index, for use as a font, at ptsize size.
@@ -83,7 +83,7 @@ external open_font: file:string -> ptsize:int -> (font, string) Extlib.Std.Eithe
     @return loaded font or error string
 *)
 external open_font_index: file:string -> ptsize:int -> index:int
-  -> (font, string) Extlib.Std.Either.t = "sdlcaml_ttf_open_font_index"
+  -> (font, string) Baselib.Std.Either.t = "sdlcaml_ttf_open_font_index"
 
 (** Free the memory used by font, and free font itself as well.
     Do not use font after this.
@@ -251,7 +251,7 @@ external size_utf8: font:font -> text:string -> int * int option = "sdlcaml_ttf_
     @return new surface rendered text if successful, or error string
 *)
 external render_utf8_solid: font:font -> text:string -> color:Sdl_video.color
-  -> (Sdl_video.surface, string) Extlib.Std.Either.t = "sdlcaml_ttf_render_utf8_solid"
+  -> (Sdl_video.surface, string) Baselib.Std.Either.t = "sdlcaml_ttf_render_utf8_solid"
 
 (** Render the UTF8 encoed text using font with color onto a new surface
     filled with the bg color.
@@ -266,7 +266,7 @@ external render_utf8_solid: font:font -> text:string -> color:Sdl_video.color
 *)
 external render_utf8_shaded: font:font -> text:string -> fg:Sdl_video.color
   -> bg:Sdl_video.color
-  -> (Sdl_video.surface, string) Extlib.Std.Either.t = "sdlcaml_ttf_render_utf8_shaded"
+  -> (Sdl_video.surface, string) Baselib.Std.Either.t = "sdlcaml_ttf_render_utf8_shaded"
 
 (** Render the UTF8 encoed text using font with color onto a new surface,
     using the blended mode.
@@ -279,4 +279,4 @@ external render_utf8_shaded: font:font -> text:string -> fg:Sdl_video.color
     @return new surface rendered text if successful, or error string
 *)
 external render_utf8_blended: font:font -> text:string -> color:Sdl_video.color
-  -> (Sdl_video.surface, string) Extlib.Std.Either.t = "sdlcaml_ttf_render_utf8_blended"
+  -> (Sdl_video.surface, string) Baselib.Std.Either.t = "sdlcaml_ttf_render_utf8_blended"

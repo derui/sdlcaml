@@ -38,7 +38,7 @@ let is_square v1 v2 =
     | _ -> false
 
 let compare v1 v2 =
-  let open Extlib.Std.Prelude in
+  let open Baselib.Std.Prelude in
   let cmp = cmp_float ~epsilon:0.0000001 in
   let compare_x = cmp v1.x v2.x
   and compare_y = cmp v1.y v2.y
