@@ -67,7 +67,11 @@ let pack_signed_16 ~byte_order ~buffer ~pos n =
 ;;
 
 exception Binary_pack_invalid_unsigned_short_range of int
-let unpack_unsigned_16 = unpack_signed_16
+let unpack_unsigned_16 ~byte_order ~buffer ~pos =
+  assert(String.length buffer >= pos + 1);
+  (Char.code buffer.[pos + offset ~byte_order ~len:2 0] lsl 8) lor
+    (Char.code buffer.[pos + offset ~byte_order ~len:2 1])
+;;
 
 let pack_unsigned_16 ~byte_order ~buffer ~pos n =
   assert(String.length buffer >= pos + 1);
@@ -165,14 +169,14 @@ let pack_float ~byte_order ~buffer ~pos n =
   pack_signed_64 ~byte_order ~buffer ~pos bits
 ;;
 
-external unpack_float_c_layout : endian -> string -> int -> float
-  = "unpack_float_c_layout"
-
-external pack_float_c_layout : endian -> string -> int -> float -> unit
-  = "pack_float_c_layout"
-
 let unpack_float_c ~byte_order ~buffer ~pos =
-  unpack_float_c_layout byte_order buffer pos
+  assert(String.length buffer >= pos + 3);
+  let n = unpack_signed_32 ~byte_order ~buffer ~pos in
+  Int32.float_of_bits n
+;;
 
 let pack_float_c ~byte_order ~buffer ~pos n =
-  pack_float_c_layout byte_order buffer pos n
+  assert(String.length buffer >= pos + 3);
+  let bits = Int32.bits_of_float n in
+  pack_signed_32 ~byte_order ~buffer ~pos bits
+;;

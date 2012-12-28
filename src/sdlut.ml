@@ -145,7 +145,7 @@ let enable_events etypes =
   List.iter func etypes
 
 let init ?auto_clean:(auto_clean=true) ~flags =
-  Sdl_init.init ~auto_clean ~flags;
+  Sdl_init.init ~auto_clean ~flags ();
   ignore_events [
     Event.ACTIVEEVENT;
     Event.KEYDOWN;

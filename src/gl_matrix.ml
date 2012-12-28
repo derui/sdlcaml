@@ -52,8 +52,7 @@ let ortho_projection ~left ~right ~top ~bottom ~near ~far =
 
 let perspective_projection ~fov ~ratio ~near ~far =
   let pi = 3.14159265358979323846 in
-  let cot l = 1.0 /. tan (fov *. pi /. 360.0) in
-  let maxY = cot (fov /. 2.0) in
+  let maxY = sin (fov /. 2.0 *. pi /. 180.0) in
   let minY = -. maxY in
   let minX = minY /. ratio
   and maxX = maxY /. ratio in
@@ -94,6 +93,13 @@ let multiply ~m1 ~m2 =
     m42 = m1.m41 *. m2.m12 +. m1.m42 *. m2.m22 +. m1.m43 *. m2.m32 +. m1.m44 *. m2.m42;
     m43 = m1.m41 *. m2.m13 +. m1.m42 *. m2.m23 +. m1.m43 *. m2.m33 +. m1.m44 *. m2.m43;
     m44 = m1.m41 *. m2.m14 +. m1.m42 *. m2.m24 +. m1.m43 *. m2.m34 +. m1.m44 *. m2.m44;
+  }
+
+let mult_vec ~mat ~vec =
+  let open Gl_vector in
+  { x = mat.m11 *. vec.x +. mat.m12 *. vec.y +. mat.m13 *. vec.z +. mat.m14;
+    y = mat.m21 *. vec.x +. mat.m22 *. vec.y +. mat.m23 *. vec.z +. mat.m24;
+    z = mat.m31 *. vec.x +. mat.m32 *. vec.y +. mat.m33 *. vec.z +. mat.m34;
   }
 
 let rotation_matrix_of_axis ~dir ~angle =

@@ -56,7 +56,7 @@ val angle : t -> float
     if this quaternion is not unit, apply `normalize' for previous
     converting.
 *)
-val convert_matrix : t -> Gl_matrix.t
+val to_matrix : t -> Gl_matrix.t
 
 (** construct `obversing quaternion` between from and
     by obversing frequency.

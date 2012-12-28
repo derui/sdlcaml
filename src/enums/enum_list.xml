@@ -16,9 +16,13 @@
       <type>set_light_1</type>
       <type>set_light_4</type>
     </module>
-    <module name="Material">
+    <module name="GetMaterial">
+      <type>material_4f</type>
+      <type>material_3f</type>
+      <type>material_1f</type>
       <type>face_mode</type>
-      <type>set_material</type>
+    </module>
+    <module name="Material">
       <type>material_4f</type>
       <type>material_3f</type>
       <type>material_1f</type>
@@ -223,7 +227,6 @@
   </section>
 
   <section name="set_light_1">
-    <pname version="GL_VERSION_0_0">GL_SPOT_DIRECTION</pname>
     <pname version="GL_VERSION_0_0">GL_SPOT_EXPONENT</pname>
     <pname version="GL_VERSION_0_0">GL_SPOT_CUTOFF</pname>
     <pname version="GL_VERSION_0_0">GL_CONSTANT_ATTENUATION</pname>
@@ -256,21 +259,12 @@
   </section>
 
   <!-- Enums for Material -->
-  <section name="set_material">
-    <pname version="GL_VERSION_0_0">GL_AMBIENT</pname>
-    <pname version="GL_VERSION_0_0">GL_DIFFUSE</pname>
-    <pname version="GL_VERSION_0_0">GL_SPECULAR</pname>
-    <pname version="GL_VERSION_0_0">GL_EMISSION</pname>
-    <pname version="GL_VERSION_0_0">GL_SHININESS</pname>
-    <pname version="GL_VERSION_0_0">GL_AMBIENT_AND_DIFFUSE</pname>
-    <pname version="GL_VERSION_0_0">GL_COLOR_INDEXES</pname>
-  </section>
-
   <section name="material_4f">
     <pname version="GL_VERSION_0_0">GL_AMBIENT</pname>
     <pname version="GL_VERSION_0_0">GL_DIFFUSE</pname>
     <pname version="GL_VERSION_0_0">GL_SPECULAR</pname>
     <pname version="GL_VERSION_0_0">GL_EMISSION</pname>
+    <pname version="GL_VERSION_0_0">GL_AMBIENT_AND_DIFFUSE</pname>
   </section>
 
   <section name="material_3f">

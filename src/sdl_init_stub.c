@@ -42,8 +42,8 @@ static void sdlcaml_inner_quit(void) {
   SDL_Quit();
 }
 
-CAMLprim value sdlcaml_init(value auto_clean, value flags) {
-  CAMLparam2(auto_clean, flags);
+CAMLprim value sdlcaml_init(value auto_clean, value flags, value unit) {
+  CAMLparam3(auto_clean, flags, unit);
   int init_flag = ml_make_init_flag(flags);
 
   if (SDL_Init(init_flag) < 0) {
@@ -51,7 +51,7 @@ CAMLprim value sdlcaml_init(value auto_clean, value flags) {
                            SDL_GetError());
   }
 
-  if (is_none(auto_clean)) {
+  if (is_none(auto_clean) || Val_true == Field(auto_clean, 0)) {
     atexit(sdlcaml_inner_quit);
   }
 

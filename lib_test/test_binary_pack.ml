@@ -152,6 +152,49 @@ let test_binary_int64_pack_unpack () =
   "a signed int64 unpack 7" @? (Int64.compare (v 56) (Int64.pred Int64.zero)         = 0);
 ;;
 
+let test_binary_float_pack_unpack () =
+  let buffer = make_buffer 80 in
+  pack_float ~byte_order:Little_endian ~buffer ~pos: 0 1.0;
+  pack_float ~byte_order:Little_endian ~buffer ~pos: 8 0.0;
+  pack_float ~byte_order:Little_endian ~buffer ~pos:16 100.0;
+  pack_float ~byte_order:Little_endian ~buffer ~pos:24 100e10;
+  pack_float ~byte_order:Little_endian ~buffer ~pos:32 203e5;
+  pack_float ~byte_order:Little_endian ~buffer ~pos:40 nan;
+  pack_float ~byte_order:Little_endian ~buffer ~pos:48 max_float;
+  pack_float ~byte_order:Little_endian ~buffer ~pos:56 min_float;
+
+  let v pos = unpack_float ~byte_order:Little_endian ~buffer ~pos in
+  "a float unpack 0" @? ((v  0) = 1.0        );
+  "a float unpack 1" @? ((v  8) = 0.0        );
+  "a float unpack 2" @? ((v 16) = 100.0      );
+  "a float unpack 3" @? ((v 24) = 100e10     );
+  "a float unpack 4" @? ((v 32) = 203e5      );
+  "a float unpack 5" @? ((v 40) <> nan        );
+  "a float unpack 6" @? ((v 48) = max_float  );
+  "a float unpack 7" @? ((v 56) = min_float  );
+;;
+
+let test_binary_c_layout_float_pack_unpack () =
+  let buffer = make_buffer 40 in
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos: 0 1.0;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos: 4 0.0;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos: 8 100.0;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos:12 1e10;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos:16 203e5;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos:20 nan;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos:24 max_float;
+  pack_float_c ~byte_order:Little_endian ~buffer ~pos:28 min_float;
+
+  let v pos = unpack_float_c ~byte_order:Little_endian ~buffer ~pos in
+  "a float unpack 0" @? ((v  0) = 1.0        );
+  "a float unpack 1" @? ((v  4) = 0.0        );
+  "a float unpack 2" @? ((v  8) = 100.0      );
+  "a float unpack 3" @? ((v 12) = 1e10      );
+  "a float unpack 4" @? ((v 16) = 203e5      );
+  "a float unpack 5" @? ((v 20) <> nan        );
+  "a float unpack 6" @? ((v 24) = infinity  );
+  "a float unpack 7" @? ((v 28) = 0.0  );
+;;
 
 let suite = "binary pack/unpack specs" >::: [
   "a byte pack/unpack" >:: test_binary_byte_pack_unpack;
@@ -159,7 +202,15 @@ let suite = "binary pack/unpack specs" >::: [
   "a 32-bit int pack/unpack" >:: test_binary_int32_pack_unpack;
   "a 32-bit ocaml int pack/unpack" >:: test_binary_int_pack_unpack;
   "a 64-bit int pack/unpack" >:: test_binary_int64_pack_unpack;
+  "a float pack/unpack" >:: test_binary_float_pack_unpack;
+  "a C layout float pack/unpack" >:: test_binary_c_layout_float_pack_unpack;
 ]
 
 let _ =
-  run_test_tt_main suite
+  let results = run_test_tt_main suite in
+  if List.for_all (fun x -> match x with
+  | RSuccess _ -> true
+  | _ -> false) results then
+    exit 0
+  else
+    exit 1

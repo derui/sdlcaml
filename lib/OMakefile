@@ -68,14 +68,13 @@ OCAMLFLAGS    += -annot -bin-annot
 # Build an OCaml library
 #
 FILES[] = $(removesuffix $(ls *ml))
-CFILES[] = $(removesuffix $(ls *.c))
 #
 LIB = baselib
 #
-INSTALL_FILES = $(OCamlPackageGeneratedFiles $(LIB), $(CFILES))
+INSTALL_FILES = $(OCamlPackageGeneratedFiles $(LIB), $(EMPTY))
 INSTALL_FILES += $(ls *mli)
 
-MyOCamlPackage($(LIB), $(FILES), $(CFILES), -linkall, false)
+MyOCamlPackage($(LIB), $(FILES), $(EMPTY), $(EMPTY), false)
 OCamlInstallParentPackage(sdlcaml, $(INSTALL_FILES))
 
 all: $(LIB).cmxa

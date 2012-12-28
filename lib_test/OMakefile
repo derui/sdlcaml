@@ -56,7 +56,7 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot -thread
+OCAMLFLAGS    += -annot -thread -g
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
 
@@ -99,13 +99,13 @@ PROGRAMS =
 
 test: $(PROGRAMS)
 
-run-all:
+.PHONY: run-all
+run-all: $(PROGRAMS)
 	foreach(x, $(FILES))
-		./$x
+		./$x$(EXE)
 
 clean:
-	foreach(x, $(PROGRAMS))
-		rm -rf $x
+	rm -rf $(PROGRAMS)
 	rm -f *o
 	rm -f *cmx
 	rm -f *cmo
@@ -115,8 +115,7 @@ clean:
 	rm -f *cmti
 
 test-clean:
-	foreach(x, $(PROGRAMS))
-		rm -rf $x
+	rm -rf $(PROGRAMS)
 	rm -f *o
 	rm -f *cmx
 	rm -f *cmo

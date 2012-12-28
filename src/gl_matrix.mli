@@ -99,6 +99,9 @@ val translation : Gl_vector.t -> t
 *)
 val scaling : Gl_vector.t -> t
 
+(** multiply given vector with given matrix. *)
+val mult_vec: mat:t -> vec:Gl_vector.t -> Gl_vector.t
+
 (** construct inverse matrix.
     inverse matrix is usually used to unprojection matrix that
     translate position translated by projection matrix to  world

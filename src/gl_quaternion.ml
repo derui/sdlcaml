@@ -66,7 +66,7 @@ let axis {quat_axis;quat_angle} =
     let over_sin = 1.0 /. sqrt sin_theta_sq in
     V.scale ~v:quat_axis ~scale:over_sin
 
-let convert_matrix quat =
+let to_matrix quat =
   let w = quat.quat_angle
   and (x, y, z) = V.of_vec quat.quat_axis in
   {

@@ -511,7 +511,7 @@ t_prim gl_api_glGetError(value _unit) {
   _res = glGetError();
   for (int i = 0; i < sizeof(get_error) / sizeof(get_error[0]); ++i) {
     if (get_error[i] == _res) {
-      CAMLreturn(Val_int(_res));
+      CAMLreturn(Val_int(i));
     }
   }
   CAMLreturn(Val_int(0));
@@ -842,8 +842,8 @@ t_prim gl_api_glVertex2v(value _v_x) {
   CAMLparam1(_v_x);
   float x; /*in*/
   float y; /*in*/
-  x = Double_field(_v_x, 0);
-  y = Double_field(_v_x, 1);
+  x = Double_val(Field(_v_x, 0));
+  y = Double_val(Field(_v_x, 1));
   glVertex2f(x, y);
   CAMLreturn(Val_unit);
 }
@@ -865,9 +865,9 @@ t_prim gl_api_glVertex3v(value _v_x) {
   float x; /*in*/
   float y; /*in*/
   float z; /*in*/
-  x = Double_field(_v_x, 0);
-  y = Double_field(_v_x, 1);
-  z = Double_field(_v_x, 2);
+  x = Double_val(Field(_v_x, 0));
+  y = Double_val(Field(_v_x, 1));
+  z = Double_val(Field(_v_x, 2));
   glVertex3f(x, y, z);
   CAMLreturn(Val_unit);
 }
@@ -892,10 +892,10 @@ t_prim gl_api_glVertex4v(value _v_x) {
   float y; /*in*/
   float z; /*in*/
   float w; /*in*/
-  x = Double_field(_v_x, 0);
-  y = Double_field(_v_x, 1);
-  z = Double_field(_v_x, 2);
-  w = Double_field(_v_x, 3);
+  x = Double_val(Field(_v_x, 0));
+  y = Double_val(Field(_v_x, 1));
+  z = Double_val(Field(_v_x, 2));
+  w = Double_val(Field(_v_x, 3));
   glVertex4f(x, y, z, w);
   CAMLreturn(Val_unit);
 }
@@ -908,6 +908,7 @@ t_prim gl_api_glNormal(value _v_nx, value _v_ny, value _v_nz) {
   nx = Double_val(_v_nx);
   ny = Double_val(_v_ny);
   nz = Double_val(_v_nz);
+
   glNormal3f(nx, ny, nz);
   CAMLreturn(Val_unit);
 }
@@ -917,9 +918,9 @@ t_prim gl_api_glNormalv(value _v_nx) {
   float nx; /*in*/
   float ny; /*in*/
   float nz; /*in*/
-  nx = Double_field(_v_nx, 0);
-  ny = Double_field(_v_nx, 1);
-  nz = Double_field(_v_nx, 2);
+  nx = Double_val(Field(_v_nx, 0));
+  ny = Double_val(Field(_v_nx, 1));
+  nz = Double_val(Field(_v_nx, 2));
   glNormal3f(nx, ny, nz);
   CAMLreturn(Val_unit);
 }
@@ -949,9 +950,9 @@ t_prim gl_api_glColor3v(value _v_col) {
   float red; /*in*/
   float green; /*in*/
   float blue; /*in*/
-  red = Double_field(_v_col, 0);
-  green = Double_field(_v_col, 1);
-  blue = Double_field(_v_col, 2);
+  red = Double_val(Field(_v_col, 0));
+  green = Double_val(Field(_v_col, 1));
+  blue = Double_val(Field(_v_col, 2));
   glColor3f(red, green, blue);
   CAMLreturn(Val_unit);
 }
@@ -977,10 +978,10 @@ t_prim gl_api_glColor4v(value _v_col) {
   float green; /*in*/
   float blue; /*in*/
   float alpha; /*in*/
-  red = Double_field(_v_col, 0);
-  green = Double_field(_v_col, 1);
-  blue = Double_field(_v_col, 2);
-  alpha = Double_field(_v_col, 3);
+  red = Double_val(Field(_v_col, 0));
+  green = Double_val(Field(_v_col, 1));
+  blue = Double_val(Field(_v_col, 2));
+  alpha = Double_val(Field(_v_col, 3));
   glColor4f(red, green, blue, alpha);
   CAMLreturn(Val_unit);
 }
@@ -1126,9 +1127,9 @@ t_prim gl_api_glLight3(value _v_light, value _v_param) {
   CAMLparam2(_v_light, _v_param);
 
   float param[3]; /*in*/
-  param[0] = Double_field(_v_param, 0);
-  param[1] = Double_field(_v_param, 1);
-  param[2] = Double_field(_v_param, 2);
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
   glLightfv(GL_LIGHT0 + Int_val(_v_light),
             GL_SPOT_DIRECTION, param);
   CAMLreturn(Val_unit);
@@ -1139,24 +1140,37 @@ t_prim gl_api_glLight4(value _v_light, value _v_pname, value _v_param) {
 #include "enums/set_light_4.inc"
 
   float param[4]; /*in*/
-  param[0] = Double_field(_v_param, 0);
-  param[1] = Double_field(_v_param, 1);
-  param[2] = Double_field(_v_param, 2);
-  param[3] = Double_field(_v_param, 3);
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  param[3] = Double_val(Field(_v_param, 3));
+
   glLightfv(GL_LIGHT0 + Int_val(_v_light),
             set_light_4[Int_val(_v_pname)], param);
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glLightModel(value _v_pname, value _v_params) {
+t_prim gl_api_glLightModel1(value _v_pname, value _v_params) {
   CAMLparam2(_v_pname, _v_params);
 #include "enums/light_model.inc"
 
-  float const *params; /*in*/
-  params = Bigarray_val(_v_params)->data;
-  glLightModelfv(light_model[Int_val(_v_pname)], params);
+  glLightModelf(light_model[Int_val(_v_pname)], Double_val(_v_params));
   CAMLreturn(Val_unit);
 }
+
+t_prim gl_api_glLightModel4(value _v_params) {
+  CAMLparam1(_v_params);
+
+  float param[4];
+  param[0] = Double_val(Field(_v_params, 0));
+  param[1] = Double_val(Field(_v_params, 1));
+  param[2] = Double_val(Field(_v_params, 2));
+  param[3] = Double_val(Field(_v_params, 3));
+
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, param);
+  CAMLreturn(Val_unit);
+}
+
 
 t_prim gl_api_glLightModelControl(value _v_pname) {
   CAMLparam1(_v_pname);
@@ -1167,23 +1181,50 @@ t_prim gl_api_glLightModelControl(value _v_pname) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glMaterial(value _v_face, value _v_pname, value _v_param) {
-  CAMLparam3(_v_face, _v_pname, _v_param);
+t_prim gl_api_glMaterial1(value _v_face, value _v_param) {
+  CAMLparam2(_v_face, _v_param);
 #include "enums/face_mode.inc"
-#include "enums/set_material.inc"
 
-  glMaterialfv(face_mode[Int_val(_v_face)],
-               set_material[Int_val(_v_pname)], Caml_ba_data_val(_v_param));
+  glMaterialf(face_mode[Int_val(_v_face)],
+              GL_SHININESS, Double_val(_v_param));
   CAMLreturn(Val_unit);
 }
 
+t_prim gl_api_glMaterial3(value _v_face, value _v_param) {
+  CAMLparam2(_v_face, _v_param);
+#include "enums/face_mode.inc"
 
-t_prim gl_api_glColorMaterial(value _v_face, value _v_mode) {
-  CAMLparam2(_v_face, _v_mode);
+  float param[3]; /*in*/
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  glMaterialfv(face_mode[Int_val(_v_face)],
+               GL_COLOR_INDEXES, param);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glMaterial4(value _v_face, value _v_pname, value _v_param) {
+  CAMLparam3(_v_face, _v_pname, _v_param);
 #include "enums/face_mode.inc"
 #include "enums/material_4f.inc"
 
-  glColorMaterial(face_mode[Int_val(_v_face)],
+  float param[4]; /*in*/
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  param[3] = Double_val(Field(_v_param, 3));
+
+  glMaterialfv(face_mode[Int_val(_v_face)],
+               material_4f[Int_val(_v_pname)], param);
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glColorMaterial(value _v_face, value _v_mode) {
+  CAMLparam2(_v_face, _v_mode);
+#include "enums/cull_face_mode.inc"
+#include "enums/material_4f.inc"
+
+  glColorMaterial(cull_face_mode[Int_val(_v_face)],
                   material_4f[Int_val(_v_mode)]);
   CAMLreturn(Val_unit);
 }
@@ -1364,10 +1405,10 @@ t_prim gl_api_glTexGen4(value _v_coord, value _v_pname, value _v_param) {
 #include "enums/texgen_plane.inc"
 
   float param[4];
-  param[0] = Double_field(_v_param, 0);
-  param[1] = Double_field(_v_param, 1);
-  param[2] = Double_field(_v_param, 2);
-  param[3] = Double_field(_v_param, 3);
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  param[3] = Double_val(Field(_v_param, 3));
   glTexGenfv(coord[Int_val(_v_coord)], texgen_plane[Int_val(_v_pname)],
              param);
   CAMLreturn(Val_unit);
@@ -1386,10 +1427,10 @@ t_prim gl_api_glTexEnv4(value _v_param) {
   CAMLparam1(_v_param);
 
   float param[4];
-  param[0] = Double_field(_v_param, 0);
-  param[1] = Double_field(_v_param, 1);
-  param[2] = Double_field(_v_param, 2);
-  param[3] = Double_field(_v_param, 3);
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  param[3] = Double_val(Field(_v_param, 3));
   glTexEnvfv(GL_TEXTURE_FILTER_CONTROL, GL_TEXTURE_ENV_COLOR,
              param);
   CAMLreturn(Val_unit);
@@ -1414,10 +1455,10 @@ t_prim gl_api_glTexParameter4(value _v_target,
 #include "enums/texture_image_type.inc"
 
   GLfloat param[4];
-  param[0] = Double_field(_v_param, 0);
-  param[1] = Double_field(_v_param, 1);
-  param[2] = Double_field(_v_param, 2);
-  param[3] = Double_field(_v_param, 3);
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  param[3] = Double_val(Field(_v_param, 3));
 
   glTexParameterfv(texture_image_type[Int_val(_v_target)],
                    GL_TEXTURE_BORDER_COLOR, param);
@@ -1759,8 +1800,8 @@ t_prim gl_api_glMap1_2(value _v_u1, value _v_u2,
   u2 = Double_val(_v_u2);
   stride = Int_val(_v_stride);
   order = Int_val(_v_order);
-  points[0] = Double_field(_v_points, 0);
-  points[1] = Double_field(_v_points, 1);
+  points[0] = Double_val(Field(_v_points, 0));
+  points[1] = Double_val(Field(_v_points, 1));
   glMap1f(GL_MAP1_TEXTURE_COORD_2, u1, u2, stride, order, points);
   CAMLreturn(Val_unit);
 }
@@ -1781,9 +1822,9 @@ t_prim gl_api_glMap1_3(value _v_target, value _v_u1, value _v_u2,
   u2 = Double_val(_v_u2);
   stride = Int_val(_v_stride);
   order = Int_val(_v_order);
-  points[0] = Double_field(_v_points, 0);
-  points[1] = Double_field(_v_points, 1);
-  points[2] = Double_field(_v_points, 2);
+  points[0] = Double_val(Field(_v_points, 0));
+  points[1] = Double_val(Field(_v_points, 1));
+  points[2] = Double_val(Field(_v_points, 2));
   glMap1f(map_target_1_3[Int_val(_v_target)], u1, u2, stride, order, points);
   CAMLreturn(Val_unit);
 }
@@ -1807,10 +1848,10 @@ t_prim gl_api_glMap1_4(value _v_target, value _v_u1, value _v_u2,
   u2 = Double_val(_v_u2);
   stride = Int_val(_v_stride);
   order = Int_val(_v_order);
-  points[0] = Double_field(_v_points, 0);
-  points[1] = Double_field(_v_points, 1);
-  points[2] = Double_field(_v_points, 2);
-  points[3] = Double_field(_v_points, 3);
+  points[0] = Double_val(Field(_v_points, 0));
+  points[1] = Double_val(Field(_v_points, 1));
+  points[2] = Double_val(Field(_v_points, 2));
+  points[3] = Double_val(Field(_v_points, 3));
   glMap1f(map_target_1_4[Int_val(_v_target)], u1, u2, stride, order, points);
   CAMLreturn(Val_unit);
 }
@@ -1881,8 +1922,8 @@ t_prim gl_api_glMap2_2(value _v_u1, value _v_u2,
   vstride = Int_val(_v_vstride);
   vorder = Int_val(_v_vorder);
 
-  points[0] = Double_field(_v_points, 0);
-  points[1] = Double_field(_v_points, 1);
+  points[0] = Double_val(Field(_v_points, 0));
+  points[1] = Double_val(Field(_v_points, 1));
 
   glMap2f(GL_MAP2_TEXTURE_COORD_2, u1, u2, ustride, uorder, v1, v2,
           vstride, vorder, points);
@@ -1920,9 +1961,9 @@ t_prim gl_api_glMap2_3(value _v_target, value _v_u1, value _v_u2,
   vstride = Int_val(_v_vstride);
   vorder = Int_val(_v_vorder);
 
-  points[0] = Double_field(_v_points, 0);
-  points[1] = Double_field(_v_points, 1);
-  points[2] = Double_field(_v_points, 2);
+  points[0] = Double_val(Field(_v_points, 0));
+  points[1] = Double_val(Field(_v_points, 1));
+  points[2] = Double_val(Field(_v_points, 2));
 
   glMap2f(map_target_2_3[Int_val(_v_target)], u1, u2, ustride, uorder, v1, v2,
           vstride, vorder, points);
@@ -1960,9 +2001,9 @@ t_prim gl_api_glMap2_4(value _v_target, value _v_u1, value _v_u2,
   vstride = Int_val(_v_vstride);
   vorder = Int_val(_v_vorder);
 
-  points[0] = Double_field(_v_points, 0);
-  points[1] = Double_field(_v_points, 1);
-  points[2] = Double_field(_v_points, 2);
+  points[0] = Double_val(Field(_v_points, 0));
+  points[1] = Double_val(Field(_v_points, 1));
+  points[2] = Double_val(Field(_v_points, 2));
 
   glMap2f(map_target_2_4[Int_val(_v_target)], u1, u2, ustride, uorder, v1, v2,
           vstride, vorder, points);
@@ -2096,10 +2137,10 @@ t_prim gl_api_glFog1(value _v_pname, value _v_param) {
 t_prim gl_api_glFog4(value _v_param) {
   CAMLparam1(_v_param);
   float param[4];
-  param[0] = Double_field(_v_param, 0);
-  param[1] = Double_field(_v_param, 1);
-  param[2] = Double_field(_v_param, 2);
-  param[3] = Double_field(_v_param, 3);
+  param[0] = Double_val(Field(_v_param, 0));
+  param[1] = Double_val(Field(_v_param, 1));
+  param[2] = Double_val(Field(_v_param, 2));
+  param[3] = Double_val(Field(_v_param, 3));
 
   glFogfv(GL_FOG_COLOR, param);
   CAMLreturn(Val_unit);
@@ -2210,10 +2251,10 @@ t_prim gl_api_glConvolutionParameter(value _v_target, value _v_pname,
 #include "enums/convolution_pname.inc"
 
   float params[4];
-  params[0] = Double_field(_v_param, 0);
-  params[1] = Double_field(_v_param, 1);
-  params[2] = Double_field(_v_param, 2);
-  params[3] = Double_field(_v_param, 3);
+  params[0] = Double_val(Field(_v_param, 0));
+  params[1] = Double_val(Field(_v_param, 1));
+  params[2] = Double_val(Field(_v_param, 2));
+  params[3] = Double_val(Field(_v_param, 3));
 
   glConvolutionParameterfv(convolution_target[Int_val(_v_target)],
                            convolution_pname[Int_val(_v_pname)],

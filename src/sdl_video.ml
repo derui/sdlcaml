@@ -281,13 +281,13 @@ external get_size: surface -> int * int = "sdlcaml_video_get_size"
     @param doublebuffer give true if want to enable GL_DOUBLEBUFFER. Default is true.
     @param unit dummy argument
 *)
-let gl_init ~red ~blue ~green ~depth ?doublebuffer:(dbuffer=true) () =
+let gl_init ~red ~blue ~green ~depth ?(doublebuffer=true) () =
   ignore (set_attribute ~attr:GL_RED_SIZE ~value:red);
   ignore (set_attribute ~attr:GL_BLUE_SIZE ~value:blue);
   ignore (set_attribute ~attr:GL_GREEN_SIZE ~value:green);
   ignore (set_attribute ~attr:GL_DEPTH_SIZE ~value:depth);
 
-  if dbuffer then
+  if doublebuffer then
     ignore (set_attribute ~attr:GL_DOUBLEBUFFER ~value:1)
   else
     ignore (set_attribute ~attr:GL_DOUBLEBUFFER ~value:0)

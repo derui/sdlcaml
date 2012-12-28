@@ -20,9 +20,9 @@ let dot v1 v2 =
   v1.x *. v2.x +. v1.y *. v2.y +. v1.z *. v2.z
 
 let cross v1 v2 =
-  {x = v1.y *. v2.z -. v2.y *. v1.z;
-   y = v1.x *. v2.z -. v2.x *. v1.z;
-   z = v1.x *. v2.y -. v2.x *. v1.y;
+  {x = v1.y *. v2.z -. v1.z *. v2.y;
+   y = v1.z *. v2.x -. v1.x *. v2.z;
+   z = v1.x *. v2.y -. v1.y *. v2.x;
   }
 
 let scale ~v ~scale =

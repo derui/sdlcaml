@@ -473,20 +473,26 @@ type float_array = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Arr
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLightModel.xml}
     manual pages on opengl.org}
 *)
-external glLightModel : pname:Light.light_model -> value:float_array -> unit = "gl_api_glLightModel"
+external glLightModel1 : pname:Light.light_model -> value:float -> unit = "gl_api_glLightModel1"
+external glLightModel4 : float * float * float * float -> unit = "gl_api_glLightModel4"
 external glLightModelControl :Light.light_model_control -> unit = "gl_api_glLightModelControl"
 
 module Material = Enums.Material
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml}
     manual pages on opengl.org}
 *)
-external glMaterial : face:Material.face_mode -> pname:Material.set_material -> value:float_array -> unit
-  = "gl_api_glMaterial"
+external glMaterial1 : face:Material.cull_face_mode -> value:float -> unit
+  = "gl_api_glMaterial1"
+external glMaterial3 : face:Material.cull_face_mode ->
+  value:float * float * float -> unit = "gl_api_glMaterial3"
+external glMaterial4 : face:Material.cull_face_mode -> pname:Material.material_4f ->
+  value:float * float * float * float -> unit
+  = "gl_api_glMaterial4"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glColorMaterial.xml}
     manual pages on opengl.org}
 *)
-external glColorMaterial : face:Material.face_mode -> mode:Material.material_4f -> unit
+external glColorMaterial : face:Material.cull_face_mode -> mode:Material.material_4f -> unit
   = "gl_api_glColorMaterial"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPixelZoom.xml}
@@ -988,15 +994,19 @@ let glGetLight ~light ~(pname:Light.get_light) =
   | Light.GL_LINEAR_ATTENUATION -> Tuple1 (_glGetLightf1 ~light_i 8)
   | Light.GL_QUADRATIC_ATTENUATION -> Tuple1 (_glGetLightf1 ~light_i 9)
 
+module GetMaterial = struct
+  include Enums.GetMaterial
+end
+
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetMaterial.xml}
     manual pages on opengl.org}
 *)
-external glGetMaterialf1 : Material.face_mode ->
-  Material.material_1f -> float = "gl_api_glGetMaterialf1"
-external glGetMaterialf3 : Material.face_mode ->
-  Material.material_3f -> float * float * float = "gl_api_glGetMaterialf3"
-external glGetMaterialf4 : Material.face_mode ->
-  Material.material_4f -> float * float * float * float  = "gl_api_glGetMaterialf4"
+external glGetMaterialf1 : GetMaterial.face_mode ->
+  GetMaterial.material_1f -> float = "gl_api_glGetMaterialf1"
+external glGetMaterialf3 : GetMaterial.face_mode ->
+  GetMaterial.material_3f -> float * float * float = "gl_api_glGetMaterialf3"
+external glGetMaterialf4 : GetMaterial.face_mode ->
+  GetMaterial.material_4f -> float * float * float * float  = "gl_api_glGetMaterialf4"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glReadPixels.xml}
     manual pages on opengl.org}
