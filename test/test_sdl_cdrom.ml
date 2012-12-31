@@ -2,7 +2,7 @@ open Sdlcaml
 open OUnit
 
 let test_set_up _ =
-  Sdl_init.init [`CDROM]
+  Sdl_init.init [`CDROM] ()
 
 let test_tear_down _ =
   Sdl_init.quit ()

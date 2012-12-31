@@ -2,7 +2,7 @@ open Sdlcaml
 open OUnit
 
 let test_set_up _ =
-  Sdl_init.init [`TIMER]
+  Sdl_init.init [`TIMER] ()
 
 let test_tear_up _ =
   Sdl_init.quit ()

@@ -3,7 +3,7 @@ open OUnit
 open Baselib
 
 let test_set_up _ =
-  Sdl_init.init [`AUDIO]
+  Sdl_init.init [`AUDIO] ()
 
 let test_tear_down _ =
   Sdl_init.quit ()

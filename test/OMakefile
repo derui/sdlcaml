@@ -59,7 +59,7 @@ BYTE_ENABLED = true
 OCAMLFLAGS    += -annot -thread
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
-MY_LINK_FLAGS = $(shell sdl-config --cflags --libs) -logg -lSDL_mixer -lSDL_image -lSDL_ttf -DDEBUG
+MY_LINK_FLAGS = $(shell sdl-config --cflags --libs) -logg -lSDL_mixer -lSDL_image -DDEBUG
 if $(IsMac)
 	MY_LINK_FLAGS += -framework OpenGL
 	export

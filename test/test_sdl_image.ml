@@ -3,7 +3,7 @@ open OUnit
 open Baselib
 
 let test_set_up _ =
-  Sdl_init.init [`VIDEO]
+  Sdl_init.init [`VIDEO] ()
 
 let test_tear_down _ =
   Sdl_init.quit ()

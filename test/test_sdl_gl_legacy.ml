@@ -5,7 +5,7 @@ module S = Baselib.Std
 
 let test_set_up _ =
   begin
-    Sdl_init.init [`VIDEO];
+    Sdl_init.init [`VIDEO] ();
     let open Sdlcaml.Sdl in
     assert_bool "set red size" (Video.set_attribute ~attr:Video.GL_RED_SIZE ~value:5);
     assert_bool "set blue size" (Video.set_attribute ~attr:Video.GL_BLUE_SIZE ~value:5);

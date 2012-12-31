@@ -93,6 +93,8 @@ module Tree = struct
         let c = compare_key key k in
         if c < 0 then
           fixup_balance (Node (level, (add_inner l key data), k, d, r))
+        else if c = 0 then
+          fixup_balance (Node (level, l, key, data, r))
         else
           fixup_balance (Node (level, l, k, d, (add_inner r key data)))
     in

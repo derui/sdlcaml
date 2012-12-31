@@ -212,6 +212,8 @@ let quit_callback ~func = quit_callback_func := func
 let update_input_infos () =
   let update_info (func, info) =
     let key_states = Input.get_key_state () in
+    let replace_if_false tbl key v =
+      if Hashtbl.find tbl key then () else Hashtbl.replace tbl key v in
 
     VMap.iteri !info.virtual_mapping (fun ~key ~data ->
       List.iter (fun data ->
@@ -220,22 +222,31 @@ let update_input_infos () =
           let open Baselib.Std.Option.Open in
           let open Baselib.Std.Prelude in
           (Key.StateMap.find key_states synonym >>=
-            return @< Hashtbl.replace !info.virtual_state key) |> ignore
+            return @< replace_if_false !info.virtual_state key) |> ignore
         | Button button ->
           let open Baselib.Std.Option.Open in
           let open Baselib.Std.Prelude in
           (!info.joy_struct >>= (fun js ->
-            Joystick.get_button ~button ~js |> (return @< Hashtbl.replace !info.virtual_state key)
+            Joystick.get_button ~button ~js |> (return @< replace_if_false !info.virtual_state key)
            )) |> ignore
         | Axis {axis; capacity} ->
+
           let open Baselib.Std.Option.Open in
           let open Baselib.Std.Prelude in
           ignore |< (!info.joy_struct >>= (fun js ->
             let value = Joystick.get_axis ~js ~axis in
-            return |< Hashtbl.replace !info.virtual_state key
-              (abs value > abs capacity))))
+            return |< replace_if_false !info.virtual_state key
+              (if capacity < 0 && value < 0 then
+                  capacity > value
+               else if capacity > 0 && value > 0 then
+                 capacity < value
+               else false))))
         data
     ) in
+  let reset_input_state (_, info) =
+    Hashtbl.iter (fun k _ -> Hashtbl.replace !info.virtual_state k false) !info.virtual_state in
+  Joystick.update ();
+  IntMap.iter !input_callback_funcs reset_input_state;
   IntMap.iter !input_callback_funcs update_info
 
 let event_dispatch () =

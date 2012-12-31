@@ -3,7 +3,7 @@ open OUnit
 
 let test_set_up _ =
   begin
-    Sdl_init.init [`VIDEO];
+    Sdl_init.init [`VIDEO] ();
     Sdl_video.set_video_mode ~width:640 ~height:480 ~depth:32
       ~flags:[Sdl_video.SDL_SWSURFACE]
   end

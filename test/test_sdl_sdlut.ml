@@ -2,7 +2,7 @@ open Sdlcaml
 open OUnit
 
 let test_set_up _ =
-  Sdl_init.init [`VIDEO;`JOYSTICK];
+  Sdl_init.init [`VIDEO;`JOYSTICK] ();
   Sdl_video.set_video_mode ~width:400 ~height:400 ~depth:32
     ~flags:[Sdl_video.SDL_SWSURFACE]
 
