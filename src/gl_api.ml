@@ -633,39 +633,40 @@ external glGetTexParameter_wrap : target:Tex.texture_image_type ->
   pname:Tex.tex_parameter_wrap -> Tex.tex_parameter_wrap_type
     = "gl_api_glGetTexParameter_filter"
 
+type texture
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenTextures.xml}
     manual pages on opengl.org}
 *)
-external glGenTextures : int -> int array = "gl_api_glGenTextures"
+external glGenTextures : int -> texture array = "gl_api_glGenTextures"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteTextures.xml}
     manual pages on opengl.org}
 *)
-external glDeleteTextures : size:int -> textures:int array -> unit = "gl_api_glDeleteTextures"
+external glDeleteTextures : size:int -> textures:texture array -> unit = "gl_api_glDeleteTextures"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml}
     manual pages on opengl.org}
 *)
-external glBindTexture : target:Tex.texture_image_type -> texture:int -> unit
+external glBindTexture : target:Tex.texture_image_type -> texture:texture -> unit
   = "gl_api_glBindTexture"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPrioritizeTextures.xml}
     manual pages on opengl.org}
 *)
-external glPrioritizeTextures : textures:(int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
+external glPrioritizeTextures : textures:texture array
   -> priorities:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit
     = "gl_api_glPrioritizeTextures"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glAreTexturesResident.xml}
     manual pages on opengl.org}
 *)
-external glAreTexturesResident : textures:int array -> residences:bool array -> bool
+external glAreTexturesResident : textures:texture array -> residences:bool array -> bool
   = "gl_api_glAreTexturesResident"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsTexture.xml}
     manual pages on opengl.org}
 *)
-external glIsTexture : int -> bool = "gl_api_glIsTexture"
+external glIsTexture : texture -> bool = "gl_api_glIsTexture"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyTexImage1D.xml}
     manual pages on opengl.org}
@@ -852,17 +853,17 @@ external glCopyConvolutionFilter2D : internalformat:InternalFormat.internal_form
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glActiveTexture.xml}
     manual pages on opengl.org}
 *)
-external glActiveTexture : int -> unit = "gl_api_glActiveTexture"
+external glActiveTexture : texture -> unit = "gl_api_glActiveTexture"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMultiTexCoord.xml}
     manual pages on opengl.org}
 *)
-external glMultiTexCoord1 : texture:int -> s:float -> unit = "gl_api_glMultiTexCoord1"
-external glMultiTexCoord2 : texture:int -> s:float -> t:float -> unit
+external glMultiTexCoord1 : texture:texture -> s:float -> unit = "gl_api_glMultiTexCoord1"
+external glMultiTexCoord2 : texture:texture -> s:float -> t:float -> unit
   = "gl_api_glMultiTexCoord2"
-external glMultiTexCoord3 : texture:int -> s:float -> t:float -> r:float -> unit
+external glMultiTexCoord3 : texture:texture -> s:float -> t:float -> r:float -> unit
   = "gl_api_glMultiTexCoord3"
-external glMultiTexCoord4 : texture:int -> s:float -> t:float -> r:float -> q:float -> unit
+external glMultiTexCoord4 : texture:texture -> s:float -> t:float -> r:float -> q:float -> unit
   = "gl_api_glMultiTexCoord4"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLoadTransposeMatrix.xml}
@@ -1158,4 +1159,813 @@ external glDrawRangeElements: mode:DrawRange.draw_mode ->
    glMinmax
    glResetMinmax
    glClientActiveTexture
+*)
+
+(* APIs being OpenGL 3.0 above version are implemented as follows.  *)
+type shader
+type program
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glAttachShader.xml}
+    manual pages on opengl.org}
+*)
+external glAttachShader: shader:shader -> program:program -> unit = "gl_api_glAttachShader"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindAttribLocation.xml}
+    manual pages on opengl.org}
+*)
+external glBindAttribLocation: program:program -> index:int -> name:string -> unit =
+  "gl_api_glBindAttribLocation"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindBuffer.xml}
+    manual pages on opengl.org}
+*)
+external glBindBuffer: target:Buffer.buffer_type -> buffer:int -> unit =
+  "gl_api_glBindBuffer"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindFragDataLocation.xml}
+    manual pages on opengl.org}
+*)
+external glBindFragDataLocation: program:program -> color:int -> name:string -> unit =
+  "gl_api_glBindFragDataLocation"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindFragDataLocationIndexed.xml}
+    manual pages on opengl.org}
+*)
+external glBindFragDataLocationIndexed: program:program -> color:int -> index:int -> name:string -> unit
+  = "gl_api_glBindFragDataLocationIndexed"
+
+type framebuffer
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindFramebuffer.xml}
+    manual pages on opengl.org}
+*)
+external glBindFramebuffer: target:Buffer.frame_buffer_type ->
+  buffer:framebuffer -> unit = "gl_api_glBindFramebuffer"
+
+type renderbuffer
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindRenderbuffer.xml}
+    manual pages on opengl.org}
+*)
+external glBindRenderbuffer: renderbuffer -> unit  = "gl_api_glBindRenderbuffer"
+
+type sampler
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindSampler.xml}
+    manual pages on opengl.org}
+*)
+external glBindSampler: target:int -> sampler:sampler -> unit
+  = "gl_api_glBindSampler"
+
+type vbo
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindVertexArray.xml}
+    manual pages on opengl.org}
+*)
+external glBindVertexArray: vbo -> unit = "gl_api_glBindVertexArray"
+
+module Blend = struct
+  include Enums.Blend
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBlendEquationSeparate.xml}
+    manual pages on opengl.org}
+*)
+external glBlendEquationSeparate: rgb:Blend.equation_mode -> alpha:Blend.equation_mode -> unit =
+  "gl_api_glBlendEquationSeparate"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBlendFuncSeparate.xml}
+    manual pages on opengl.org}
+*)
+external glBlendFuncSeparate: src_rgb:Blend.func_equation_mode ->
+  dst_rgb:Blend.func_equation_mode -> src_alpha:Blend.func_equation_mode ->
+    dst_alpha:Blend.func_equation_mode -> unit =
+  "gl_api_glBlendFuncSeparate"
+
+module Framebuffer = struct
+  include Enums.Framebuffer
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBlitFramebuffer.xml}
+    manual pages on opengl.org}
+*)
+external glBlitFramebuffer: src_x0:int -> src_y0:int -> src_x1:int -> src_y1:int ->
+  dst_x0:int -> dst_y0:int -> dst_x1:int -> dst_y1:int ->
+    mask:Framebuffer.blit_mask -> filter:Framebuffer.filter_type -> unit =
+  "gl_api_glBlitFramebuffer_bytecode"
+  "gl_api_glBlitFramebuffer_native"
+
+module BufferData = struct
+  include Enums.BufferData
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml}
+    manual pages on opengl.org}
+*)
+external glBufferData: target:BufferData.target_type -> size:int -> usage:BufferData.usage_type -> unit =
+  "gl_api_glBufferData"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBufferSubData.xml}
+    manual pages on opengl.org}
+*)
+external glBufferSubData: target:BufferData.target_type -> offset:int ->
+  size:int -> data:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glBufferSubData"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml}
+    manual pages on opengl.org}
+*)
+external glCheckFramebufferStatus: Framebuffer.frame_buffer_type -> Framebuffer.status_type =
+  "gl_api_glCheckFramebufferStatus"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glClampColor.xml}
+    manual pages on opengl.org}
+*)
+external glClampColor: bool -> unit = "gl_api_glClampColor"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glClearBuffer_depth.xml}
+    manual pages on opengl.org}
+*)
+external glClearBuffer_color: drawbuffer:int -> r:float -> g:float -> b:float -> alpha:float -> unit =
+  "gl_api_glClearBuffer_color"
+external glClearBuffer_depth: float -> unit = "gl_api_glClearBuffer_depth"
+external glClearBuffer_stencil: int -> unit = "gl_api_glClearBuffer_stencil"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCompileShader.xml}
+    manual pages on opengl.org}
+*)
+external glCompileShader: shader -> unit = "gl_api_glCompileShader"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyBufferSubData.xml}
+    manual pages on opengl.org}
+*)
+external glCopyBufferSubData: read:BufferData.target_type -> write:BufferData.target_type ->
+  readoffset:int -> writeoffset:int -> size:int -> unit = "gl_api_glCopyBufferSubData"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCreateProgram.xml}
+    manual pages on opengl.org}
+*)
+external glCreateProgram: unit -> program = "gl_api_glCreateProgram"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCreateShader.xml}
+    manual pages on opengl.org}
+*)
+external glCreateShader: unit -> shader = "gl_api_glCreateShader"
+
+type buffer
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteBuffers.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteBuffers: size:int -> buffers:buffer list -> unit =
+  "gl_api_glDeleteBuffers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteFramebuffers.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteFramebuffers: size:int -> buffers:framebuffer list -> unit =
+  "gl_api_glDeleteFramebuffers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteProgram.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteProgram : program -> unit = "gl_api_glDeleteProgram"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteRenderbuffers.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteRenderbuffers: size:int -> buffers:renderbuffer list -> unit =
+  "gl_api_glDeleteRenderbuffers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteSamplers.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteSamplers: size:int -> samplers:sampler list -> unit =
+  "gl_api_glDeleteSamplers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteShader.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteShader: shader -> unit = "gl_api_glDeleteShader"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteVertexArrays.xml}
+    manual pages on opengl.org}
+*)
+external glDeleteVertexArrays: size:int -> arrays:vbo list -> unit =
+  "gl_api_glDeleteVertexArrays"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDetachShader.xml}
+    manual pages on opengl.org}
+*)
+external glDetachShader: program:program -> shader:shader -> unit =
+  "gl_api_glDetachShader"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawBuffers.xml}
+    manual pages on opengl.org}
+*)
+external glDrawBuffers : Buffer.draw_buffer_mode list -> unit =
+  "gl_api_glDrawBuffers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glEnableVertexAttribArray.xml}
+    manual pages on opengl.org}
+*)
+external glEnableVertexAttribArray: int -> unit = "gl_api_glEnableVertexAttribArray"
+external glDisableVertexAttribArray: int -> unit = "gl_api_glDisableVertexAttribArray"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFlushMappedBufferRange.xml}
+    manual pages on opengl.org}
+*)
+external glFlushMappedBufferRange: target:BufferData.target_type ->
+  offset:int -> length:int -> unit = "gl_api_glFlushMappedBufferRange"
+
+type gl_attachment = GL_ATTACHMENT of int |
+    GL_DEPTH_ATTACHMENT | GL_STENCIL_ATTACHMENT | GL_DEPTH_STENCIL_ATTACHMENT
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFramebufferRenderbuffer.xml}
+    manual pages on opengl.org}
+*)
+external glFramebufferRenderbuffer: target:Framebuffer.frame_buffer_type ->
+  attachment:gl_attachment -> render:renderbuffer -> unit =
+  "gl_api_glFramebufferRenderbuffer"
+
+external glFramebufferTextureLayer_attachment : Framebuffer.frame_buffer_type ->
+  int -> texture -> int -> int -> unit = "gl_api_glFramebufferTextureLayer_attachment"
+external glFramebufferTextureLayer_depth : Framebuffer.frame_buffer_type ->
+  texture -> int -> int -> unit = "gl_api_glFramebufferTextureLayer_depth"
+external glFramebufferTextureLayer_stencil : Framebuffer.frame_buffer_type ->
+  texture -> int -> int -> unit = "gl_api_glFramebufferTextureLayer_stencil"
+external glFramebufferTextureLayer_depth_stencil : Framebuffer.frame_buffer_type ->
+  texture -> int -> int -> unit = "gl_api_glFramebufferTextureLayer_depth_stencil"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFramebufferTextureLayer.xml}
+    manual pages on opengl.org}
+*)
+let glFramebufferTextureLayer ~target ~attachment ~texture ~level ~layer =
+  match attachment with
+  | GL_ATTACHMENT num -> glFramebufferTextureLayer_attachment target num texture level layer
+  | GL_DEPTH_ATTACHMENT -> glFramebufferTextureLayer_depth target texture level layer
+  | GL_STENCIL_ATTACHMENT -> glFramebufferTextureLayer_stencil target texture level layer
+  | GL_DEPTH_STENCIL_ATTACHMENT -> glFramebufferTextureLayer_depth_stencil target texture level layer
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenFramebuffers.xml}
+    manual pages on opengl.org}
+*)
+external glGenFramebuffer: unit -> framebuffer = "gl_api_glGenFramebuffer"
+external glGenFramebuffers: int -> framebuffer list = "gl_api_glGenFramebuffers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenRenderbuffers.xml}
+    manual pages on opengl.org}
+*)
+external glGenRenderbuffer: unit -> renderbuffer = "gl_api_glGenRenderbuffer"
+external glGenRenderbuffers: int -> renderbuffer list = "gl_api_glGenRenderbuffers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenSamplers.xml}
+    manual pages on opengl.org}
+*)
+external glGenSampler: unit -> sampler = "gl_api_glGenSampler"
+external glGenSamplers: int -> sampler list = "gl_api_glGenSamplers"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenVertexArrayss.xml}
+    manual pages on opengl.org}
+*)
+external glGenVertexArray: unit -> vbo = "gl_api_glGenVertexArray"
+external glGenVertexArrays: int -> vbo list = "gl_api_glGenVertexArrays"
+
+module Mipmap = struct
+  include Enums.Mipmap
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenerateMipmap.xml}
+    manual pages on opengl.org}
+*)
+external glGenerateMipmap: Mipmap.mipmap_type -> unit = "gl_api_glGenerateMipmap"
+
+module GetAttrib = struct
+  include Enums.GetAttrib
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveAttrib.xml}
+    manual pages on opengl.org}
+*)
+external glGetActiveAttrib_length: program:program -> index:int -> int =
+  "gl_api_glGetActiveAttrib_length"
+external glGetActiveAttrib_size: program:program -> index:int -> int =
+  "gl_api_glGetActiveAttrib_size"
+external glGetActiveAttrib_type: program:program -> index:int -> GetAttrib.attrib_type =
+  "gl_api_glGetActiveAttrib_type"
+external glGetActiveAttrib_name: program:program -> index:int -> string =
+  "gl_api_glGetActiveAttrib_name"
+
+module GetUniform = struct
+  include Enums.GetUniform
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveAttrib.xml}
+    manual pages on opengl.org}
+*)
+external glGetActiveUniform_length: program:program -> index:int -> int =
+  "gl_api_glGetActiveUniform_length"
+external glGetActiveUniform_type: program:program -> index:int -> GetUniform.uniform_type =
+  "gl_api_glGetActiveUniform_type"
+external glGetActiveUniform_name: program:program -> index:int -> string =
+  "gl_api_glGetActiveUniform_name"
+
+module GetUniformBlock = struct
+  include Enums.GetUniformBlock
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniformBlock.xml}
+    manual pages on opengl.org}
+*)
+external glGetActiveUniformBlock: program:program -> index:int ->
+  pname:GetUniformBlock.uniform_block_type -> int = "gl_api_glGetActiveUniformBlock"
+external glGetActiveUniformBlock_indices: program:program -> index:int ->
+  (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t = "gl_api_glGetActiveUniformBlock_indices"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniformBlockName.xml}
+    manual pages on opengl.org}
+*)
+external glGetActiveUniformBlockName: program:program -> index:int -> string =
+  "gl_api_glGetActiveUniformBlockName"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniformName.xml}
+    manual pages on opengl.org}
+*)
+external glGetActiveUniformName: program:program -> index:int -> string =
+  "gl_api_glGetActiveUniformName"
+
+module GetActiveUniform = struct
+  include Enums.GetActiveUniform
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniformName.xml}
+    manual pages on opengl.org}
+*)
+external glGetActiveUniforms_type: program:program -> index:int ->
+  GetActiveUniform.uniform_type = "gl_api_glGetActiveUniforms_type"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetAttachedShaders.xml}
+    manual pages on opengl.org}
+*)
+external glGetAttachedShaders: program -> shader list =
+  "gl_api_glGetAttachedShaders"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetAttribLocation.xml}
+    manual pages on opengl.org}
+*)
+external glGetAttribLocation: program:program -> name:string -> int =
+  "gl_api_glGetAttribLocation"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetBufferParameter.xml}
+    manual pages on opengl.org}
+*)
+external glGetBufferParameter_access: Buffer.buffer_type -> Buffer.access_type =
+  "gl_api_glGetBufferParameter_access"
+external glGetBufferParameter_mapped: Buffer.buffer_type -> bool =
+  "gl_api_glGetBufferParameter_mapped"
+external glGetBufferParameter_size: Buffer.buffer_type -> int =
+  "gl_api_glGetBufferParameter_size"
+external glGetBufferParameter_usage: Buffer.buffer_type -> Buffer.buffer_usage_type =
+  "gl_api_glGetBufferParameter_usage"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetBufferSubData.xml}
+    manual pages on opengl.org}
+*)
+external glGetBufferSubData: target:Buffer.buffer_type ->
+  offset:int -> size:int -> (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t =
+  "gl_api_glGetBufferSubData"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetFragDataIndex.xml}
+    manual pages on opengl.org}
+*)
+external glGetFragDataIndex: program:program -> name:string -> int =
+  "gl_api_glGetFragDataIndex"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetFragDataLocation.xml}
+    manual pages on opengl.org}
+*)
+external glGetFragDataLocation: program:program -> name:string -> int =
+  "gl_api_glGetFragDataLocation"
+
+module FramebufferAttachment = struct
+  include Enums.FramebufferAttachment
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetFramebufferAttachmentParameter.xml}
+    manual pages on opengl.org}
+*)
+external glGetFramebufferAttachmentParameter_attachment:
+  target:FramebufferAttachment.frame_buffer_type ->
+    pname: FramebufferAttachment.attachment_pname_type -> int =
+  "gl_api_glGetFramebufferAttachmentParameter_attachment"
+external glGetFramebufferAttachmentParameter_depth:
+  target:FramebufferAttachment.frame_buffer_type ->
+    pname: FramebufferAttachment.attachment_pname_type -> int =
+  "gl_api_glGetFramebufferAttachmentParameter_depth"
+external glGetFramebufferAttachmentParameter_stencil:
+  target:FramebufferAttachment.frame_buffer_type ->
+    pname: FramebufferAttachment.attachment_pname_type -> int =
+  "gl_api_glGetFramebufferAttachmentParameter_stencil"
+external glGetFramebufferAttachmentParameter_depth_stencil:
+  target:FramebufferAttachment.frame_buffer_type ->
+    pname: FramebufferAttachment.attachment_pname_type -> int =
+  "gl_api_glGetFramebufferAttachmentParameter_depth_stencil"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetMultisample.xml}
+    manual pages on opengl.org}
+*)
+external glGetMultisample: int -> float * float = "gl_api_glGetMultisample"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetProgramInfoLog.xml}
+    manual pages on opengl.org}
+*)
+external glGetProgramInfoLog: program -> string = "gl_api_glGetProgramInfoLog"
+
+module RenderbufferParameter = struct
+  include Enums.RenderbufferParameter
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetRenderbufferParameter.xml}
+    manual pages on opengl.org}
+*)
+external glGetRenderbufferParameter: RenderbufferParameter.renderbuffer_parameter_type ->
+  int = "gl_api_glGetRenderbufferParameter"
+
+module SamplerParameter = struct
+  include Enums.SamplerParameter
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetSamplerParameter.xml}
+    manual pages on opengl.org}
+*)
+external glGetSamplerParameter_min_filter: sampler ->
+  SamplerParameter.sampler_min_filter_type = "gl_api_glGetSamplerParameter_min_filter"
+external glGetSamplerParameter_mag_filter: sampler ->
+  SamplerParameter.sampler_mag_filter_type = "gl_api_glGetSamplerParameter_mag_filter"
+external glGetSamplerParameter_lod: sampler:sampler ->
+  pname:SamplerParameter.sampler_lod_type -> int = "gl_api_glGetSamplerParameter_lod"
+external glGetSamplerParameter_wrap: sampler:sampler ->
+  pname:SamplerParameter.sampler_wrap_type -> SamplerParameter.sampler_wrap_func
+    = "gl_api_glGetSamplerParameter_wrap"
+external glGetSamplerParameter_compare_mode: sampler ->
+  SamplerParameter.sampler_compare_mode = "gl_api_glGetSamplerParameter_compare_mode"
+external glGetSamplerParameter_compare_func: sampler ->
+  SamplerParameter.sampler_compare_func = "gl_api_glGetSamplerParameter_compare_func"
+external glGetSamplerParameter_color: sampler ->
+  float * float * float * float = "gl_api_glGetSamplerParameter_color"
+
+module GetShader = struct
+  include Enums.GetShader
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetShader.xml}
+    manual pages on opengl.org}
+*)
+external glGetShader_type: shader -> GetShader.shader_type = "gl_api_glGetShader_type"
+external glGetShader_bool: shader:shader -> pname:GetShader.get_shader_bool
+  -> bool = "gl_api_glGetShader_bool"
+external glGetShader_int: shader:shader -> pname:GetShader.get_shader_int
+  -> int = "gl_api_glGetShader_int"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetShaderInfoLog.xml}
+    manual pages on opengl.org}
+*)
+external glGetShaderInfoLog: shader -> string = "gl_api_glGetShaderInfoLog"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetShaderSource.xml}
+    manual pages on opengl.org}
+*)
+external glGetShaderSource: shader -> string = "gl_api_glGetShaderSource"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetUniform.xml}
+    manual pages on opengl.org}
+*)
+external glGetUniformf1: program:program -> location:int ->
+  float = "gl_api_glGetUniformf1"
+external glGetUniformf2: program:program -> location:int ->
+  float * float = "gl_api_glGetUniformf2"
+external glGetUniformf3: program:program -> location:int ->
+  float * float * float = "gl_api_glGetUniformf3"
+external glGetUniformf4: program:program -> location:int ->
+  float * float * float * float = "gl_api_glGetUniformf4"
+
+external glGetUniformi1: program:program -> location:int -> int = "gl_api_glGetUniformi1"
+external glGetUniformi2: program:program -> location:int -> int * int = "gl_api_glGetUniformi2"
+external glGetUniformi3: program:program -> location:int -> int * int * int = "gl_api_glGetUniformi3"
+external glGetUniformi4: program:program -> location:int -> int * int * int * int = "gl_api_glGetUniformi4"
+
+external glGetUniformui1: program:program -> location:int -> int = "gl_api_glGetUniformui1"
+external glGetUniformui2: program:program -> location:int -> int * int = "gl_api_glGetUniformui2"
+external glGetUniformui3: program:program -> location:int -> int * int * int = "gl_api_glGetUniformui3"
+external glGetUniformui4: program:program -> location:int -> int * int * int * int = "gl_api_glGetUniformui4"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetUniformBlockIndex.xml}
+    manual pages on opengl.org}
+*)
+external glGetUniformBlockIndex: program:program -> name:string -> int =
+  "gl_api_glGetUniformBlockIndex"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetUniformIndices.xml}
+    manual pages on opengl.org}
+*)
+external glGetUniformIndices: program:program -> names:string list -> count:int -> int list =
+  "gl_api_glGetUniformIndices"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetUniformLocation.xml}
+    manual pages on opengl.org}
+*)
+external glGetUniformLocation: program:program -> name:string -> int =
+  "gl_api_glGetUniformLocation"
+
+module VertexAttrib = struct
+  include Enums.VertexAttrib
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetVertexAttrib.xml}
+    manual pages on opengl.org}
+*)
+external glGetVertexAttrib_bool: index:int -> pname:VertexAttrib.get_vertex_attrib_bool ->
+  bool = "gl_api_glGetVertexAttrib_bool"
+external glGetVertexAttrib_int: index:int -> pname:VertexAttrib.get_vertex_attrib_int ->
+  int = "gl_api_glGetVertexAttrib_int"
+external glGetVertexAttrib_vertex: int -> float * float * float * float
+   = "gl_api_glGetVertexAttrib_vertex"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsBuffer.xml}
+    manual pages on opengl.org}
+*)
+external glIsBuffer: buffer -> bool = "gl_api_glIsBuffer"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsFramebuffer.xml}
+    manual pages on opengl.org}
+*)
+external glIsFramebuffer: framebuffer -> bool = "gl_api_glIsFramebuffer"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsProgram.xml}
+    manual pages on opengl.org}
+*)
+external glIsProgram: program -> bool = "gl_api_glIsProgram"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsRenderbuffer.xml}
+    manual pages on opengl.org}
+*)
+external glIsRenderbuffer: renderbuffer -> bool = "gl_api_glIsRenderbuffer"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsSampler.xml}
+    manual pages on opengl.org}
+*)
+external glIsSampler: sampler -> bool = "gl_api_glIsSampler"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsShader.xml}
+    manual pages on opengl.org}
+*)
+external glIsShader: shader -> bool = "gl_api_glIsShader"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsVertexArray.xml}
+    manual pages on opengl.org}
+*)
+external glIsVertexArray: vbo -> bool = "gl_api_glIsVertexArray"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glLinkProgram.xml}
+    manual pages on opengl.org}
+*)
+external glLinkProgram: program -> unit = "gl_api_glLinkProgram"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMapBuffer.xml}
+    manual pages on opengl.org}
+*)
+external glMapBuffer: target:Buffer.buffer_type -> access:Buffer.access_type ->
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t =
+  "gl_api_glMapBuffer"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glUnmapBuffer.xml}
+    manual pages on opengl.org}
+*)
+external glUnmapBuffer: Buffer.buffer_type -> bool = "gl_api_glUnmapBuffer"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMapBuffer.xml}
+    manual pages on opengl.org}
+*)
+external glMapBuffer: target:Buffer.buffer_type -> access:Buffer.access_type ->
+  offset:int -> length:int ->
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t =
+  "gl_api_glMapBufferRange"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glMultiDrawElements.xml}
+    manual pages on opengl.org}
+*)
+external glMultiDrawElements : mode:DrawElements.draw_mode ->
+  elements_type:DrawElements.draw_elements_type -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t list ->
+    primcount:int -> unit
+    = "gl_api_glMultiDrawElements"
+
+module PointParameter = struct
+  include Enums.PointParameter
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPointParameter.xml}
+    manual pages on opengl.org}
+*)
+external glPointParameter: float -> unit = "gl_api_glPointParameter"
+external glPointParameter_coord: PointParameter.coord_origin -> unit = "gl_api_glPointParameter_coord"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glPrimitiveRestartIndex.xml}
+    manual pages on opengl.org}
+*)
+external glPrimitiveRestartIndex : int -> unit = "gl_api_glPrimitiveRestartIndex"
+
+module Provoking = struct
+  include Enums.Provoking
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glProvokingVertex.xml}
+    manual pages on opengl.org}
+*)
+external glProvokingVertex: Provoking.provoking_type -> unit = "gl_api_glProvokingVertex"
+
+module Renderbuffer = struct
+  include Enums.Renderbuffer
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glRenderbufferMultisample.xml}
+    manual pages on opengl.org}
+*)
+external glRenderbufferStorageMultisample: samples:int -> internalformat:Renderbuffer.internal_format
+  -> width:int -> height:int -> unit = "gl_api_glRenderbufferStorageMultisample"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glSampleMaski.xml}
+    manual pages on opengl.org}
+*)
+external glSampleMask: masknumber:int -> mask:int -> unit = "gl_api_glSampleMask"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glSamplerParameter.xml}
+    manual pages on opengl.org}
+    TODO:need to implement for other parameter.
+*)
+external glSamplerParameter: sampler:sampler -> pname:SamplerParameter.sampler_lod_type ->
+  value:int -> unit = "gl_api_glSamplerParameter"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glShaderSource.xml}
+    manual pages on opengl.org}
+*)
+external glShaderSource: shader:shader -> source:string -> unit =
+  "gl_api_glShaderSource"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glStencilFuncSeparate.xml}
+    manual pages on opengl.org}
+*)
+external glStencilFuncSeparate : face:CullFace.cull_face_mode ->
+  func:Func.compare_func -> func_ref:int -> mask:int -> unit = "gl_api_glStencilFuncSeparate"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glStencilMaskSeparate.xml}
+    manual pages on opengl.org}
+*)
+external glStencilMaskSeparate : face:CullFace.cull_face_mode ->
+  mask:int -> unit = "gl_api_glStencilMaskSeparate"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glStencilOpSeparate.xml}
+    manual pages on opengl.org}
+*)
+external glStencilOpSeparate : face:Stencil.face_mode ->
+  fail:Stencil.stencil_op -> zfail:Stencil.stencil_op
+  -> zpass:Stencil.stencil_op -> unit = "gl_api_glStencilOpSeparate"
+
+module TexBuffer = struct
+  include Enums.TexBuffer
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexBuffer.xml}
+    manual pages on opengl.org}
+*)
+external glTexBuffer: internalformat:TexBuffer.internal_format ->
+  buffer:buffer -> unit = "gl_api_glTexBuffer"
+
+module TransformFeedback = struct
+  include Enums.TransformFeedback
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTransformFeedbackVaryings.xml}
+    manual pages on opengl.org}
+*)
+external glTransformFeedbackVaryings: program:program -> varyings:string array ->
+  buffer_mode:TransformFeedback.transform_buffer_mode -> unit =
+  "gl_api_glTransformFeedbackVaryings"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glUniform.xml}
+    manual pages on opengl.org}
+*)
+external glUniform1f: location:int -> value:float -> unit = "gl_api_glUniform1f"
+external glUniform2f: location:int -> value:float * float -> unit = "gl_api_glUniform2f"
+external glUniform3f: location:int -> value:float * float * float -> unit = "gl_api_glUniform3f"
+external glUniform4f: location:int -> value:float * float * float * float -> unit = "gl_api_glUniform4f"
+
+external glUniform1ui: location:int -> value:int -> unit = "gl_api_glUniform1ui"
+external glUniform2ui: location:int -> value:int * int -> unit = "gl_api_glUniform2ui"
+external glUniform3ui: location:int -> value:int * int * int -> unit = "gl_api_glUniform3ui"
+external glUniform4ui: location:int -> value:int * int * int * int -> unit = "gl_api_glUniform4ui"
+
+external glUniformMatrix: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix"
+external glUniformMatrix2x3: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix2x3"
+external glUniformMatrix3x2: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix3x2"
+external glUniformMatrix2x4: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix2x4"
+external glUniformMatrix4x2: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix4x2"
+external glUniformMatrix3x4: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix3x4"
+external glUniformMatrix4x3: location:int -> ?transpose:bool ->
+  value:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glUniformMatrix4x3"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glUniformBlockBinding.xml}
+    manual pages on opengl.org}
+*)
+external glUniformBlockBinding: program:program -> index:int -> binding:int -> unit =
+  "gl_api_glUniformBlockBinding"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glUseProgram.xml}
+    manual pages on opengl.org}
+*)
+external glUseProgram: program -> unit = "gl_api_glUseProgram"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glValidateProgram.xml}
+    manual pages on opengl.org}
+*)
+external glValidateProgram: program -> unit = "gl_api_glValidateProgram"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml}
+    manual pages on opengl.org}
+    TODO: need to implement I, N options.
+*)
+external glVertexAttribf: int ->
+  (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glVertexAttribf"
+external glVertexAttribi: int ->
+  (int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glVertexAttribi"
+external glVertexAttribui: int ->
+  (int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glVertexAttribui"
+external glVertexAttribs: int ->
+  (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glVertexAttribs"
+external glVertexAttribus: int ->
+  (int, Bigarray.int16_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glVertexAttribus"
+external glVertexAttribd: int ->
+  (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
+  "gl_api_glVertexAttribd"
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribDivisor.xml}
+    manual pages on opengl.org}
+*)
+external glVertexAttribDivisor: index:int -> divisor:int -> unit =
+  "gl_api_glVertexAttribDivisor"
+
+(* not implement yet
+
+   glBeginConditionalRender
+   glEndConditionalRender
+   glBeginQuery
+   glEndQuery
+   glBeginTransformFeedback
+   glEndTransformFeedback
+   glBindBufferBase
+   glBindBufferRange
+   glClientWaitSync
+   glDeleteQueries
+   glDeleteSync
+   glDrawArraysInstanced
+   glDrawElementsBaseVertex
+   glDrawElementsInstanced
+   glDrawElementsInstancedBaseVertex
+   glDrawRangeElementBaseVertex
+   glFenceSync
+   glFramebufferTexture
+   glFramebufferTexture1D
+   glFramebufferTexture2D
+   glFramebufferTexture3D
+   glGenQueries
+   glGetBufferPointerv
+   glGetProgram
+   glGetQueryObject
+   glGetQueryiv
+   glGetSync
+   glGetTransformFeedbackVarying
+   glGetVertexAttribPointerv
+   glIsQuery
+   glIsSync
+   glMultiDrawElementsBaseVertex
+   glQueryCounter
+   glVertexAttribPointer
+   glWaitSync
+   glGetFramebufferAttachmentParameter
 *)

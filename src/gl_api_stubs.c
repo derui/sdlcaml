@@ -13,6 +13,12 @@
 #include <caml/bigarray.h>
 #include "common.h"
 
+#if defined(GL3_ENABLE)
+#include "gl_api_stubs_gl3_enable.inc"
+#else
+#include "gl_api_stubs_gl3_disable.inc"
+#endif
+
 int ml_find_flag(GLenum *array, int size, GLenum query) {
   for (int i = 0; i < size; ++i) {
     if (array[i] == query) {
@@ -1594,16 +1600,21 @@ t_prim gl_api_glBindTexture(value _v_target, value _v_texture) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glPrioritizeTextures(value _v_n, value _v_textures,
-                                            value _v_priorities) {
-  CAMLparam3(_v_n, _v_textures, _v_priorities);
-  int n; /*in*/
-  unsigned int const *textures; /*in*/
+t_prim gl_api_glPrioritizeTextures(value _v_textures,
+                                   value _v_priorities) {
+  CAMLparam2(_v_textures, _v_priorities);
+  unsigned int *textures; /*in*/
   float const *priorities; /*in*/
-  n = Int_val(_v_n);
-  textures = Caml_ba_data_val(_v_textures);
+  int n = caml_array_length(_v_textures);
+
+  textures = malloc(n * sizeof(unsigned int));
+  for (int i = 0; i < n; ++i) {
+    textures[i] = Int_val(Field(_v_textures, i));
+  }
+
   priorities = Caml_ba_data_val(_v_priorities);
   glPrioritizeTextures(n, textures, priorities);
+  free(textures);
   CAMLreturn(Val_unit);
 }
 

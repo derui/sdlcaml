@@ -12,18 +12,23 @@ let (|>) f g = g f
 let (<|) f g = f g
 
 type output_type =
-  | Module of string * string list
-  | Alone of string
+| Module of string * string list
+| Alone of string
 
 let output_module_name = "enums.ml"
 
 let xml_file = ref ""
+let major_version = ref 0
+let minor_version = ref 0
 let modules = ref []
 let sections = ref []
 
 let arg_parse () =
-  let specs = [] in
-  let usega = "usega: enums <xml file>" in
+  let specs =
+    [("-major", Arg.Int (fun s -> major_version := s), "Major version of the OpenGL");
+     ("-minor", Arg.Int (fun s -> minor_version := s), "Minor version of the OpenGL");
+    ] in
+  let usega = "usega: enums <xml file> -major <major version> -minor <minor version" in
   Arg.parse specs (fun s -> xml_file := s) usega
 
 let child elements name =
@@ -50,12 +55,25 @@ let extract_sections xml =
   let sects = child xml "section" in
   let extract x =
     let name = Xml.attrib x "name" in
-    let pnames = List.concat <| Xml.map (fun x -> Xml.map Xml.pcdata x) x in
+    let pnames = List.concat <| Xml.map (fun x ->
+      let version = Xml.attrib x "version" in
+      Xml.map (fun x -> (Xml.pcdata x, version)) x) x in
     if List.mem_assoc name !sections then
       failwith (Printf.sprintf "%s already exists." name)
     else
-      sections := (name, pnames) :: !sections
-  in
+      let reg = Str.regexp "GL_VERSION_\\([0-9]\\)_\\([0-9]\\)" in
+      let pnames = List.filter (fun (_, version) ->
+        if Str.string_match reg version 0 then
+          if !major_version = 0 && !minor_version = 0 then
+            true
+          else if !major_version > int_of_string (Str.matched_group 1 version) then
+            true
+          else if !major_version = int_of_string (Str.matched_group 1 version) then
+            !minor_version >= int_of_string (Str.matched_group 2 version)
+          else
+            false
+          else false) pnames in
+      sections := (name, List.map fst pnames) :: !sections in
   List.iter extract sects
 
 let construct_includes () =
@@ -78,10 +96,16 @@ let common_construct name func =
 
 let construct_modules () =
   let per_type file t =
-    let pnames = List.assoc t !sections in begin
-      output_string file (Printf.sprintf "type %s = \n" t);
-      List.iter (fun p -> output_string file (Printf.sprintf "| %s \n" p)) pnames;
-    end in
+    try
+      let pnames = List.assoc t !sections in begin
+        (* only type name if it has no variants *)
+        if List.length pnames <> 0 then begin
+          output_string file (Printf.sprintf "type %s = \n" t);
+          List.iter (fun p -> output_string file (Printf.sprintf "| %s \n" p)) pnames;
+        end else
+          output_string file (Printf.sprintf "type %s\n" t)
+      end
+    with Not_found -> Printf.printf "not found type : %s\n" t in
   let construct file = function
     | Module (name, types) ->
       begin
@@ -99,8 +123,10 @@ let construct_modules () =
 let () =
   arg_parse ();
   let xml = Xml.parse_file !xml_file in
-  extract_modules xml;
-  extract_sections xml;
+  try
+    extract_modules xml;
+    extract_sections xml;
 
-  construct_includes ();
-  construct_modules ();
+    construct_includes ();
+    construct_modules ();
+  with Xml.Not_element s -> failwith (Printf.sprintf "%s do not have element is %s " !xml_file (Xml.to_string s))

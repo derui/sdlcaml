@@ -1,5 +1,5 @@
 <glenumlists>
-  <!-- These enum lists are used to convert .ml or .c then it include some sources.  -->
+  <!-- These enum lists are used to convert .ml and .c then it include some sources.  -->
   <!-- Lists of enum has equivalence structure.
        Tag of 'section' start a list of enums, it have one attribute of 'name' is
        name of section and type name.
@@ -42,6 +42,7 @@
     </module>
     <module name="Stencil">
       <type>stencil_op</type>
+      <type>face_mode</type>
     </module>
     <module name="Coord">
       <type>coord</type>
@@ -171,6 +172,10 @@
     <module name="Buffer">
       <type>draw_buffer_mode</type>
       <type>read_buffer_mode</type>
+      <type>buffer_type</type>
+      <type>frame_buffer_type</type>
+      <type>access_type</type>
+      <type>buffer_usage_type</type>
     </module>
     <module name="Enable">
       <type>enable_mode</type>
@@ -209,6 +214,75 @@
     </module>
     <module name="Shade">
       <type>shade_mode</type>
+    </module>
+    <module name="Blend">
+      <type>equation_mode</type>
+      <type>func_equation_mode</type>
+    </module>
+    <module name="Framebuffer">
+      <type>blit_mask</type>
+      <type>filter_type</type>
+      <type>status_type</type>
+      <type>frame_buffer_type</type>
+    </module>
+    <module name="BufferData">
+      <type>usage_type</type>
+      <type>target_type</type>
+    </module>
+    <module name="Mipmap">
+      <type>mipmap_type</type>
+    </module>
+    <module name="GetAttrib">
+      <type>attrib_type</type>
+    </module>
+    <module name="GetUniform">
+      <type>uniform_type</type>
+    </module>
+    <module name="GetUniformBlock">
+      <type>uniform_block_type</type>
+    </module>
+    <module name="GetActiveUniform">
+      <type>uniform_type</type>
+    </module>
+    <module name="FramebufferAttachment">
+      <type>frame_buffer_type</type>
+      <type>attachment_pname_type</type>
+    </module>
+    <module name="RenderbufferParameter">
+      <type>renderbuffer_parameter_type</type>
+    </module>
+    <module name="SamplerParameter">
+      <type>sampler_min_filter_type</type>
+      <type>sampler_mag_filter_type</type>
+      <type>sampler_lod_type</type>
+      <type>sampler_wrap_type</type>
+      <type>sampler_wrap_func</type>
+      <type>sampler_compare_mode</type>
+      <type>sampler_compare_func</type>
+    </module>
+    <module name="GetShader">
+      <type>shader_type</type>
+      <type>get_shader_bool</type>
+      <type>get_shader_int</type>
+    </module>
+    <module name="VertexAttrib">
+      <type>get_vertex_attrib_bool</type>
+      <type>get_vertex_attrib_int</type>
+    </module>
+    <module name="PointParameter">
+      <type>coord_origin</type>
+    </module>
+    <module name="Provoking">
+      <type>provoking_type</type>
+    </module>
+    <module name="Renderbuffer">
+      <type>internal_format</type>
+    </module>
+    <module name="TexBuffer">
+      <type>internal_format</type>
+    </module>
+    <module name="TransformFeedback">
+      <type>transform_buffer_mode</type>
     </module>
   </modules>
 
@@ -1359,5 +1433,310 @@
     <pname version="GL_VERSION_0_0">GL_UNSIGNED_INT</pname>
   </section>
 
-
+  <section name="buffer_type">
+    <pname version="GL_VERSION_3_0">GL_ARRAY_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_COPY_READ_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_COPY_WRITE_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_ELEMENT_ARRAY_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_PIXEL_PACK_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_PIXEL_UNPACK_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_TRANSFORM_FEEDBACK_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BUFFER</pname>
+  </section>
+  <section name="frame_buffer_type">
+    <pname version="GL_VERSION_3_0">GL_DRAW_FRAMEBUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_READ_FRAMEBUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER</pname>
+  </section>
+  <section name="equation_mode">
+    <pname version="GL_VERSION_3_0">GL_FUNC_ADD</pname>
+    <pname version="GL_VERSION_3_0">GL_FUNC_SUBTRACT</pname>
+    <pname version="GL_VERSION_3_0">GL_FUNC_REVERSE_SUBTRACT</pname>
+    <pname version="GL_VERSION_3_0">GL_MIN</pname>
+    <pname version="GL_VERSION_3_0">GL_MAX</pname>
+  </section>
+  <section name="blit_mask">
+    <pname version="GL_VERSION_3_0">GL_COLOR_BUFFER_BIT</pname>
+    <pname version="GL_VERSION_3_0">GL_DEPTH_BUFFER_BIT</pname>
+    <pname version="GL_VERSION_3_0">GL_STENCIL_BUFFER_BIT</pname>
+  </section>
+  <section name="filter_type">
+    <pname version="GL_VERSION_3_0">GL_NEAREST</pname>
+    <pname version="GL_VERSION_3_0">GL_LINEAR</pname>
+  </section>
+  <section name="status_type">
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_COMPLETE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_UNDEFINED</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS</pname>
+  </section>
+  <section name="usage_type">
+    <pname version="GL_VERSION_3_0">GL_STREAM_DRAW</pname>
+    <pname version="GL_VERSION_3_0">GL_STREAM_READ</pname>
+    <pname version="GL_VERSION_3_0">GL_STREAM_COPY</pname>
+    <pname version="GL_VERSION_3_0">GL_STATIC_DRAW</pname>
+    <pname version="GL_VERSION_3_0">GL_STATIC_READ</pname>
+    <pname version="GL_VERSION_3_0">GL_STATIC_COPY</pname>
+    <pname version="GL_VERSION_3_0">GL_DYNAMIC_DRAW</pname>
+    <pname version="GL_VERSION_3_0">GL_DYNAMIC_READ</pname>
+    <pname version="GL_VERSION_3_0">GL_DYNAMIC_COPY</pname>
+  </section>
+  <section name="target_type">
+    <pname version="GL_VERSION_3_0">GL_ARRAY_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_COPY_READ_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_COPY_WRITE_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_ELEMENT_ARRAY_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_PIXEL_PACK_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_PIXEL_UNPACK_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_TRANSFORM_FEEDBACK_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BUFFER</pname>
+  </section>
+  <section name="mipmap_type">
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_1D</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_2D</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_3D</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_1D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_2D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_CUBE_MAP</pname>
+  </section>
+  <section name="attrib_type">
+    <pname version="GL_VERSION_3_0">GL_FLOAT</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_VEC4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT3</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT2x3</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT2x4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT3x2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT3x4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT4x2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT4x3</pname>
+    <pname version="GL_VERSION_3_0">GL_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_VEC4</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC4</pname>
+  </section>
+  <section name="uniform_type">
+    <pname version="GL_VERSION_3_0">GL_FLOAT</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_VEC4</pname>
+    <pname version="GL_VERSION_3_0">GL_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_VEC4</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC4</pname>
+    <pname version="GL_VERSION_3_0">GL_BOOL</pname>
+    <pname version="GL_VERSION_3_0">GL_BOOL_VEC2</pname>
+    <pname version="GL_VERSION_3_0">GL_BOOL_VEC3</pname>
+    <pname version="GL_VERSION_3_0">GL_BOOL_VEC4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT3</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT2x3</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT2x4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT3x2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT3x4</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT4x2</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT_MAT4x3</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_1D</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_3D</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_CUBE</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_1D_SHADOW</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_SHADOW</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_1D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_1D_ARRAY_SHADOW</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_ARRAY_SHADOW</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_MULTISAMPLE</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_MULTISAMPLE_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_CUBE_SHADOW</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_RECT</pname>
+    <pname version="GL_VERSION_3_0">GL_SAMPLER_2D_RECT_SHADOW</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_1D</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_2D</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_3D</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_CUBE</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_1D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_2D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_2D_MULTISAMPLE</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_SAMPLER_2D_RECT</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_1D</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_2D</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_3D</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_CUBE</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_1D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_2D_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_BUFFER</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_2D_RECT</pname>
+  </section>
+  <section name="attachment_pname_type">
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_LAYERED</pname>
+  </section>
+  <section name="renderbuffer_parameter_type">
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_WIDTH</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_HEIGHT</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_INTERNAL_FORMAT</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_RED_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_GREEN_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_BLUE_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_ALPHA_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_DEPTH_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_STENCIL_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_SAMPLES</pname>
+  </section>
+  <section name="sampler_min_filter_type">
+    <pname version="GL_VERSION_3_0">GL_NEAREST</pname>
+    <pname version="GL_VERSION_3_0">GL_LINEAR</pname>
+    <pname version="GL_VERSION_3_0">GL_NEAREST_MIPMAP_NEAREST</pname>
+    <pname version="GL_VERSION_3_0">GL_LINEAR_MIPMAP_NEAREST</pname>
+    <pname version="GL_VERSION_3_0">GL_NEAREST_MIPMAP_LINEAR</pname>
+    <pname version="GL_VERSION_3_0">GL_LINEAR_MIPMAP_LINEAR</pname>
+  </section>
+  <section name="sampler_mag_filter_type">
+    <pname version="GL_VERSION_3_0">GL_NEAREST</pname>
+    <pname version="GL_VERSION_3_0">GL_LINEAR</pname>
+  </section>
+  <section name="sampler_lod_type">
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_MIN_LOD</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_MAX_LOD</pname>
+  </section>
+  <section name="sampler_wrap_type">
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_WRAP_S</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_WRAP_T</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE_WRAP_R</pname>
+  </section>
+  <section name="sampler_wrap_func">
+    <pname version="GL_VERSION_3_0">GL_CLAMP_TO_EDGE</pname>
+    <pname version="GL_VERSION_3_0">GL_MIRRORED_REPEAT</pname>
+    <pname version="GL_VERSION_3_0">GL_REPEAT</pname>
+  </section>
+  <section name="sampler_compare_mode">
+    <pname version="GL_VERSION_3_0">GL_COMPARE_REF_TO_TEXTURE</pname>
+    <pname version="GL_VERSION_3_0">GL_NONE</pname>
+  </section>
+  <section name="sampler_compare_func">
+    <pname version="GL_VERSION_3_0">GL_LEQUAL</pname>
+    <pname version="GL_VERSION_3_0">GL_GEQUAL</pname>
+    <pname version="GL_VERSION_3_0">GL_LESS</pname>
+    <pname version="GL_VERSION_3_0">GL_GREATER</pname>
+    <pname version="GL_VERSION_3_0">GL_EQUAL</pname>
+    <pname version="GL_VERSION_3_0">GL_NOTEQUAL</pname>
+    <pname version="GL_VERSION_3_0">GL_ALWAYS</pname>
+    <pname version="GL_VERSION_3_0">GL_NEVER</pname>
+  </section>
+  <section name="shader_type">
+    <pname version="GL_VERSION_3_0">GL_VERTEX_SHADER</pname>
+    <pname version="GL_VERSION_3_0">GL_GEOMETRY_SHADER</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAGMENT_SHADER</pname>
+  </section>
+  <section name="get_shader_bool">
+    <pname version="GL_VERSION_3_0">GL_DELETE_STATUS</pname>
+    <pname version="GL_VERSION_3_0">GL_COMPILE_STATUS</pname>
+  </section>
+  <section name="get_shader_int">
+    <pname version="GL_VERSION_3_0">GL_INFO_LOG_LENGTH</pname>
+    <pname version="GL_VERSION_3_0">GL_SHADER_SOURCE_LENGTH</pname>
+  </section>
+  <section name="get_vertex_attrib_bool">
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_ENABLED</pname>
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_INTEGER</pname>
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_NORMALIZED</pname>
+  </section>
+  <section name="get_vertex_attrib_int">
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_DIVISOR</pname>
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_STRIDE</pname>
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING</pname>
+  </section>
+  <section name="coord_origin">
+    <pname version="GL_VERSION_3_0">GL_LOWER_LEFT</pname>
+    <pname version="GL_VERSION_3_0">GL_UPPER_LEFT</pname>
+  </section>
+  <section name="provoking_type">
+    <pname version="GL_VERSION_3_0">GL_FIRST_VERTEX_CONVENTION</pname>
+    <pname version="GL_VERSION_3_0">GL_LAST_VERTEX_CONVENTION</pname>
+  </section>
+  <section name="transform_buffer_mode">
+    <pname version="GL_VERSION_3_0">GL_INTERLEAVED_ATTRIBS</pname>
+    <pname version="GL_VERSION_3_0">GL_SEPARATE_ATTRIBS</pname>
+  </section>
+  <section name="uniform_block_type">
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_BINDING</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_DATA_SIZE</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_NAME_LENGTH</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER</pname>
+    <pname version="GL_VERSION_3_0">GL_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER</pname>
+  </section>
+  <section name="func_equation_mode">
+    <pname version="GL_VERSION_3_0">GL_ZERO</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE</pname>
+    <pname version="GL_VERSION_3_0">GL_SRC_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE_MINUS_SRC_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_DST_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE_MINUS_DST_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_SRC_ALPHA</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE_MINUS_SRC_ALPHA</pname>
+    <pname version="GL_VERSION_3_0">GL_DST_ALPHA</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE_MINUS_DST_ALPHA</pname>
+    <pname version="GL_VERSION_3_0">GL_CONSTANT_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE_MINUS_CONSTANT_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_CONSTANT_ALPHA</pname>
+    <pname version="GL_VERSION_3_0">GL_ONE_MINUS_CONSTANT_ALPHA</pname>
+    <pname version="GL_VERSION_3_0">GL_SRC_ALPHA_SATURATE</pname>
+    <pname version="GL_VERSION_3_0">GL_SRC1_COLOR</pname>
+    <pname version="GL_VERSION_3_0">GL_SRC1_ALPHA</pname>
+  </section>
+  <section name="access_type">
+    <pname version="GL_VERSION_3_0">GL_READ_ONLY</pname>
+    <pname version="GL_VERSION_3_0">GL_WRITE_ONLY</pname>
+    <pname version="GL_VERSION_3_0">GL_READ_WRITE</pname>
+  </section>
+  <section name="buffer_usage_type">
+    <pname version="GL_VERSION_3_0">GL_STREAM_DRAW</pname>
+    <pname version="GL_VERSION_3_0">GL_STREAM_READ</pname>
+    <pname version="GL_VERSION_3_0">GL_STREAM_COPY</pname>
+    <pname version="GL_VERSION_3_0">GL_STATIC_DRAW</pname>
+    <pname version="GL_VERSION_3_0">GL_STATIC_READ</pname>
+    <pname version="GL_VERSION_3_0">GL_STATIC_COPY</pname>
+    <pname version="GL_VERSION_3_0">GL_DYNAMIC_DRAW</pname>
+    <pname version="GL_VERSION_3_0">GL_DYNAMIC_READ</pname>
+    <pname version="GL_VERSION_3_0">GL_DYNAMIC_COPY</pname>
+  </section>
 </glenumlists>
