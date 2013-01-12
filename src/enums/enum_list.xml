@@ -5,7 +5,7 @@
        name of section and type name.
        Tag of pname is a enum name into the section, it have one attribute of 'version'
        is able to use version for OpenGL.
-  -->
+    -->
   <modules>
     <module name="Light">
       <type>get_light</type>
@@ -246,7 +246,11 @@
     </module>
     <module name="FramebufferAttachment">
       <type>frame_buffer_type</type>
-      <type>attachment_pname_type</type>
+      <type>get_attachment_int</type>
+      <type>attachment_type</type>
+      <type>attachment_object_type</type>
+      <type>attachment_component_type</type>
+      <type>attachment_encoding_type</type>
     </module>
     <module name="RenderbufferParameter">
       <type>renderbuffer_parameter_type</type>
@@ -283,6 +287,12 @@
     </module>
     <module name="TransformFeedback">
       <type>transform_buffer_mode</type>
+    </module>
+    <module name="VertexArray">
+      <type>vertattr_type</type>
+    </module>
+    <module name="Shader">
+      <type>shader_type</type>
     </module>
   </modules>
 
@@ -1523,7 +1533,6 @@
     <pname version="GL_VERSION_3_0">GL_INT_VEC2</pname>
     <pname version="GL_VERSION_3_0">GL_INT_VEC3</pname>
     <pname version="GL_VERSION_3_0">GL_INT_VEC4</pname>
-    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC</pname>
     <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC2</pname>
     <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC3</pname>
     <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_VEC4</pname>
@@ -1591,8 +1600,7 @@
     <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_BUFFER</pname>
     <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_SAMPLER_2D_RECT</pname>
   </section>
-  <section name="attachment_pname_type">
-    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE</pname>
+  <section name="get_attachment_int">
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE</pname>
@@ -1601,11 +1609,32 @@
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE</pname>
-    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER</pname>
     <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_ATTACHMENT_LAYERED</pname>
+  </section>
+  <section name="attachment_type">
+    <pname version="GL_VERSION_3_0">GL_DEPTH_ATTACHMENT</pname>
+    <pname version="GL_VERSION_3_0">GL_STENCIL_ATTACHMENT</pname>
+    <pname version="GL_VERSION_3_0">GL_DEPTH_STENCIL_ATTACHMENT</pname>
+  </section>
+  <section name="attachment_object_type">
+    <pname version="GL_VERSION_3_0">GL_NONE</pname>
+    <pname version="GL_VERSION_3_0">GL_FRAMEBUFFER_DEFAULT</pname>
+    <pname version="GL_VERSION_3_0">GL_TEXTURE</pname>
+    <pname version="GL_VERSION_3_0">GL_RENDERBUFFER</pname>
+  </section>
+  <section name="attachment_component_type">
+    <pname version="GL_VERSION_3_0">GL_FLOAT</pname>
+    <pname version="GL_VERSION_3_0">GL_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_SIGNED_NORMALIZED</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_NORMALIZED</pname>
+  </section>
+  <section name="attachment_encoding_type">
+    <pname version="GL_VERSION_3_0">GL_LINEAR</pname>
+    <pname version="GL_VERSION_3_0">GL_SRGB</pname>
   </section>
   <section name="renderbuffer_parameter_type">
     <pname version="GL_VERSION_3_0">GL_RENDERBUFFER_WIDTH</pname>
@@ -1739,4 +1768,18 @@
     <pname version="GL_VERSION_3_0">GL_DYNAMIC_READ</pname>
     <pname version="GL_VERSION_3_0">GL_DYNAMIC_COPY</pname>
   </section>
+  <section name="vertattr_type">
+    <pname version="GL_VERSION_3_0">GL_BYTE</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_BYTE</pname>
+    <pname version="GL_VERSION_3_0">GL_SHORT</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_SHORT</pname>
+    <pname version="GL_VERSION_3_0">GL_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT</pname>
+    <pname version="GL_VERSION_3_0">GL_HALF_FLOAT</pname>
+    <pname version="GL_VERSION_3_0">GL_FLOAT</pname>
+    <pname version="GL_VERSION_3_0">GL_DOUBLE</pname>
+    <pname version="GL_VERSION_3_0">GL_INT_2_10_10_10_REV</pname>
+    <pname version="GL_VERSION_3_0">GL_UNSIGNED_INT_2_10_10_10_REV</pname>
+  </section>
+
 </glenumlists>

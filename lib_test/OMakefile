@@ -33,7 +33,7 @@ USE_OCAMLFIND = true
 OCAMLPACKS[] =
     threads
     oUnit
-    sdlcaml.baselib
+    num
 #
 if $(not $(OCAMLFIND_EXISTS))
    eprintln(This project requires ocamlfind, but is was not found.)
@@ -43,7 +43,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-# OCAMLINCLUDES +=
+OCAMLINCLUDES += $(file ../lib)
 
 #
 # Compile native or byte code?
@@ -79,16 +79,8 @@ OCAML_LINK_FLAGS +=
 
 FILES = $(removesuffix $(ls *.ml))
 
-PROGRAMS =
-	foreach(x, $(FILES))
-		.PHONY: run-$(removeprefix test_sdl_, $x)
-		run-$(removeprefix test_sdl_, $x):
-			./$x$(EXE)
-		export
-		value $(OCamlProgram $x, $x)
-
 #
-# OCAML_LIBS += ../src/sdlcaml
+OCAML_LIBS += ../lib/baselib
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl
@@ -96,6 +88,14 @@ PROGRAMS =
 #
 
 # need sdlcaml library
+
+PROGRAMS =
+	foreach(x, $(FILES))
+		.PHONY: run-$(removeprefix test_sdl_, $x)
+		run-$(removeprefix test_sdl_, $x):
+			./$x$(EXE)
+		export
+		value $(OCamlProgram $x, $x)
 
 test: $(PROGRAMS)
 

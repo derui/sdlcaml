@@ -1245,10 +1245,12 @@ external glAttachShader: shader:shader -> program:program -> unit = "gl_api_glAt
 external glBindAttribLocation: program:program -> index:int -> name:string -> unit =
   "gl_api_glBindAttribLocation"
 
+type buffer
+
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindBuffer.xml}
     manual pages on opengl.org}
 *)
-external glBindBuffer: target:Buffer.buffer_type -> buffer:int -> unit =
+external glBindBuffer: target:Buffer.buffer_type -> buffer:buffer -> unit =
   "gl_api_glBindBuffer"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindFragDataLocation.xml}
@@ -1331,7 +1333,9 @@ end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml}
     manual pages on opengl.org}
 *)
-external glBufferData: target:BufferData.target_type -> size:int -> usage:BufferData.usage_type -> unit =
+external glBufferData: target:BufferData.target_type -> size:int ->
+  data:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t ->
+  usage:BufferData.usage_type -> unit =
   "gl_api_glBufferData"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBufferSubData.xml}
@@ -1376,12 +1380,14 @@ external glCopyBufferSubData: read:BufferData.target_type -> write:BufferData.ta
 *)
 external glCreateProgram: unit -> program = "gl_api_glCreateProgram"
 
+module Shader : sig
+  include module type of Enums.Shader
+end
+
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCreateShader.xml}
     manual pages on opengl.org}
 *)
-external glCreateShader: unit -> shader = "gl_api_glCreateShader"
-
-type buffer
+external glCreateShader: Shader.shader_type -> shader = "gl_api_glCreateShader"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteBuffers.xml}
     manual pages on opengl.org}
@@ -1452,21 +1458,29 @@ external glDisableVertexAttribArray: int -> unit = "gl_api_glDisableVertexAttrib
 external glFlushMappedBufferRange: target:BufferData.target_type ->
   offset:int -> length:int -> unit = "gl_api_glFlushMappedBufferRange"
 
-type gl_attachment = GL_ATTACHMENT of int |
-    GL_DEPTH_ATTACHMENT | GL_STENCIL_ATTACHMENT | GL_DEPTH_STENCIL_ATTACHMENT
+type gl_attachment =
+  GL_ATTACHMENT of int
+| GL_DEPTH_ATTACHMENT
+| GL_STENCIL_ATTACHMENT
+| GL_DEPTH_STENCIL_ATTACHMENT
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFramebufferRenderbuffer.xml}
     manual pages on opengl.org}
 *)
-external glFramebufferRenderbuffer: target:Framebuffer.frame_buffer_type ->
-  attachment:gl_attachment -> render:renderbuffer -> unit =
-  "gl_api_glFramebufferRenderbuffer"
+val glFramebufferRenderbuffer: target:Framebuffer.frame_buffer_type ->
+  attachment:gl_attachment -> render:renderbuffer -> unit
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFramebufferTextureLayer.xml}
     manual pages on opengl.org}
 *)
 val glFramebufferTextureLayer: target:Framebuffer.frame_buffer_type ->
   attachment:gl_attachment -> texture:texture -> level:int -> layer:int -> unit
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenBuffers.xml}
+    manual pages on opengl.org}
+*)
+external glGenBuffer: unit -> buffer = "gl_api_glGenBuffer"
+external glGenBuffers: int -> buffer list = "gl_api_glGenBuffers"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenFramebuffers.xml}
     manual pages on opengl.org}
@@ -1615,22 +1629,15 @@ end
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetFramebufferAttachmentParameter.xml}
     manual pages on opengl.org}
 *)
-external glGetFramebufferAttachmentParameter_attachment:
-  target:FramebufferAttachment.frame_buffer_type ->
-    pname: FramebufferAttachment.attachment_pname_type -> int =
-  "gl_api_glGetFramebufferAttachmentParameter_attachment"
-external glGetFramebufferAttachmentParameter_depth:
-  target:FramebufferAttachment.frame_buffer_type ->
-    pname: FramebufferAttachment.attachment_pname_type -> int =
-  "gl_api_glGetFramebufferAttachmentParameter_depth"
-external glGetFramebufferAttachmentParameter_stencil:
-  target:FramebufferAttachment.frame_buffer_type ->
-    pname: FramebufferAttachment.attachment_pname_type -> int =
-  "gl_api_glGetFramebufferAttachmentParameter_stencil"
-external glGetFramebufferAttachmentParameter_depth_stencil:
-  target:FramebufferAttachment.frame_buffer_type ->
-    pname: FramebufferAttachment.attachment_pname_type -> int =
-  "gl_api_glGetFramebufferAttachmentParameter_depth_stencil"
+val glGetFramebufferAttachmentParameter_type: target:FramebufferAttachment.frame_buffer_type ->
+  attachment:gl_attachment -> FramebufferAttachment.attachment_object_type
+val glGetFramebufferAttachmentParameter_int: target:FramebufferAttachment.frame_buffer_type ->
+  attachment:gl_attachment ->
+  pname:FramebufferAttachment.get_attachment_int -> int
+val glGetFramebufferAttachmentParameter_component: target:FramebufferAttachment.frame_buffer_type ->
+  attachment:gl_attachment -> FramebufferAttachment.attachment_component_type
+val glGetFramebufferAttachmentParameter_encoding: target:FramebufferAttachment.frame_buffer_type ->
+  attachment:gl_attachment -> FramebufferAttachment.attachment_encoding_type
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetMultisample.xml}
     manual pages on opengl.org}
@@ -1943,34 +1950,22 @@ external glUseProgram: program -> unit = "gl_api_glUseProgram"
 *)
 external glValidateProgram: program -> unit = "gl_api_glValidateProgram"
 
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml}
-    manual pages on opengl.org}
-    TODO: need to implement I, N options.
-*)
-external glVertexAttribf: int ->
-  (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glVertexAttribf"
-external glVertexAttribi: int ->
-  (int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glVertexAttribi"
-external glVertexAttribui: int ->
-  (int, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glVertexAttribui"
-external glVertexAttribs: int ->
-  (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glVertexAttribs"
-external glVertexAttribus: int ->
-  (int, Bigarray.int16_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glVertexAttribus"
-external glVertexAttribd: int ->
-  (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glVertexAttribd"
-
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribDivisor.xml}
     manual pages on opengl.org}
 *)
 external glVertexAttribDivisor: index:int -> divisor:int -> unit =
   "gl_api_glVertexAttribDivisor"
+
+module VertexArray : sig
+  include module type of Enums.VertexArray
+end
+
+(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribPointer.xml}
+    manual pages on opengl.org}
+*)
+external glVertexAttribPointer: index:int -> size:int ->
+  vert_type:VertexArray.vertattr_type -> normalize:bool ->
+    stride:int -> unit = "gl_api_glVertexAttribPointer"
 
 (* not implement yet
 
@@ -2002,7 +1997,6 @@ external glVertexAttribDivisor: index:int -> divisor:int -> unit =
    glGetQueryiv
    glGetSync
    glGetTransformFeedbackVarying
-   glGetVertexAttribPointerv
    glIsQuery
    glIsSync
    glMultiDrawElementsBaseVertex
@@ -2012,4 +2006,5 @@ external glVertexAttribDivisor: index:int -> divisor:int -> unit =
    glMapBuffer
    glUnmapBuffer
    glMapBufferRange
+   glVertexAttrib
 *)

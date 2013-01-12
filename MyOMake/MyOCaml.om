@@ -30,7 +30,7 @@ public.USE_OCAMLFIND = false
     DEBUG_ENABLE = false
     if $(and $(defined DEBUG), $(equal $(DEBUG), 1))
         DEBUG_ENABLE = true
-    	export
+        export
 
 public.CAMLIDL = $`(if $(CAMLIDL_EXISTS), camlidl)
 public.OCAMLFIND = $`(if $(USE_OCAMLFIND), ocamlfind)
@@ -478,6 +478,43 @@ OCamlLibrary(library, targets) =
                 $(OCAML_LIB_FLAGS) -a -o $(NATIVELIB) $(OCamlLinkSort $(CMXFILES))
     return $(array $(if $(NATIVE_ENABLED), $(NATIVELIB)), $(if $(NATIVE_ENABLED), $(CLIB)), $(if $(BYTE_ENABLED), $(BYTELIB)))
 
+# Get files which are made by MyOCamlPackage function.
+# files returned this function are targeted in MyOCamlPackage, then
+# it can be used as dependency for any target.
+#
+#    name
+#        target package name
+#    has_cmodule
+#        flag to have C modules for this package whether true or false.
+# Example:
+#    OCamlPackageTargetFiles(hoge, true)
+#
+public.OCamlPackageTargetFiles(name, has_cmodule) =
+    protected.OBJ       = $(file $(name)$(EXT_OBJ))
+    protected.CMO       = $(file $(name).cmo)
+    protected.CMX       = $(file $(name).cmx)
+    protected.CMI       = $(file $(name).cmi)
+    protected.MLI       = $(file $(name).mli)
+
+    protected.BYTE_TARGETS   = $(CMO)
+    protected.NATIVE_TARGETS = $(CMX) $(OBJ)
+
+    protected.TARGETS = $(CMI)
+
+    if $(NATIVE_ENABLED)
+        TARGETS += $(NATIVE_TARGETS)
+        export
+
+    if $(BYTE_ENABLED)
+        TARGETS += $(BYTE_TARGETS)
+        export
+
+    if $(has_cmodule)
+        TARGETS += dll$(name).so lib$(name)$(EXT_LIB)
+        export
+
+    return $(TARGETS)
+
 # Add a rule for OCaml package $(name).cmo, $(name).cmx and etc.
 #    name
 #        target package name
@@ -527,7 +564,7 @@ public.MyOCamlPackage(name, files, cmodules, linkopts, is_install) =
    export OCAML_PACKAGE_FLAG
 
    # build rule for package
-   OCamlPackage($(name), $(files))
+   protected.TARGETS = $(OCamlPackage $(name), $(files))
 
    # add a rule for clean
    AutoClean()

@@ -77,7 +77,7 @@ INSTALL_FILES += $(ls *mli)
 MyOCamlPackage($(LIB), $(FILES), $(EMPTY), $(EMPTY), false)
 OCamlInstallParentPackage(sdlcaml, $(INSTALL_FILES))
 
-all: $(LIB).cmxa
+all: $(OCamlPackageTargetFiles $(LIB), false)
 .DEFAULT: all
 
 lib: all

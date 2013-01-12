@@ -2,7 +2,7 @@
 
 CAMLprim value gl_api_glAttachShader(value shader, value program) {
   CAMLparam2(shader, program);
-  glAttachShader(Int_val(shader), Int_val(program));
+  glAttachShader(Int_val(program), Int_val(shader));
   CAMLreturn(Val_unit);
 }
 
@@ -17,7 +17,7 @@ CAMLprim value gl_api_glBindAttribLocation(value program, value index, value nam
 
 CAMLprim value gl_api_glBindBuffer(value target, value buffer) {
   CAMLparam2(target, buffer);
-  #include "enums/buffer_type.inc"
+#include "enums/buffer_type.inc"
 
   glBindBuffer(buffer_type[Int_val(target)], Int_val(buffer));
 
@@ -50,11 +50,10 @@ CAMLprim value gl_api_glBindFramebuffer(value target, value buffer) {
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value gl_api_glBindRenderbuffer(value target, value buffer) {
-  CAMLparam2(target, buffer);
-#include "enums/render_buffer_type.inc"
+CAMLprim value gl_api_glBindRenderbuffer(value buffer) {
+  CAMLparam1(buffer);
 
-  glBindRenderbuffer(render_buffer_type[Int_val(target)], Int_val(buffer));
+  glBindRenderbuffer(GL_RENDERBUFFER, Int_val(buffer));
 
   CAMLreturn(Val_unit);
 }
@@ -67,10 +66,10 @@ CAMLprim value gl_api_glBindSampler(value target, value sampler) {
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value gl_api_glBindVertexArray(value vbo) {
-  CAMLparam1(vbo);
+CAMLprim value gl_api_glBindVertexArray(value vao) {
+  CAMLparam1(vao);
 
-  glBindVertexArray(Int_val(vbo));
+  glBindVertexArray(Int_val(vao));
 
   CAMLreturn(Val_unit);
 }
@@ -98,9 +97,9 @@ CAMLprim value gl_api_glBlendFuncSeparate(value src_rgb, value dst_rgb, value sr
 }
 
 CAMLprim value gl_api_glBlitFramebuffer_native(value sx0, value sy0, value sx1, value sy1,
-                                        value dx0, value dy0, value dx1, value dy1,
-                                        value mask, value filter) {
-  CAMLparam5(sx0, sy0, sx1, xy1, dx0);
+                                               value dx0, value dy0, value dx1, value dy1,
+                                               value mask, value filter) {
+  CAMLparam5(sx0, sy0, sx1, sy1, dx0);
   CAMLxparam5(dy0, dx1, dy1, mask, filter);
 
   CAMLreturn(Val_unit);
@@ -112,12 +111,13 @@ CAMLprim value gl_api_glBlitFramebuffer_bytecode(int argc, value* argv) {
                                          argv[8], argv[9]);
 }
 
-CAMLprim value gl_api_glBufferData(value target, value size, value usage) {
-  CAMLparam3(target, size, usage);
-#include "enums/buffer_data_type.inc"
+CAMLprim value gl_api_glBufferData(value target, value size, value data, value usage) {
+  CAMLparam4(target, size, data, usage);
+#include "enums/target_type.inc"
 #include "enums/usage_type.inc"
 
-  glBufferData(buffer_data_type[Int_val(target)], Int_val(size),
+  glBufferData(target_type[Int_val(target)], Int_val(size) * sizeof(float),
+               Caml_ba_data_val(data),
                usage_type[Int_val(usage)]);
 
   CAMLreturn(Val_unit);
@@ -126,10 +126,9 @@ CAMLprim value gl_api_glBufferData(value target, value size, value usage) {
 CAMLprim value gl_api_glBufferSubData(value target, value offset, value size,
                                       value data) {
   CAMLparam4(target, offset, size, data);
-#include "enums/buffer_data_type.inc"
-#include "enums/usage_type.inc"
+#include "enums/target_type.inc"
 
-  glBufferSubData(buffer_data_type[Int_val(target)], Int_val(offset),
+  glBufferSubData(target_type[Int_val(target)], Int_val(offset),
                   Int_val(size), Caml_ba_data_val(data));
 
   CAMLreturn(Val_unit);
@@ -140,10 +139,10 @@ CAMLprim value gl_api_glCheckFramebufferStatus(value query) {
 #include "enums/frame_buffer_type.inc"
 #include "enums/status_type.inc"
 
-  GLenum v = glCheckFramebufferStatus(frame_buffer_status_query_type[Int_val(query)]);
+  GLenum v = glCheckFramebufferStatus(frame_buffer_type[Int_val(query)]);
 
-  for (int i = 0; i < sizeof(frame_buffer_status_type) / sizeof(frame_buffer_status_type[0]); ++i) {
-    if (frame_buffer_status_type[i] == v) {
+  for (int i = 0; i < sizeof(status_type) / sizeof(status_type[0]); ++i) {
+    if (status_type[i] == v) {
       CAMLreturn(Val_int(i));
     }
   }
@@ -165,7 +164,7 @@ CAMLprim value gl_api_glClearBuffer_color(value drawbuffer, value r, value g, va
 
   float val[4] = {Double_val(r), Double_val(g), Double_val(b), Double_val(alpha)};
 
-  glClearBufferfv(GL_COLOR, GL_DRAWBUFFER0 + Int_val(drawbuffer),val);
+  glClearBufferfv(GL_COLOR, Int_val(drawbuffer), val);
 
   CAMLreturn(Val_unit);
 }
@@ -189,16 +188,16 @@ CAMLprim value gl_api_glClearBuffer_stencil(value val) {
 
 CAMLprim value gl_api_glCompileShader(value shader) {
   CAMLparam1(shader);
-  glCompileShader(shader);
+  glCompileShader(Int_val(shader));
   CAMLreturn(Val_unit);
 }
 
 CAMLprim value gl_api_glCopyBufferSubData(value read, value write, value readoffset,
                                           value writeoffset, value size) {
   CAMLparam5(read, write, readoffset, writeoffset, size);
-#include "enums/buffer_data_type.inc"
+#include "enums/target_type.inc"
 
-  glCopyBufferSubData(buffer_data_type[Int_val(read)], buffer_data_type[Int_val(write)],
+  glCopyBufferSubData(target_type[Int_val(read)], target_type[Int_val(write)],
                       Int_val(readoffset), Int_val(writeoffset), Int_val(size));
   CAMLreturn(Val_unit);
 }
@@ -211,10 +210,11 @@ CAMLprim value gl_api_glCreateProgram(value unit) {
   CAMLreturn(Val_int(program));
 }
 
-CAMLprim value gl_api_glCreateShader(value unit) {
-  CAMLparam1(unit);
+CAMLprim value gl_api_glCreateShader(value type) {
+  CAMLparam1(type);
+#include "enums/shader_type.inc"
 
-  GLuint shader = glCreateShader();
+  GLuint shader = glCreateShader(shader_type[Int_val(type)]);
 
   CAMLreturn(Val_int(shader));
 }
@@ -354,21 +354,52 @@ CAMLprim value gl_api_glDisableVertexAttribArray(value index) {
 CAMLprim value gl_api_glFlushMappedBufferRange(value target, value offset, value length) {
   CAMLparam3(target, offset, length);
 
-#include "enums/buffer_data_type.inc"
+#include "enums/target_type.inc"
 
-  glFlushMappedBufferRange(buffer_data_type[Int_val(target)], Int_val(offset), Int_val(length));
+  glFlushMappedBufferRange(target_type[Int_val(target)], Int_val(offset), Int_val(length));
 
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value gl_api_glFramebufferRenderbuffer(value target, value attachment, value render) {
+CAMLprim value gl_api_glFramebufferRenderbuffer_attachment(value target, value attachment, value render) {
   CAMLparam3(target, attachment, render);
 #include "enums/frame_buffer_type.inc"
-  #include "enums/attachment_type.inc"
-
 
   glFramebufferRenderbuffer(frame_buffer_type[Int_val(target)],
-                            attachment_type[Int_val(attachment)], GL_RENDERBUFFER,
+                            GL_COLOR_ATTACHMENT0 + Int_val(attachment), GL_RENDERBUFFER,
+                            Int_val(render));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glFramebufferRenderbuffer_depth(value target, value render) {
+  CAMLparam2(target, render);
+#include "enums/frame_buffer_type.inc"
+
+  glFramebufferRenderbuffer(frame_buffer_type[Int_val(target)],
+                            GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
+                            Int_val(render));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glFramebufferRenderbuffer_stencil(value target, value render) {
+  CAMLparam2(target, render);
+#include "enums/frame_buffer_type.inc"
+
+  glFramebufferRenderbuffer(frame_buffer_type[Int_val(target)],
+                            GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
+                            Int_val(render));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glFramebufferRenderbuffer_depth_stencil(value target, value render) {
+  CAMLparam2(target, render);
+#include "enums/frame_buffer_type.inc"
+
+  glFramebufferRenderbuffer(frame_buffer_type[Int_val(target)],
+                            GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
                             Int_val(render));
 
   CAMLreturn(Val_unit);
@@ -413,7 +444,7 @@ CAMLprim value gl_api_glFramebufferTextureLayer_stencil(
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value gl_api_glFramebufferTextureLayer_stencil(
+CAMLprim value gl_api_glFramebufferTextureLayer_depth_stencil(
     value target, value texture, value level, value layer) {
 
   CAMLparam4(target, texture, level, layer);
@@ -426,6 +457,31 @@ CAMLprim value gl_api_glFramebufferTextureLayer_stencil(
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value gl_api_glGenBuffer(value unit) {
+  CAMLparam1(unit);
+
+  GLuint buffer;
+  glGenBuffers(1, &buffer);
+
+  CAMLreturn(Val_int(buffer));
+}
+
+CAMLprim value gl_api_glGenBuffers(value size) {
+  CAMLparam1(size);
+  CAMLlocal1(list);
+
+  list = Val_unit;
+
+  GLuint *buffer =  malloc(Int_val(size) * sizeof(GLuint));
+  glGenBuffers(Int_val(size), buffer);
+
+  for (int i = 0; i < Int_val(size); ++i) {
+    list = add_head(list, Val_int(buffer[i]));
+  }
+  free(buffer);
+
+  CAMLreturn(list);
+}
 
 CAMLprim value gl_api_glGenFramebuffer(value unit) {
   CAMLparam1(unit);
@@ -530,7 +586,7 @@ CAMLprim value gl_api_glGenVertexArrays(value size) {
 CAMLprim value gl_api_glGenerateMipmap(value target) {
   CAMLparam1(target);
 
-  #include "enums/mipmap_type.inc"
+#include "enums/mipmap_type.inc"
   glGenerateMipmap(mipmap_type[Int_val(target)]);
 
   CAMLreturn(Val_unit);
@@ -561,7 +617,7 @@ CAMLprim value gl_api_glGetActiveAttrib_type(value program, value index) {
 #include "enums/attrib_type.inc"
 
   for (int i = 0; i < sizeof(attrib_type) / sizeof(attrib_type[0]); ++i) {
-    if (attrib_type[i] == v) {
+    if (attrib_type[i] == type) {
       CAMLreturn(Val_int(i));
     }
   }
@@ -602,7 +658,7 @@ CAMLprim value gl_api_glGetActiveUniform_type(value program, value index) {
 #include "enums/attrib_type.inc"
 
   for (int i = 0; i < sizeof(attrib_type) / sizeof(attrib_type[0]); ++i) {
-    if (attrib_type[i] == v) {
+    if (attrib_type[i] == type) {
       CAMLreturn(Val_int(i));
     }
   }
@@ -618,7 +674,7 @@ CAMLprim value gl_api_glGetActiveUniform_name(value program, value index) {
   glGetActiveUniform(Int_val(program), Int_val(index), 0, &length, NULL, NULL, NULL);
   GLchar* str = malloc((length + 1) * sizeof(GLchar));
   glGetActiveUniform(Int_val(program), Int_val(index), length + 1, NULL, NULL, NULL,
-                    str);
+                     str);
 
   string = caml_copy_string(str);
   free(str);
@@ -631,7 +687,7 @@ CAMLprim value gl_api_glGetActiveUniformBlock(value program, value index, value 
 #include "enums/uniform_block_type.inc"
   GLint param;
   glGetActiveUniformBlockiv(Int_val(program), Int_val(index),
-                          uniform_block_type[Int_val(pname)], &param);
+                            uniform_block_type[Int_val(pname)], &param);
 
   CAMLreturn(Val_int(param));
 }
@@ -649,7 +705,7 @@ CAMLprim value gl_api_glGetActiveUniformBlock_indices(value program, value index
 
   res = alloc_bigarray_dims(
       BIGARRAY_INT32 | BIGARRAY_C_LAYOUT | BIGARRAY_MANAGED,
-      1, mask, length);
+      1, params, length);
 
   CAMLreturn(res);
 }
@@ -670,7 +726,7 @@ CAMLprim value gl_api_glGetActiveUniformBlockName(value program, value index) {
   CAMLreturn(string);
 }
 
-CAMLprim value gl_api_glGetActiveUniformName(value unit) {
+CAMLprim value gl_api_glGetActiveUniformName(value program, value index) {
   CAMLparam2(program, index);
   CAMLlocal1(string);
 
@@ -679,7 +735,7 @@ CAMLprim value gl_api_glGetActiveUniformName(value unit) {
                               &length, NULL);
   GLchar* str = malloc(length * sizeof(GLchar));
   glGetActiveUniformName(Int_val(program), Int_val(index), length,
-                              NULL, str);
+                         NULL, str);
   string = caml_copy_string(str);
   free(str);
 
@@ -693,11 +749,11 @@ CAMLprim value gl_api_glGetActiveUniforms_type(value program, value index) {
 
   GLuint v_index = Int_val(index);
   GLint param;
-  glGetActiveUniforms(Int_val(program), 1, &v_index, GL_UNIFORM_TYPE,
-                      &param);
+  glGetActiveUniformsiv(Int_val(program), 1, &v_index, GL_UNIFORM_TYPE,
+                        &param);
 
   for (int i = 0; i < sizeof(uniform_type) / sizeof(uniform_type[0]); ++i) {
-    if (uniform_type[i] == v) {
+    if (uniform_type[i] == param) {
       CAMLreturn(Val_int(i));
     }
   }
@@ -712,11 +768,11 @@ CAMLprim value gl_api_glGetAttachedShaders(value program) {
 
   GLint shaders;
   GLint count;
-  glGetProgram(Int_val(program), GL_ATTACHED_SHADERS, &shaders);
+  glGetProgramiv(Int_val(program), GL_ATTACHED_SHADERS, &shaders);
 
-  GLint *shader = malloc(count * sizeof(GLint));
+  GLuint *shader = malloc(count * sizeof(GLuint));
 
-  glGetAttachedShaders(Int_val(program), shaders, &count, &shader);
+  glGetAttachedShaders(Int_val(program), shaders, &count, shader);
   for (int i = 0; i < count; ++i) {
     list = add_head(list, Val_int(shader[i]));
   }
@@ -763,7 +819,7 @@ CAMLprim value gl_api_glGetBufferParameter_mapped(value target) {
 
 CAMLprim value gl_api_glGetBufferParameter_size(value target) {
   CAMLparam1(target);
-  #include "enums/buffer_type.inc"
+#include "enums/buffer_type.inc"
 
   GLint data;
   glGetBufferParameteriv(buffer_type[Int_val(target)], GL_BUFFER_SIZE,
@@ -782,7 +838,7 @@ CAMLprim value gl_api_glGetBufferParameter_usage(value target) {
   glGetBufferParameteriv(buffer_type[Int_val(target)], GL_BUFFER_MAPPED,
                          &data);
   for (int i = 0; i < sizeof(buffer_usage_type) / sizeof(buffer_usage_type[0]); ++i) {
-    if (access_type[i] == data) {
+    if (buffer_usage_type[i] == data) {
       CAMLreturn(Val_int(i));
     }
   }
@@ -825,9 +881,9 @@ CAMLprim value gl_api_glGetMultisample(value index) {
   CAMLlocal1(res);
   res = caml_alloc(2, 0);
   float v[2];
-  glGetMultisample(GL_SAMPLE_POSITION, Int_val(index), v);
-  Store_field(res, 0, caml_Double_val(v[0]));
-  Store_field(res, 1, caml_Double_val(v[1]));
+  glGetMultisamplefv(GL_SAMPLE_POSITION, Int_val(index), v);
+  Store_field(res, 0, caml_copy_double(v[0]));
+  Store_field(res, 1, caml_copy_double(v[1]));
   CAMLreturn(res);
 }
 
@@ -835,10 +891,10 @@ CAMLprim value gl_api_glGetProgramInfoLog(value program) {
   CAMLparam1(program);
   CAMLlocal1(res);
   GLsizei length;
-  glGetProgramInfoLog(Int_val(program), 0, &length, NULL);
+  glGetProgramiv(Int_val(program), GL_INFO_LOG_LENGTH, &length);
   GLchar* string = malloc(length * sizeof(GLchar));
 
-  glGetProgramInfoLog(Int_val(program), length, NULL, string);
+  glGetProgramInfoLog(Int_val(program), length, &length, string);
   res = caml_copy_string(string);
   free(string);
 
@@ -849,11 +905,11 @@ CAMLprim value gl_api_glGetRenderbufferParameter(value param) {
   CAMLparam1(param);
   GLint data;
 
-  #include "enums/renderbuffer_parameter_type.inc"
+#include "enums/renderbuffer_parameter_type.inc"
 
-  glGetRenderbufferParameter(GL_RENDERBUFFER,
-                             renderbuffer_parameter_type[Int_val(param)],
-                             &data);
+  glGetRenderbufferParameteriv(GL_RENDERBUFFER,
+                               renderbuffer_parameter_type[Int_val(param)],
+                               &data);
 
   CAMLreturn(Val_int(data));
 }
@@ -912,7 +968,7 @@ CAMLprim value gl_api_glGetSamplerParameter_wrap(value sampler, value pname) {
 }
 
 CAMLprim value gl_api_glGetSamplerParameter_compare_mode(value sampler) {
-  CAMLparam1(param);
+  CAMLparam1(sampler);
 #include "enums/sampler_compare_mode.inc"
   GLint data;
   glGetSamplerParameteriv(Int_val(sampler), GL_TEXTURE_COMPARE_MODE, &data);
@@ -926,7 +982,7 @@ CAMLprim value gl_api_glGetSamplerParameter_compare_mode(value sampler) {
 }
 
 CAMLprim value gl_api_glGetSamplerParameter_compare_func(value sampler) {
-  CAMLparam1(param);
+  CAMLparam1(sampler);
 #include "enums/sampler_compare_func.inc"
   GLint data;
   glGetSamplerParameteriv(Int_val(sampler), GL_TEXTURE_COMPARE_FUNC, &data);
@@ -939,15 +995,30 @@ CAMLprim value gl_api_glGetSamplerParameter_compare_func(value sampler) {
   CAMLreturn(Val_int(0));
 }
 
+CAMLprim value gl_api_glGetSamplerParameter_color(value sampler) {
+  CAMLparam1(sampler);
+  CAMLlocal1(res);
+  GLfloat data[4];
+  glGetSamplerParameterfv(Int_val(sampler), GL_TEXTURE_COMPARE_FUNC, data);
+
+  res = caml_alloc(4, 0);
+  Store_field(res, 0, caml_copy_double(data[0]));
+  Store_field(res, 1, caml_copy_double(data[1]));
+  Store_field(res, 2, caml_copy_double(data[2]));
+  Store_field(res, 3, caml_copy_double(data[3]));
+
+  CAMLreturn(res);
+}
+
 CAMLprim value gl_api_glGetShader_type(value shader) {
   CAMLparam1(shader);
 
   GLint type;
 #include "enums/shader_type.inc"
-  glGetShader(Int_val(shader), GL_SHADER_TYPE, &type);
+  glGetShaderiv(Int_val(shader), GL_SHADER_TYPE, &type);
 
   for (int i = 0; i < sizeof(shader_type) / sizeof(shader_type[0]); ++i) {
-    if (shader_type[i] == data) {
+    if (shader_type[i] == type) {
       CAMLreturn(Val_int(i));
     }
   }
@@ -959,7 +1030,7 @@ CAMLprim value gl_api_glGetShader_bool(value shader, value pname) {
 #include "enums/get_shader_bool.inc"
 
   GLint data;
-  glGetShader(Int_val(shader), get_shader_bool[Int_val(pname)], &data);
+  glGetShaderiv(Int_val(shader), get_shader_bool[Int_val(pname)], &data);
 
   CAMLreturn(Val_bool(data));
 }
@@ -969,7 +1040,7 @@ CAMLprim value gl_api_glGetShader_int(value shader, value pname) {
 #include "enums/get_shader_int.inc"
 
   GLint data;
-  glGetShader(Int_val(shader), get_shader_int[Int_val(pname)], &data);
+  glGetShaderiv(Int_val(shader), get_shader_int[Int_val(pname)], &data);
 
   CAMLreturn(Val_int(data));
 }
@@ -979,7 +1050,7 @@ CAMLprim value gl_api_glGetShaderInfoLog(value shader) {
   CAMLlocal1(string);
 
   GLsizei length;
-  glGetShaderInfoLog(Int_val(shader), 0, &length, NULL);
+  glGetShaderiv(Int_val(shader), GL_INFO_LOG_LENGTH, &length);
   GLchar *str = malloc(length * sizeof(GLchar));
   glGetShaderInfoLog(Int_val(shader), length, NULL, str);
   string = caml_copy_string(str);
@@ -1164,7 +1235,7 @@ CAMLprim value gl_api_glGetUniformBlockIndex(value program, value name) {
 
 CAMLprim value gl_api_glGetUniformIndices(value program, value names, value count) {
   CAMLparam3(program, names, count);
-  CAMLlocal1(v, res);
+  CAMLlocal2(v, res);
 
   GLchar** uniform_names = malloc(Int_val(count) * sizeof(GLchar*));
   for (int i = 0; i < Int_val(count); ++i) {
@@ -1172,8 +1243,8 @@ CAMLprim value gl_api_glGetUniformIndices(value program, value names, value coun
     names = tail(names);
     uniform_names[i] = String_val(v);
   }
-  GLint* indices = malloc(Int_val(count) * sizeof(GLint));
-  glGetUniformIndices(Int_val(program), Int_val(count), uniform_names, indices);
+  GLuint* indices = malloc(Int_val(count) * sizeof(GLuint));
+  glGetUniformIndices(Int_val(program), Int_val(count), (const char**)uniform_names, indices);
 
   res = Val_unit;
   for (int i = 0; i < Int_val(count); ++i) {
@@ -1205,6 +1276,7 @@ CAMLprim value gl_api_glGetVertexAttrib_bool(value index, value pname) {
 
 CAMLprim value gl_api_glGetVertexAttrib_int(value index, value pname) {
   CAMLparam2(index, pname);
+#include "enums/get_vertex_attrib_int.inc"
 
   GLint v;
   glGetVertexAttribiv(Int_val(index), get_vertex_attrib_int[Int_val(pname)], &v);
@@ -1285,15 +1357,16 @@ CAMLprim value gl_api_glIsVertexArray(value vbo) {
 
 CAMLprim value gl_api_glLinkProgram(value program) {
   CAMLparam1(program);
+
   glLinkProgram(Int_val(program));
 
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value gl_api_glMultiDrawElements(value draw_mode, value elements_type, value list,
+CAMLprim value gl_api_glMultiDrawElements(value mode, value elements_type, value list,
                                           value primcount) {
-  CAMLparam4(draw_mode, elements_type, list, primcount);
-  CAMLlocal1(v, t);
+  CAMLparam4(mode, elements_type, list, primcount);
+  CAMLlocal2(v, t);
   v = list;
 #include "enums/draw_mode.inc"
 #include "enums/draw_elements_type.inc"
@@ -1315,8 +1388,8 @@ CAMLprim value gl_api_glMultiDrawElements(value draw_mode, value elements_type, 
     v = tail(v);
   }
 
-  glMultiDrawElements(draw_mode[Int_val(draw_mode)], sizes,
-                      elements_type[Int_val(elements_type)], datas, Int_val(primcount));
+  glMultiDrawElements(draw_mode[Int_val(mode)], sizes,
+                      draw_elements_type[Int_val(elements_type)], (const void**)datas, Int_val(primcount));
 
   free(datas);
   free(sizes);
@@ -1326,17 +1399,17 @@ CAMLprim value gl_api_glMultiDrawElements(value draw_mode, value elements_type, 
 CAMLprim value gl_api_glPointParameter(value val) {
   CAMLparam1(val);
 
-  glPointParameter(GL_POINT_FADE_THRESHOLD_SIZE, Double_val(val));
+  glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, Double_val(val));
 
   CAMLreturn(Val_unit);
 }
 
 CAMLprim value gl_api_glPointParameter_coord(value param) {
   CAMLparam1(param);
-#include "enums/coord_origiin.inc"
+#include "enums/coord_origin.inc"
 
-  glPointParameter(GL_POINT_SPRITE_COORD_ORIGIN,
-                   coord_origin[Int_val(param)]);
+  glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN,
+                    coord_origin[Int_val(param)]);
 
   CAMLreturn(Val_unit);
 }
@@ -1361,7 +1434,7 @@ CAMLprim value gl_api_glRenderbufferStorageMultisample(value samples, value inte
   CAMLparam4(samples, internalformat, width, height);
 #include "enums/internal_format.inc"
 
-  glRenderbufferStorateMultisample(GL_RENDERBUFFER, Int_val(samples),
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, Int_val(samples),
                                    internal_format[Int_val(internalformat)],
                                    Int_val(width), Int_val(height));
 
@@ -1378,10 +1451,10 @@ CAMLprim value gl_api_glSampleMask(value masknumber, value mask) {
 
 CAMLprim value gl_api_glSamplerParameter(value sampler, value pname, value val) {
   CAMLparam3(sampler, pname, val);
-#include "enums/sampler_parameter_int.inc"
+#include "enums/sampler_lod_type.inc"
 
-  glSamplerParameteri(Int_val(sampler), sampler_parameter_int[Int_val(pname)],
-                     Int_val(val))
+  glSamplerParameteri(Int_val(sampler), sampler_lod_type[Int_val(pname)],
+                      Int_val(val));
 
   CAMLreturn(Val_unit);
 }
@@ -1391,7 +1464,7 @@ CAMLprim value gl_api_glShaderSource(value shader, value source) {
 
   const char* c = String_val(source);
   int length = caml_string_length(source);
-  glShaderSource(Int_val(shader), 1, String_val(source), &length);
+  glShaderSource(Int_val(shader), 1 , &c, &length);
 
   CAMLreturn(Val_unit);
 }
@@ -1441,7 +1514,7 @@ CAMLprim value gl_api_glTexBuffer(value internalformat, value buffer) {
 CAMLprim value gl_api_glTransformFeedbackVaryings(value program, value varyings,
                                                   value buffer_mode) {
   CAMLparam3(program, varyings, buffer_mode);
-  CAMLlocal1(tmp, tmp_list);
+  CAMLlocal2(tmp, tmp_list);
 #include "enums/transform_buffer_mode.inc"
 
   tmp_list = varyings;
@@ -1457,7 +1530,7 @@ CAMLprim value gl_api_glTransformFeedbackVaryings(value program, value varyings,
   }
 
   glTransformFeedbackVaryings(Int_val(program), count,
-                              strings, transform_buffer_mode[Int_val(buffer_mode)]);
+                              (const GLchar**)strings, transform_buffer_mode[Int_val(buffer_mode)]);
 
   CAMLreturn(Val_unit);
 }
@@ -1511,7 +1584,7 @@ CAMLprim value gl_api_glUniform2ui(value location, value val) {
   CAMLparam2(location, val);
 
   glUniform2ui(Int_val(location), Int_val(Field(val, 0)),
-              Int_val(Field(val, 1)));
+               Int_val(Field(val, 1)));
 
   CAMLreturn(Val_unit);
 }
@@ -1520,7 +1593,7 @@ CAMLprim value gl_api_glUniform3ui(value location, value val) {
   CAMLparam2(location, val);
 
   glUniform3ui(Int_val(location), Int_val(Field(val, 0)),
-              Int_val(Field(val, 1)), Int_val(Field(val, 2)));
+               Int_val(Field(val, 1)), Int_val(Field(val, 2)));
 
   CAMLreturn(Val_unit);
 }
@@ -1529,8 +1602,8 @@ CAMLprim value gl_api_glUniform4ui(value location, value val) {
   CAMLparam2(location, val);
 
   glUniform4ui(Int_val(location), Int_val(Field(val, 0)),
-              Int_val(Field(val, 1)), Int_val(Field(val, 2)),
-              Int_val(Field(val, 3)));
+               Int_val(Field(val, 1)), Int_val(Field(val, 2)),
+               Int_val(Field(val, 3)));
 
   CAMLreturn(Val_unit);
 }
@@ -1571,7 +1644,7 @@ CAMLprim value gl_api_glUniformMatrix2x3(value location, value transpose, value 
 
   int count = Caml_ba_array_val(val)->dim[0];
   glUniformMatrix2x3fv(Int_val(location), count, gl_transpose,
-                         Caml_ba_data_val(val));
+                       Caml_ba_data_val(val));
 
   CAMLreturn(Val_unit);
 }
@@ -1585,7 +1658,7 @@ CAMLprim value gl_api_glUniformMatrix3x2(value location, value transpose, value 
 
   int count = Caml_ba_array_val(val)->dim[0];
   glUniformMatrix2x3fv(Int_val(location), count, gl_transpose,
-                         Caml_ba_data_val(val));
+                       Caml_ba_data_val(val));
 
   CAMLreturn(Val_unit);
 
@@ -1600,7 +1673,7 @@ CAMLprim value gl_api_glUniformMatrix2x4(value location, value transpose, value 
 
   int count = Caml_ba_array_val(val)->dim[0];
   glUniformMatrix2x4fv(Int_val(location), count, gl_transpose,
-                         Caml_ba_data_val(val));
+                       Caml_ba_data_val(val));
 
   CAMLreturn(Val_unit);
 }
@@ -1614,7 +1687,7 @@ CAMLprim value gl_api_glUniformMatrix4x2(value location, value transpose, value 
 
   int count = Caml_ba_array_val(val)->dim[0];
   glUniformMatrix4x2fv(Int_val(location), count, gl_transpose,
-                         Caml_ba_data_val(val));
+                       Caml_ba_data_val(val));
 
   CAMLreturn(Val_unit);
 }
@@ -1628,7 +1701,7 @@ CAMLprim value gl_api_glUniformMatrix3x4(value location, value transpose, value 
 
   int count = Caml_ba_array_val(val)->dim[0];
   glUniformMatrix3x4fv(Int_val(location), count, gl_transpose,
-                         Caml_ba_data_val(val));
+                       Caml_ba_data_val(val));
 
   CAMLreturn(Val_unit);
 }
@@ -1642,13 +1715,13 @@ CAMLprim value gl_api_glUniformMatrix4x3(value location, value transpose, value 
 
   int count = Caml_ba_array_val(val)->dim[0];
   glUniformMatrix4x3fv(Int_val(location), count, gl_transpose,
-                         Caml_ba_data_val(val));
+                       Caml_ba_data_val(val));
 
   CAMLreturn(Val_unit);
 }
 
 CAMLprim value gl_api_glUniformBlockBinding(value program, value index, value binding) {
-  CAMLparam1(program, index, binding);
+  CAMLparam3(program, index, binding);
 
   glUniformBlockBinding(Int_val(program), Int_val(index), Int_val(binding));
 
@@ -1674,7 +1747,7 @@ CAMLprim value gl_api_glValidateProgram(value program) {
 CAMLprim value gl_api_glVertexAttribf(value index, value data) {
   CAMLparam2(index, data);
 
-  int count = Caml_ba_array_val(val)->dim[0];
+  int count = Caml_ba_array_val(data)->dim[0];
   switch (count) {
     case 1:
       glVertexAttrib1fv(Int_val(index), Caml_ba_data_val(data));
@@ -1696,19 +1769,19 @@ CAMLprim value gl_api_glVertexAttribf(value index, value data) {
 CAMLprim value gl_api_glVertexAttribi(value index, value data) {
   CAMLparam2(index, data);
 
-  int count = Caml_ba_array_val(val)->dim[0];
+  int count = Caml_ba_array_val(data)->dim[0];
   switch (count) {
     case 1:
-      glVertexAttrib1iv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI1iv(Int_val(index), Caml_ba_data_val(data));
       break;
     case 2:
-      glVertexAttrib2iv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI2iv(Int_val(index), Caml_ba_data_val(data));
       break;
     case 3:
-      glVertexAttrib3iv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI3iv(Int_val(index), Caml_ba_data_val(data));
       break;
     case 4:
-      glVertexAttrib4iv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI4iv(Int_val(index), Caml_ba_data_val(data));
       break;
   }
 
@@ -1717,19 +1790,19 @@ CAMLprim value gl_api_glVertexAttribi(value index, value data) {
 CAMLprim value gl_api_glVertexAttribui(value index, value data) {
   CAMLparam2(index, data);
 
-  int count = Caml_ba_array_val(val)->dim[0];
+  int count = Caml_ba_array_val(data)->dim[0];
   switch (count) {
     case 1:
-      glVertexAttrib1uiv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI1uiv(Int_val(index), Caml_ba_data_val(data));
       break;
     case 2:
-      glVertexAttrib2uiv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI2uiv(Int_val(index), Caml_ba_data_val(data));
       break;
     case 3:
-      glVertexAttrib3uiv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI3uiv(Int_val(index), Caml_ba_data_val(data));
       break;
     case 4:
-      glVertexAttrib4uiv(Int_val(index), Caml_ba_data_val(data));
+      glVertexAttribI4uiv(Int_val(index), Caml_ba_data_val(data));
       break;
   }
 
@@ -1739,7 +1812,7 @@ CAMLprim value gl_api_glVertexAttribui(value index, value data) {
 CAMLprim value gl_api_glVertexAttribs(value index, value data) {
   CAMLparam2(index, data);
 
-  int count = Caml_ba_array_val(val)->dim[0];
+  int count = Caml_ba_array_val(data)->dim[0];
   switch (count) {
     case 1:
       glVertexAttrib1sv(Int_val(index), Caml_ba_data_val(data));
@@ -1757,32 +1830,10 @@ CAMLprim value gl_api_glVertexAttribs(value index, value data) {
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value gl_api_glVertexAttribus(value index, value data) {
-  CAMLparam2(index, data);
-
-  int count = Caml_ba_array_val(val)->dim[0];
-  switch (count) {
-    case 1:
-      glVertexAttrib1usv(Int_val(index), Caml_ba_data_val(data));
-      break;
-    case 2:
-      glVertexAttrib2usv(Int_val(index), Caml_ba_data_val(data));
-      break;
-    case 3:
-      glVertexAttrib3usv(Int_val(index), Caml_ba_data_val(data));
-      break;
-    case 4:
-      glVertexAttrib4usv(Int_val(index), Caml_ba_data_val(data));
-      break;
-  }
-
-  CAMLreturn(Val_unit);
-}
-
 CAMLprim value gl_api_glVertexAttribd(value index, value data) {
   CAMLparam2(index, data);
 
-  int count = Caml_ba_array_val(val)->dim[0];
+  int count = Caml_ba_array_val(data)->dim[0];
   switch (count) {
     case 1:
       glVertexAttrib1dv(Int_val(index), Caml_ba_data_val(data));
@@ -1807,4 +1858,179 @@ CAMLprim value gl_api_glVertexAttribDivisor(value index, value divisor) {
   glVertexAttribDivisor(Int_val(index), Int_val(divisor));
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glVertexAttribPointer(value index, value size,
+                                            value vert_type, value normalize,
+                                            value stride) {
+  CAMLparam5(index, size, vert_type, normalize, stride);
+#include "enums/vertattr_type.inc"
+
+  glVertexAttribPointer(Int_val(index), Int_val(size),
+                        vertattr_type[Int_val(vert_type)], Bool_val(normalize),
+                        Int_val(stride), NULL);
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_type_color(
+    value target, value num) {
+
+  CAMLparam2(target, num);
+#include "enums/frame_buffer_type.inc"
+#include "enums/attachment_object_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+      GL_COLOR_ATTACHMENT0 + Int_val(num), GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+      &param);
+
+  for (int i = 0; i < sizeof(attachment_object_type) / sizeof(attachment_object_type[0]); ++i) {
+  if (attachment_object_type[i] == param) {
+  CAMLreturn(Val_int(i));
+}
+}
+
+  CAMLreturn(Val_int(0));
+}
+
+  CAMLprim value gl_api_glGetFramebufferAttachmentParameter_type_other(
+  value target, value attachment) {
+
+  CAMLparam2(target, attachment);
+#include "enums/frame_buffer_type.inc"
+#include "enums/attachment_type.inc"
+#include "enums/attachment_object_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+                                        attachment_type[Int_val(attachment)], GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+                                        &param);
+
+  for (int i = 0; i < sizeof(attachment_object_type) / sizeof(attachment_object_type[0]); ++i) {
+    if (attachment_object_type[i] == param) {
+      CAMLreturn(Val_int(i));
+    }
+  }
+
+  CAMLreturn(Val_int(0));
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_int_color(
+    value target, value num, value pname) {
+
+  CAMLparam3(target, num, pname);
+#include "enums/frame_buffer_type.inc"
+#include "enums/get_attachment_int.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+      GL_COLOR_ATTACHMENT0 + Int_val(num),
+      get_attachment_int[Int_val(pname)], &param);
+
+  CAMLreturn(Val_int(param));
+}
+
+  CAMLprim value gl_api_glGetFramebufferAttachmentParameter_int_other(
+  value target, value attachment, value pname) {
+
+  CAMLparam3(target, attachment, pname);
+#include "enums/frame_buffer_type.inc"
+#include "enums/get_attachment_int.inc"
+#include "enums/attachment_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+                                        attachment_type[Int_val(attachment)],
+                                        get_attachment_int[Int_val(pname)], &param);
+
+  CAMLreturn(Val_int(param));
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_component_color(
+    value target, value num) {
+
+  CAMLparam2(target, num);
+#include "enums/frame_buffer_type.inc"
+#include "enums/attachment_component_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+      GL_COLOR_ATTACHMENT0 + Int_val(num),
+      GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE,
+      &param);
+
+  for (int i = 0; i < sizeof(attachment_component_type) / sizeof(attachment_component_type[0]); ++i) {
+  if (attachment_component_type[i] == param) {
+  CAMLreturn(Val_int(i));
+}
+}
+
+  CAMLreturn(Val_int(0));
+}
+
+  CAMLprim value gl_api_glGetFramebufferAttachmentParameter_component_other(
+  value target, value attachment) {
+
+  CAMLparam2(target, attachment);
+#include "enums/frame_buffer_type.inc"
+#include "enums/attachment_component_type.inc"
+#include "enums/attachment_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+                                        attachment_type[Int_val(attachment)],
+                                        GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE,
+                                        &param);
+
+  for (int i = 0; i < sizeof(attachment_component_type) / sizeof(attachment_component_type[0]); ++i) {
+    if (attachment_component_type[i] == param) {
+      CAMLreturn(Val_int(i));
+    }
+  }
+
+  CAMLreturn(Val_int(0));
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_encoding_color(
+    value target, value num) {
+
+  CAMLparam2(target, num);
+#include "enums/frame_buffer_type.inc"
+#include "enums/attachment_encoding_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+      GL_COLOR_ATTACHMENT0 + Int_val(num),
+      GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
+
+  for (int i = 0; i < sizeof(attachment_encoding_type) / sizeof(attachment_encoding_type[0]); ++i) {
+  if (attachment_encoding_type[i] == param) {
+  CAMLreturn(Val_int(i));
+}
+}
+
+  CAMLreturn(Val_int(0));
+}
+
+  CAMLprim value gl_api_glGetFramebufferAttachmentParameter_encoding_other(
+  value target, value attachment) {
+
+  CAMLparam2(target, attachment);
+#include "enums/frame_buffer_type.inc"
+#include "enums/attachment_encoding_type.inc"
+#include "enums/attachment_type.inc"
+
+  GLint param;
+  glGetFramebufferAttachmentParameteriv(frame_buffer_type[Int_val(target)],
+                                        attachment_type[Int_val(attachment)],
+                                        GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
+
+  for (int i = 0; i < sizeof(attachment_encoding_type) / sizeof(attachment_encoding_type[0]); ++i) {
+    if (attachment_encoding_type[i] == param) {
+      CAMLreturn(Val_int(i));
+    }
+  }
+
+  CAMLreturn(Val_int(0));
 }

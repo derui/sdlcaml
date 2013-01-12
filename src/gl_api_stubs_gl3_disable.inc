@@ -248,6 +248,18 @@ CAMLprim value gl_api_glFramebufferTextureLayer_depth_stencil(value unit) {
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value gl_api_glGenBuffer(value unit) {
+  CAMLparam1(unit);
+  caml_failwith("gl_api_glGenBuffer can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGenBuffers(value size) {
+  CAMLparam1(size);
+  caml_failwith("gl_api_glGenBuffers can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value gl_api_glGenFramebuffer(value unit) {
   CAMLparam1(unit);
   caml_failwith("gl_api_glGenFramebuffer can not use if OpenGL3.* option did not set.");
@@ -947,5 +959,70 @@ CAMLprim value gl_api_glVertexAttribd(value unit) {
 CAMLprim value gl_api_glVertexAttribDivisor(value unit) {
   CAMLparam1(unit);
   caml_failwith("gl_api_glVertexAttribDivisor can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glVertexAttribPointer(value index,
+                                            value vert_type, value normalize,
+                                            value stride) {
+  CAMLparam4(index, vert_type, normalize, stride);
+  caml_failwith("gl_api_glVertexAttribPointer can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_type_color(
+    value target, value num) {
+
+  CAMLparam2(target, num);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_type_color can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_type_other(
+    value target, value attachment) {
+  CAMLparam2(target, num);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_type_other can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_int_color(
+    value target, value num, value pname) {
+  CAMLparam3(target, num, pname);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_int_color can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_int_other(
+    value target, value num, value pname) {
+  CAMLparam3(target, num, pname);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_int_other can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_component_color(
+    value target, value num) {
+  CAMLparam2(target, num);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_component_color can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_component_other(
+    value target, value attachment) {
+  CAMLparam2(target, attachment);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_component_other can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_encoding_color(
+    value target, value num) {
+  CAMLparam2(target, num);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_encoding_color can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value gl_api_glGetFramebufferAttachmentParameter_encoding_other(
+    value target, value attachment) {
+  CAMLparam2(target, attachment);
+  caml_failwith("gl_api_glGetFramebufferAttachmentParameter_encoding_other can not use if OpenGL3.* option did not set.");
   CAMLreturn(Val_unit);
 }

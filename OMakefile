@@ -53,8 +53,6 @@ INSTALLED = $(BIG_ROOT)/installed
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
-#    glMlite
-#    pack2
 #
 if $(not $(OCAMLFIND_EXISTS))
     eprintln(This project requires ocamlfind, but is was not found.)

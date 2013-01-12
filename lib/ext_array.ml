@@ -8,5 +8,4 @@ let remove origin ~index ~init =
   Array.blit origin second_pos new_array ((Array.length new_array) - 1) second_length;
   new_array
 
-
 let add origin element = Array.append origin [|element|]
