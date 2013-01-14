@@ -27,6 +27,7 @@ int ml_find_flag(GLenum *array, int size, GLenum query) {
       return i;
     }
   }
+  caml_failwith("key not found in a array");
   return -1;
 }
 

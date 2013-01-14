@@ -7,7 +7,7 @@
 #include <GL/gl.h>
 #endif
 #if defined(GL3_ENABLE)
-#define GLCOREARB_PROTOTYPES 1
+// #define GLCOREARB_PROTOTYPES
 #include "glcorearb.h"
 #endif
 

@@ -120,8 +120,15 @@ CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC
 
 CFILES = $(removesuffix $(ls *.c))
 
-FILES = $(removesuffix $(ls *.ml))
+FILES = $(removesuffix $(ls sdl*.ml))
 FILES += enums
+FILES[] +=
+	gl_vector
+	gl_matrix
+	gl_quaternion
+	gl_vbo
+	gl_api
+	gl
 
 # files for building extend libraries are contained to dependencies.
 SUB_FILES = $(ls *.inc)

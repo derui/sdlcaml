@@ -1176,14 +1176,6 @@ external glAttachShader: shader:shader -> program:program -> unit = "gl_api_glAt
 external glBindAttribLocation: program:program -> index:int -> name:string -> unit =
   "gl_api_glBindAttribLocation"
 
-type buffer
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindBuffer.xml}
-    manual pages on opengl.org}
-*)
-external glBindBuffer: target:Buffer.buffer_type -> buffer:buffer -> unit =
-  "gl_api_glBindBuffer"
-
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBindFragDataLocation.xml}
     manual pages on opengl.org}
 *)
@@ -1256,25 +1248,6 @@ external glBlitFramebuffer: src_x0:int -> src_y0:int -> src_x1:int -> src_y1:int
   "gl_api_glBlitFramebuffer_bytecode"
   "gl_api_glBlitFramebuffer_native"
 
-module BufferData = struct
-  include Enums.BufferData
-end
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml}
-    manual pages on opengl.org}
-*)
-external glBufferData: target:BufferData.target_type -> size:int ->
-  data:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t ->
-  usage:BufferData.usage_type -> unit =
-  "gl_api_glBufferData"
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glBufferSubData.xml}
-    manual pages on opengl.org}
-*)
-external glBufferSubData: target:BufferData.target_type -> offset:int ->
-  size:int -> data:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit =
-  "gl_api_glBufferSubData"
-
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml}
     manual pages on opengl.org}
 *)
@@ -1299,12 +1272,6 @@ external glClearBuffer_stencil: int -> unit = "gl_api_glClearBuffer_stencil"
 *)
 external glCompileShader: shader -> unit = "gl_api_glCompileShader"
 
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCopyBufferSubData.xml}
-    manual pages on opengl.org}
-*)
-external glCopyBufferSubData: read:BufferData.target_type -> write:BufferData.target_type ->
-  readoffset:int -> writeoffset:int -> size:int -> unit = "gl_api_glCopyBufferSubData"
-
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glCreateProgram.xml}
     manual pages on opengl.org}
 *)
@@ -1316,12 +1283,6 @@ module Shader = Enums.Shader
     manual pages on opengl.org}
 *)
 external glCreateShader: Shader.shader_type -> shader = "gl_api_glCreateShader"
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteBuffers.xml}
-    manual pages on opengl.org}
-*)
-external glDeleteBuffers: size:int -> buffers:buffer list -> unit =
-  "gl_api_glDeleteBuffers"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDeleteFramebuffers.xml}
     manual pages on opengl.org}
@@ -1375,12 +1336,6 @@ external glDrawBuffers : Buffer.draw_buffer_mode list -> unit =
 external glEnableVertexAttribArray: int -> unit = "gl_api_glEnableVertexAttribArray"
 external glDisableVertexAttribArray: int -> unit = "gl_api_glDisableVertexAttribArray"
 
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glFlushMappedBufferRange.xml}
-    manual pages on opengl.org}
-*)
-external glFlushMappedBufferRange: target:BufferData.target_type ->
-  offset:int -> length:int -> unit = "gl_api_glFlushMappedBufferRange"
-
 type gl_attachment = GL_ATTACHMENT of int |
     GL_DEPTH_ATTACHMENT | GL_STENCIL_ATTACHMENT | GL_DEPTH_STENCIL_ATTACHMENT
 
@@ -1422,12 +1377,6 @@ let glFramebufferTextureLayer ~target ~attachment ~texture ~level ~layer =
   | GL_STENCIL_ATTACHMENT -> glFramebufferTextureLayer_stencil target texture level layer
   | GL_DEPTH_STENCIL_ATTACHMENT -> glFramebufferTextureLayer_depth_stencil target texture level layer
 
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenBuffers.xml}
-    manual pages on opengl.org}
-*)
-external glGenBuffer: unit -> buffer = "gl_api_glGenBuffer"
-external glGenBuffers: int -> buffer list = "gl_api_glGenBuffers"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenFramebuffers.xml}
     manual pages on opengl.org}
@@ -1537,25 +1486,6 @@ external glGetAttachedShaders: program -> shader list =
 *)
 external glGetAttribLocation: program:program -> name:string -> int =
   "gl_api_glGetAttribLocation"
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetBufferParameter.xml}
-    manual pages on opengl.org}
-*)
-external glGetBufferParameter_access: Buffer.buffer_type -> Buffer.access_type =
-  "gl_api_glGetBufferParameter_access"
-external glGetBufferParameter_mapped: Buffer.buffer_type -> bool =
-  "gl_api_glGetBufferParameter_mapped"
-external glGetBufferParameter_size: Buffer.buffer_type -> int =
-  "gl_api_glGetBufferParameter_size"
-external glGetBufferParameter_usage: Buffer.buffer_type -> Buffer.buffer_usage_type =
-  "gl_api_glGetBufferParameter_usage"
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetBufferSubData.xml}
-    manual pages on opengl.org}
-*)
-external glGetBufferSubData: target:Buffer.buffer_type ->
-  offset:int -> size:int -> (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t =
-  "gl_api_glGetBufferSubData"
 
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGetFragDataIndex.xml}
     manual pages on opengl.org}
@@ -1763,11 +1693,6 @@ external glGetVertexAttrib_int: index:int -> pname:VertexAttrib.get_vertex_attri
 external glGetVertexAttrib_vertex: int -> float * float * float * float
    = "gl_api_glGetVertexAttrib_vertex"
 
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsBuffer.xml}
-    manual pages on opengl.org}
-*)
-external glIsBuffer: buffer -> bool = "gl_api_glIsBuffer"
-
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glIsFramebuffer.xml}
     manual pages on opengl.org}
 *)
@@ -1881,16 +1806,6 @@ external glStencilMaskSeparate : face:CullFace.cull_face_mode ->
 external glStencilOpSeparate : face:Stencil.face_mode ->
   fail:Stencil.stencil_op -> zfail:Stencil.stencil_op
   -> zpass:Stencil.stencil_op -> unit = "gl_api_glStencilOpSeparate"
-
-module TexBuffer = struct
-  include Enums.TexBuffer
-end
-
-(** {{:http://www.opengl.org/sdk/docs/man/xhtml/glTexBuffer.xml}
-    manual pages on opengl.org}
-*)
-external glTexBuffer: internalformat:TexBuffer.internal_format ->
-  buffer:buffer -> unit = "gl_api_glTexBuffer"
 
 module TransformFeedback = struct
   include Enums.TransformFeedback
