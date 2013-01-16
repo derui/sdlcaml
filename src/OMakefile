@@ -128,6 +128,7 @@ FILES[] +=
 	gl_quaternion
 	gl_vbo
 	gl_api
+	gl_loader
 	gl
 
 # files for building extend libraries are contained to dependencies.

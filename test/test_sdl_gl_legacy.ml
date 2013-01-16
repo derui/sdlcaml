@@ -34,7 +34,7 @@ let make_vertex_array arrayt vertex =
   barray
 
 let test_sdl_gl_basic surface =
-  let open Gl in
+  let open Gl.Api in
   begin
     let v0 = ( -1.0, -1.0,  1.0 )
     and v1 = (  1.0, -1.0,  1.0 )

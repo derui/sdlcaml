@@ -4,15 +4,16 @@ open OUnit
 module S = Baselib.Std
 
 let error _ =
-  match Gl.glGetError () with
-  | Gl.Get.GL_NO_ERROR -> "NO_ERROR"
-  | Gl.Get.GL_INVALID_ENUM -> "INVALID_ENUM"
-  | Gl.Get.GL_INVALID_VALUE -> "INVALID_VALUE"
-  | Gl.Get.GL_INVALID_OPERATION  -> "GL_INVALID_OPERATION"
-  | Gl.Get.GL_STACK_OVERFLOW -> "STACK_OVERFLOW"
-  | Gl.Get.GL_STACK_UNDERFLOW -> "STACK_UNDERFLOW"
-  | Gl.Get.GL_OUT_OF_MEMORY -> "OUT_OF_MEMORY"
-  | Gl.Get.GL_TABLE_TOO_LARGE -> "TABLE_TOO_LARGE"
+  let open Gl.Api in
+  match glGetError () with
+  | Get.GL_NO_ERROR -> "NO_ERROR"
+  | Get.GL_INVALID_ENUM -> "INVALID_ENUM"
+  | Get.GL_INVALID_VALUE -> "INVALID_VALUE"
+  | Get.GL_INVALID_OPERATION  -> "GL_INVALID_OPERATION"
+  | Get.GL_STACK_OVERFLOW -> "STACK_OVERFLOW"
+  | Get.GL_STACK_UNDERFLOW -> "STACK_UNDERFLOW"
+  | Get.GL_OUT_OF_MEMORY -> "OUT_OF_MEMORY"
+  | Get.GL_TABLE_TOO_LARGE -> "TABLE_TOO_LARGE"
 
 let test_set_up _ =
   begin
@@ -44,11 +45,18 @@ let make_vbo () =
        0.0;  1.0; 0.0;
        1.0; -1.0; 0.0;
     |] in
-  let open Gl in
+  let open Gl.VBO in
   let id = glGenBuffer () in
   glBindBuffer Buffer.GL_ARRAY_BUFFER id;
   glBufferData ~target:BufferData.GL_ARRAY_BUFFER ~size:(Bigarray.Array1.dim vertex_data)
     ~data:vertex_data ~usage:BufferData.GL_STATIC_DRAW;
+
+  assert_equal (glGetBufferParameter_access Buffer.GL_ARRAY_BUFFER)
+    Buffer.GL_READ_WRITE ~msg:"access";
+  assert_equal (glGetBufferParameter_mapped Buffer.GL_ARRAY_BUFFER) false ~msg:"mapped";
+  assert_equal (glGetBufferParameter_size Buffer.GL_ARRAY_BUFFER) 36 ~msg:"size";
+  assert_equal (glGetBufferParameter_usage Buffer.GL_ARRAY_BUFFER)
+    Buffer.GL_STATIC_DRAW ~msg:"usage";
   id
 ;;
 
@@ -68,7 +76,7 @@ void main() {
 }"
 
 let load_shaders () =
-  let open Gl in
+  let open Gl.Api in
   let vertexShaderID = glCreateShader Shader.GL_VERTEX_SHADER in
   let fragmentShaderID = glCreateShader Shader.GL_FRAGMENT_SHADER in
 
@@ -87,7 +95,8 @@ let load_shaders () =
   (shader_prog, vertexPosAttrib)
 
 let test_sdl_gl_basic surface =
-  let open Gl in
+  let open Gl.Api in
+  let open Gl.VBO in
   begin
     let vao = glGenVertexArray () in
     glBindVertexArray vao;

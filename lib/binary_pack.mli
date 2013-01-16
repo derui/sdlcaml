@@ -7,7 +7,6 @@
     @version 0.2
 *)
 
-
 (** endianness of binary data *)
 type endian = Little_endian | Big_endian
 

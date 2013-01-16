@@ -172,7 +172,7 @@ CAMLprim value gl_api_glGetBufferParameter_usage(value target) {
 CHECK_FUNC(glGetBufferParameteriv, PFNGLGETBUFFERPARAMETERIVPROC);
 
   GLint data;
-  glGetBufferParameteriv(buffer_type[Int_val(target)], GL_BUFFER_MAPPED,
+  glGetBufferParameteriv(buffer_type[Int_val(target)], GL_BUFFER_USAGE,
                          &data);
   for (int i = 0; i < sizeof(buffer_usage_type) / sizeof(buffer_usage_type[0]); ++i) {
     if (buffer_usage_type[i] == data) {
