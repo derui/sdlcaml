@@ -58,7 +58,7 @@ let make_vbo () =
   assert_equal (glGetBufferParameter_usage Buffer.GL_ARRAY_BUFFER)
     Buffer.GL_STATIC_DRAW ~msg:"usage";
   id
-;;
+h;;
 
 let vertex_shader_src = "
 #version 130
