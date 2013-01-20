@@ -12,6 +12,18 @@
 (** endianness of binary data *)
 type endian = Little_endian | Big_endian
 
+(** Exception for invalid byte position when calculate offset *)
+exception Binary_pack_invalid_byte_range of int
+exception Binary_pack_invalid_short_range of int
+exception Binary_pack_invalid_unsigned_short_range of int
+exception Binary_pack_invalid_int_position of int
+exception Binary_pack_invalid_int64_position of int
+exception Binary_pack_invalid_float_position of int
+
+(** Exception for invalid buffer position to write unpacked value. *)
+exception Binary_pack_invalid_buffer_position of int
+
+
 (** The module is used by argument for Binary_pack functions
     instead of charactor array that equals string.
 *)
@@ -19,24 +31,13 @@ module type BinaryArray = sig
   type t
   val length: t -> int
   val get: t -> int -> char
-  val set: t -> char -> int -> t
+  val set: t -> int -> char -> unit
 end
 
 (** Functions that is used to pack and unpack values.
 *)
 module type S = sig
   type t
-
-  (** Exception for invalid byte position when calculate offset *)
-  exception Binary_pack_invalid_byte_range of int
-  exception Binary_pack_invalid_short_range of int
-  exception Binary_pack_invalid_unsigned_short_range of int
-  exception Binary_pack_invalid_int_position of int
-  exception Binary_pack_invalid_int64_position of int
-  exception Binary_pack_invalid_float_position of int
-
-  (** Exception for invalid buffer position to write unpacked value. *)
-  exception Binary_pack_invalid_buffer_position of int
 
   (** Pack unsigned char data of the buffer at pos to OCaml int.
       Use a element of the buffer.
@@ -205,6 +206,6 @@ module type S = sig
 end
 
 (** The functor make functions for given binary array. *)
-module Make(A:BinaryArray) with type t := A.t
+module Make(A:BinaryArray) : S with type t = A.t
 
-include S with type t := string
+include S with type t = string

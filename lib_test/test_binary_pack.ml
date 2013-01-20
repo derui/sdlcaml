@@ -1,121 +1,190 @@
-open Baselib.Std.Binary_pack
+open Baselib.Std
 open OUnit
+
+module PArray = struct
+  type t = char array
+  let length = Array.length
+  let get = Array.get
+  let set = Array.set
+end
+
+module PBArray = struct
+  type t = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+  let length = Bigarray.Array1.dim
+  let get = Bigarray.Array1.get
+  let set = Bigarray.Array1.set
+end
 
 
 let make_buffer len = String.create len
 
+let assert_binary_byte_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  begin
+    Pack.pack_unsigned_8 ~buffer ~pos:0 0  ;
+    Pack.pack_unsigned_8 ~buffer ~pos:1 1  ;
+    Pack.pack_unsigned_8 ~buffer ~pos:2 2  ;
+    Pack.pack_unsigned_8 ~buffer ~pos:3 3  ;
+    Pack.pack_unsigned_8 ~buffer ~pos:4 4  ;
+    Pack.pack_unsigned_8 ~buffer ~pos:5 100;
+    Pack.pack_unsigned_8 ~buffer ~pos:6 255;
+
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:0) = 0);
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:1) = 1);
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:2) = 2);
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:3) = 3);
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:4) = 4);
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:5) = 100);
+    "a unsigned byte unpack" @? ((Pack.unpack_unsigned_8 ~buffer ~pos:6) = 255);
+
+    Pack.pack_signed_8 ~buffer ~pos:0 (-128);
+    Pack.pack_signed_8 ~buffer ~pos:1 0;
+    Pack.pack_signed_8 ~buffer ~pos:2 127;
+    Pack.pack_signed_8 ~buffer ~pos:3 1;
+    Pack.pack_signed_8 ~buffer ~pos:4 2;
+    Pack.pack_signed_8 ~buffer ~pos:5 100;
+
+    "a signed byte unpack" @? ((Pack.unpack_signed_8 ~buffer ~pos:0) = -128);
+    "a signed byte unpack" @? ((Pack.unpack_signed_8 ~buffer ~pos:1) = 0);
+    "a signed byte unpack" @? ((Pack.unpack_signed_8 ~buffer ~pos:2) = 127);
+    "a signed byte unpack" @? ((Pack.unpack_signed_8 ~buffer ~pos:3) = 1);
+    "a signed byte unpack" @? ((Pack.unpack_signed_8 ~buffer ~pos:4) = 2);
+    "a signed byte unpack" @? ((Pack.unpack_signed_8 ~buffer ~pos:5) = 100);
+
+    let open Binary_pack in
+    assert_raises (Binary_pack_invalid_byte_range (-129)) (fun () -> Pack.pack_signed_8 ~buffer ~pos:0 (-129));
+    assert_raises (Binary_pack_invalid_byte_range 128) (fun () -> Pack.pack_signed_8 ~buffer ~pos:0 128);
+    assert_raises (Binary_pack_invalid_byte_range 256) (fun () -> Pack.pack_unsigned_8 ~buffer ~pos:0 256);
+    assert_raises (Binary_pack_invalid_byte_range (-1)) (fun () -> Pack.pack_unsigned_8 ~buffer ~pos:0 (-1));
+  end
+;;
+
 
 let test_binary_byte_pack_unpack () =
   let buffer = make_buffer 7 in
-  pack_unsigned_8 ~buffer ~pos:0 0  ;
-  pack_unsigned_8 ~buffer ~pos:1 1  ;
-  pack_unsigned_8 ~buffer ~pos:2 2  ;
-  pack_unsigned_8 ~buffer ~pos:3 3  ;
-  pack_unsigned_8 ~buffer ~pos:4 4  ;
-  pack_unsigned_8 ~buffer ~pos:5 100;
-  pack_unsigned_8 ~buffer ~pos:6 255;
-
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:0) = 0);
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:1) = 1);
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:2) = 2);
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:3) = 3);
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:4) = 4);
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:5) = 100);
-  "a unsigned byte unpack" @? ((unpack_unsigned_8 ~buffer ~pos:6) = 255);
-
-  let buffer = make_buffer 6 in
-  pack_signed_8 ~buffer ~pos:0 (-128);
-  pack_signed_8 ~buffer ~pos:1 0;
-  pack_signed_8 ~buffer ~pos:2 127;
-  pack_signed_8 ~buffer ~pos:3 1;
-  pack_signed_8 ~buffer ~pos:4 2;
-  pack_signed_8 ~buffer ~pos:5 100;
-
-  "a signed byte unpack" @? ((unpack_signed_8 ~buffer ~pos:0) = -128);
-  "a signed byte unpack" @? ((unpack_signed_8 ~buffer ~pos:1) = 0);
-  "a signed byte unpack" @? ((unpack_signed_8 ~buffer ~pos:2) = 127);
-  "a signed byte unpack" @? ((unpack_signed_8 ~buffer ~pos:3) = 1);
-  "a signed byte unpack" @? ((unpack_signed_8 ~buffer ~pos:4) = 2);
-  "a signed byte unpack" @? ((unpack_signed_8 ~buffer ~pos:5) = 100);
-
-  assert_raises (Binary_pack_invalid_byte_range (-129)) (fun () -> pack_signed_8 ~buffer ~pos:0 (-129));
-  assert_raises (Binary_pack_invalid_byte_range 128) (fun () -> pack_signed_8 ~buffer ~pos:0 128);
-  assert_raises (Binary_pack_invalid_byte_range 256) (fun () -> pack_unsigned_8 ~buffer ~pos:0 256);
-  assert_raises (Binary_pack_invalid_byte_range (-1)) (fun () -> pack_unsigned_8 ~buffer ~pos:0 (-1));
+  assert_binary_byte_pack_unpack (module Binary_pack) buffer
 ;;
+
+let test_binary_byte_pack_unpack_for_array () =
+  let module P = Binary_pack.Make(PArray) in
+  assert_binary_byte_pack_unpack (module P) (Array.make 7 ' ')
+;;
+
+let test_binary_byte_pack_unpack_for_bigarray () =
+  let module P = Binary_pack.Make(PBArray) in
+  assert_binary_byte_pack_unpack (module P)
+    (Bigarray.Array1.create Bigarray.char Bigarray.c_layout 7)
+;;
+
+
+let assert_binary_short_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  begin
+    let open Binary_pack in
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0 0;
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:2 1;
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:4 20;
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:6 300;
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:8 4000;
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:10 0x7fff;
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:12 (-0x8000);
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:14 (-1);
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:16 (-0x7fff);
+    Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:18 (-400);
+
+    "a signed short unpack 0" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0) = 0        );
+    "a signed short unpack 1" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:2) = 1        );
+    "a signed short unpack 2" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:4) = 20       );
+    "a signed short unpack 3" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:6) = 300      );
+    "a signed short unpack 4" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:8) = 4000     );
+    "a signed short unpack 5" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:10) = 0x7fff   );
+    "a signed short unpack 6" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:12) = (-0x8000));
+    "a signed short unpack 7" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:14) = (-1)     );
+    "a signed short unpack 8" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:16) = (-0x7fff));
+    "a signed short unpack 9" @? ((Pack.unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:18) = (-400));
+
+    assert_raises (Binary_pack_invalid_short_range (-0x8001))
+      (fun () -> Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0 (-0x8001));
+    assert_raises (Binary_pack_invalid_short_range 0x8000)
+      (fun () -> Pack.pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0 0x8000);
+  end
+;;
+
 
 let test_binary_short_pack_unpack () =
   let buffer = make_buffer 20 in
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0 0;
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:2 1;
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:4 20;
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:6 300;
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:8 4000;
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:10 0x7fff;
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:12 (-0x8000);
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:14 (-1);
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:16 (-0x7fff);
-  pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:18 (-400);
-
-  "a signed short unpack 0" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0) = 0        );
-  "a signed short unpack 1" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:2) = 1        );
-  "a signed short unpack 2" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:4) = 20       );
-  "a signed short unpack 3" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:6) = 300      );
-  "a signed short unpack 4" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:8) = 4000     );
-  "a signed short unpack 5" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:10) = 0x7fff   );
-  "a signed short unpack 6" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:12) = (-0x8000));
-  "a signed short unpack 7" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:14) = (-1)     );
-  "a signed short unpack 8" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:16) = (-0x7fff));
-  "a signed short unpack 9" @? ((unpack_signed_16 ~byte_order:Little_endian ~buffer ~pos:18) = (-400));
-
-  assert_raises (Binary_pack_invalid_short_range (-0x8001))
-    (fun () -> pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0 (-0x8001));
-  assert_raises (Binary_pack_invalid_short_range 0x8000)
-    (fun () -> pack_signed_16 ~byte_order:Little_endian ~buffer ~pos:0 0x8000);
+  assert_binary_short_pack_unpack (module Binary_pack) buffer
 ;;
 
+let test_binary_short_pack_unpack_for_array () =
+  assert_binary_short_pack_unpack (module Binary_pack.Make(PArray)) (Array.make 20 ' ')
+;;
+
+let test_binary_short_pack_unpack_for_bigarray () =
+  assert_binary_short_pack_unpack (module Binary_pack.Make(PBArray))
+    (Bigarray.Array1.create Bigarray.char Bigarray.c_layout 20)
+;;
+
+let assert_binary_int32_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  let open Binary_pack in
+  begin
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:0   (Int32.of_int 0);
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:4   (Int32.of_int 1);
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:8   (Int32.of_int 20);
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:12  (Int32.of_int 300);
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:16  (Int32.of_int 4000);
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:20  (Int32.of_int 0x7fffffff);
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:24  (Int32.of_int (-0x80000000));
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:28  (Int32.of_int (-1));
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:32  (Int32.of_int (-0x7fffffff));
+    Pack.pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:36  (Int32.of_int (-500000));
+
+    let v pos = Pack.unpack_signed_32 ~byte_order:Little_endian ~buffer ~pos in
+    "a signed int32 unpack 0" @? ((Int32.compare (v  0) (Int32.of_int 0            )) = 0);
+    "a signed int32 unpack 1" @? ((Int32.compare (v  4) (Int32.of_int 1            )) = 0);
+    "a signed int32 unpack 2" @? ((Int32.compare (v  8) (Int32.of_int 20           )) = 0);
+    "a signed int32 unpack 3" @? ((Int32.compare (v 12) (Int32.of_int 300          )) = 0);
+    "a signed int32 unpack 4" @? ((Int32.compare (v 16) (Int32.of_int 4000         )) = 0);
+    "a signed int32 unpack 5" @? ((Int32.compare (v 20) (Int32.of_int 0x7fffffff   )) = 0);
+    "a signed int32 unpack 6" @? ((Int32.compare (v 24) (Int32.of_int (-0x80000000))) = 0);
+    "a signed int32 unpack 7" @? ((Int32.compare (v 28) (Int32.of_int (-1)         )) = 0);
+    "a signed int32 unpack 8" @? ((Int32.compare (v 32) (Int32.of_int (-0x7fffffff))) = 0);
+    "a signed int32 unpack 9" @? ((Int32.compare (v 36) (Int32.of_int (-500000)    )) = 0);
+  end
+;;
 
 let test_binary_int32_pack_unpack () =
   let buffer = make_buffer 40 in
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:0   (Int32.of_int 0);
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:4   (Int32.of_int 1);
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:8   (Int32.of_int 20);
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:12  (Int32.of_int 300);
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:16  (Int32.of_int 4000);
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:20  (Int32.of_int 0x7fffffff);
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:24  (Int32.of_int (-0x80000000));
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:28  (Int32.of_int (-1));
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:32  (Int32.of_int (-0x7fffffff));
-  pack_signed_32 ~byte_order:Little_endian ~buffer ~pos:36  (Int32.of_int (-500000));
-
-  let v pos = unpack_signed_32 ~byte_order:Little_endian ~buffer ~pos in
-  "a signed int32 unpack 0" @? ((Int32.compare (v  0) (Int32.of_int 0            )) = 0);
-  "a signed int32 unpack 1" @? ((Int32.compare (v  4) (Int32.of_int 1            )) = 0);
-  "a signed int32 unpack 2" @? ((Int32.compare (v  8) (Int32.of_int 20           )) = 0);
-  "a signed int32 unpack 3" @? ((Int32.compare (v 12) (Int32.of_int 300          )) = 0);
-  "a signed int32 unpack 4" @? ((Int32.compare (v 16) (Int32.of_int 4000         )) = 0);
-  "a signed int32 unpack 5" @? ((Int32.compare (v 20) (Int32.of_int 0x7fffffff   )) = 0);
-  "a signed int32 unpack 6" @? ((Int32.compare (v 24) (Int32.of_int (-0x80000000))) = 0);
-  "a signed int32 unpack 7" @? ((Int32.compare (v 28) (Int32.of_int (-1)         )) = 0);
-  "a signed int32 unpack 8" @? ((Int32.compare (v 32) (Int32.of_int (-0x7fffffff))) = 0);
-  "a signed int32 unpack 9" @? ((Int32.compare (v 36) (Int32.of_int (-500000)    )) = 0);
+  assert_binary_int32_pack_unpack (module Binary_pack) buffer
 ;;
 
-let test_binary_int_pack_unpack () =
-  if Sys.word_size = 32 then begin
-    let buffer = make_buffer 40 in
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:0   0;
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:4   1;
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:8   20;
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:12  300;
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:16  4000;
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:20  0x3fffffff;
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:24  (-0x40000000);
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:28  (-1);
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:32  (-0x3fffffff);
-    pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:36  (-500000);
+let test_binary_int32_pack_unpack_for_array () =
+  assert_binary_int32_pack_unpack (module Binary_pack.Make(PArray)) (Array.make 40 ' ')
+;;
 
-    let v pos = unpack_signed_32_int ~byte_order:Little_endian ~buffer ~pos in
+let test_binary_int32_pack_unpack_for_bigarray () =
+  assert_binary_int32_pack_unpack (module Binary_pack.Make(PBArray))
+    (Bigarray.Array1.create Bigarray.char Bigarray.c_layout 40)
+;;
+
+
+let assert_binary_int_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  let open Binary_pack in
+  begin
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:0   0;
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:4   1;
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:8   20;
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:12  300;
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:16  4000;
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:20  0x3fffffff;
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:24  (-0x40000000);
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:28  (-1);
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:32  (-0x3fffffff);
+    Pack.pack_signed_32_int ~byte_order:Little_endian ~buffer ~pos:36  (-500000);
+
+    let v pos = Pack.unpack_signed_32_int ~byte_order:Little_endian ~buffer ~pos in
     "a signed ocaml int unpack 0" @? ((v  0) = 0            );
     "a signed ocaml int unpack 1" @? ((v  4) = 1            );
     "a signed ocaml int unpack 2" @? ((v  8) = 20           );
@@ -129,72 +198,147 @@ let test_binary_int_pack_unpack () =
   end
 ;;
 
+let test_binary_int_pack_unpack () =
+  if Sys.word_size = 32 then
+    let buffer = make_buffer 40 in
+    assert_binary_int_pack_unpack (module Binary_pack) buffer
+;;
+
+let test_binary_int_pack_unpack_for_array () =
+  if Sys.word_size = 32 then
+    let buffer = Array.make 40 ' ' in
+    assert_binary_int_pack_unpack (module Binary_pack.Make(PArray)) buffer
+;;
+
+let test_binary_int_pack_unpack_for_bigarray () =
+  if Sys.word_size = 32 then
+    let buffer = Bigarray.Array1.create Bigarray.char Bigarray.c_layout 40 in
+    assert_binary_int_pack_unpack (module Binary_pack.Make(PBArray)) buffer
+;;
+
+let assert_binary_int64_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  let open Binary_pack in
+  begin
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos: 0 Int64.zero;
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos: 8 Int64.one;
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:16 (Int64.shift_left Int64.one 5);
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:24 (Int64.shift_left Int64.one 10);
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:32 (Int64.shift_left Int64.one 40);
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:40 Int64.max_int;
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:48 Int64.min_int;
+    Pack.pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:56 (Int64.pred Int64.zero);
+
+    let v pos = Pack.unpack_signed_64 ~byte_order:Little_endian ~buffer ~pos in
+    "a signed int64 unpack 0" @? (Int64.compare (v  0) Int64.zero                      = 0);
+    "a signed int64 unpack 1" @? (Int64.compare (v  8) Int64.one                       = 0);
+    "a signed int64 unpack 2" @? (Int64.compare (v 16) (Int64.shift_left Int64.one 5)  = 0);
+    "a signed int64 unpack 3" @? (Int64.compare (v 24) (Int64.shift_left Int64.one 10) = 0);
+    "a signed int64 unpack 4" @? (Int64.compare (v 32) (Int64.shift_left Int64.one 40) = 0);
+    "a signed int64 unpack 5" @? (Int64.compare (v 40) Int64.max_int                   = 0);
+    "a signed int64 unpack 6" @? (Int64.compare (v 48) Int64.min_int                   = 0);
+    "a signed int64 unpack 7" @? (Int64.compare (v 56) (Int64.pred Int64.zero)         = 0);
+  end
+;;
 
 let test_binary_int64_pack_unpack () =
   let buffer = make_buffer 80 in
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos: 0 Int64.zero;
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos: 8 Int64.one;
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:16 (Int64.shift_left Int64.one 5);
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:24 (Int64.shift_left Int64.one 10);
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:32 (Int64.shift_left Int64.one 40);
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:40 Int64.max_int;
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:48 Int64.min_int;
-  pack_signed_64 ~byte_order:Little_endian ~buffer ~pos:56 (Int64.pred Int64.zero);
+  assert_binary_int64_pack_unpack (module Binary_pack) buffer
+;;
 
-  let v pos = unpack_signed_64 ~byte_order:Little_endian ~buffer ~pos in
-  "a signed int64 unpack 0" @? (Int64.compare (v  0) Int64.zero                      = 0);
-  "a signed int64 unpack 1" @? (Int64.compare (v  8) Int64.one                       = 0);
-  "a signed int64 unpack 2" @? (Int64.compare (v 16) (Int64.shift_left Int64.one 5)  = 0);
-  "a signed int64 unpack 3" @? (Int64.compare (v 24) (Int64.shift_left Int64.one 10) = 0);
-  "a signed int64 unpack 4" @? (Int64.compare (v 32) (Int64.shift_left Int64.one 40) = 0);
-  "a signed int64 unpack 5" @? (Int64.compare (v 40) Int64.max_int                   = 0);
-  "a signed int64 unpack 6" @? (Int64.compare (v 48) Int64.min_int                   = 0);
-  "a signed int64 unpack 7" @? (Int64.compare (v 56) (Int64.pred Int64.zero)         = 0);
+let test_binary_int64_pack_unpack_for_array () =
+  let buffer = Array.make 80 ' ' in
+  assert_binary_int64_pack_unpack (module Binary_pack.Make(PArray)) buffer
+;;
+
+let test_binary_int64_pack_unpack_for_bigarray () =
+  let buffer = Bigarray.Array1.create Bigarray.char Bigarray.c_layout 80 in
+  assert_binary_int64_pack_unpack (module Binary_pack.Make(PBArray)) buffer
+;;
+
+
+let assert_binary_float_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  let open Binary_pack in
+  begin
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos: 0 1.0;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos: 8 0.0;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos:16 100.0;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos:24 100e10;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos:32 203e5;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos:40 nan;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos:48 max_float;
+    Pack.pack_float ~byte_order:Little_endian ~buffer ~pos:56 min_float;
+
+    let v pos = Pack.unpack_float ~byte_order:Little_endian ~buffer ~pos in
+    "a float unpack 0" @? ((v  0) = 1.0        );
+    "a float unpack 1" @? ((v  8) = 0.0        );
+    "a float unpack 2" @? ((v 16) = 100.0      );
+    "a float unpack 3" @? ((v 24) = 100e10     );
+    "a float unpack 4" @? ((v 32) = 203e5      );
+    "a float unpack 5" @? ((v 40) <> nan        );
+    "a float unpack 6" @? ((v 48) = max_float  );
+    "a float unpack 7" @? ((v 56) = min_float  );
+  end
 ;;
 
 let test_binary_float_pack_unpack () =
   let buffer = make_buffer 80 in
-  pack_float ~byte_order:Little_endian ~buffer ~pos: 0 1.0;
-  pack_float ~byte_order:Little_endian ~buffer ~pos: 8 0.0;
-  pack_float ~byte_order:Little_endian ~buffer ~pos:16 100.0;
-  pack_float ~byte_order:Little_endian ~buffer ~pos:24 100e10;
-  pack_float ~byte_order:Little_endian ~buffer ~pos:32 203e5;
-  pack_float ~byte_order:Little_endian ~buffer ~pos:40 nan;
-  pack_float ~byte_order:Little_endian ~buffer ~pos:48 max_float;
-  pack_float ~byte_order:Little_endian ~buffer ~pos:56 min_float;
-
-  let v pos = unpack_float ~byte_order:Little_endian ~buffer ~pos in
-  "a float unpack 0" @? ((v  0) = 1.0        );
-  "a float unpack 1" @? ((v  8) = 0.0        );
-  "a float unpack 2" @? ((v 16) = 100.0      );
-  "a float unpack 3" @? ((v 24) = 100e10     );
-  "a float unpack 4" @? ((v 32) = 203e5      );
-  "a float unpack 5" @? ((v 40) <> nan        );
-  "a float unpack 6" @? ((v 48) = max_float  );
-  "a float unpack 7" @? ((v 56) = min_float  );
+  assert_binary_float_pack_unpack (module Binary_pack) buffer
 ;;
+
+let test_binary_float_pack_unpack_for_array () =
+  let buffer = Array.make 80 ' ' in
+  assert_binary_float_pack_unpack (module Binary_pack.Make(PArray)) buffer
+;;
+
+let test_binary_float_pack_unpack_for_bigarray () =
+  let buffer = Bigarray.Array1.create Bigarray.char Bigarray.c_layout 80 in
+  assert_binary_float_pack_unpack (module Binary_pack.Make(PBArray)) buffer
+;;
+
+
+let assert_binary_c_layout_float_pack_unpack (type s) pack buffer =
+  let module Pack = (val pack : Binary_pack.S with type t = s) in
+  let open Binary_pack in
+  begin
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos: 0 1.0;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos: 4 0.0;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos: 8 100.0;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos:12 1e10;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos:16 203e5;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos:20 nan;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos:24 max_float;
+    Pack.pack_float_c ~byte_order:Little_endian ~buffer ~pos:28 min_float;
+
+    let v pos = Pack.unpack_float_c ~byte_order:Little_endian ~buffer ~pos in
+    "a float unpack 0" @? ((v  0) = 1.0        );
+    "a float unpack 1" @? ((v  4) = 0.0        );
+    "a float unpack 2" @? ((v  8) = 100.0      );
+    "a float unpack 3" @? ((v 12) = 1e10      );
+    "a float unpack 4" @? ((v 16) = 203e5      );
+    "a float unpack 5" @? ((v 20) <> nan        );
+    "a float unpack 6" @? ((v 24) = infinity  );
+    "a float unpack 7" @? ((v 28) = 0.0  );
+  end
+;;
+
 
 let test_binary_c_layout_float_pack_unpack () =
   let buffer = make_buffer 40 in
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos: 0 1.0;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos: 4 0.0;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos: 8 100.0;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos:12 1e10;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos:16 203e5;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos:20 nan;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos:24 max_float;
-  pack_float_c ~byte_order:Little_endian ~buffer ~pos:28 min_float;
-
-  let v pos = unpack_float_c ~byte_order:Little_endian ~buffer ~pos in
-  "a float unpack 0" @? ((v  0) = 1.0        );
-  "a float unpack 1" @? ((v  4) = 0.0        );
-  "a float unpack 2" @? ((v  8) = 100.0      );
-  "a float unpack 3" @? ((v 12) = 1e10      );
-  "a float unpack 4" @? ((v 16) = 203e5      );
-  "a float unpack 5" @? ((v 20) <> nan        );
-  "a float unpack 6" @? ((v 24) = infinity  );
-  "a float unpack 7" @? ((v 28) = 0.0  );
+  assert_binary_c_layout_float_pack_unpack (module Binary_pack) buffer
 ;;
+
+let test_binary_c_layout_float_pack_unpack_for_array () =
+  let buffer = Array.make 40 ' ' in
+  assert_binary_c_layout_float_pack_unpack (module Binary_pack.Make(PArray)) buffer
+;;
+
+let test_binary_c_layout_float_pack_unpack_for_array () =
+  let buffer = Bigarray.Array1.create Bigarray.char Bigarray.c_layout 40 in
+  assert_binary_c_layout_float_pack_unpack (module Binary_pack.Make(PBArray)) buffer
+;;
+
 
 let suite = "binary pack/unpack specs" >::: [
   "a byte pack/unpack" >:: test_binary_byte_pack_unpack;
@@ -204,6 +348,23 @@ let suite = "binary pack/unpack specs" >::: [
   "a 64-bit int pack/unpack" >:: test_binary_int64_pack_unpack;
   "a float pack/unpack" >:: test_binary_float_pack_unpack;
   "a C layout float pack/unpack" >:: test_binary_c_layout_float_pack_unpack;
+  (* for ocaml array *)
+  "a byte pack/unpack for ocaml array" >:: test_binary_byte_pack_unpack_for_array;
+  "a short pack/unpack for ocaml array" >:: test_binary_short_pack_unpack_for_array;
+  "a 32-bit int pack/unpack for ocaml array" >:: test_binary_int32_pack_unpack_for_array;
+  "a 32-bit ocaml int pack/unpack for ocaml array" >:: test_binary_int_pack_unpack_for_array;
+  "a 64-bit int pack/unpack for ocaml array" >:: test_binary_int64_pack_unpack_for_array;
+  "a float pack/unpack for ocaml array" >:: test_binary_float_pack_unpack_for_array;
+  "a C layout float pack/unpack for ocaml array" >:: test_binary_c_layout_float_pack_unpack_for_array;
+
+  (* for bigarray  *)
+  "a byte pack/unpack for ocaml bigarray" >:: test_binary_byte_pack_unpack_for_bigarray;
+  "a short pack/unpack for ocaml bigarray" >:: test_binary_short_pack_unpack_for_bigarray;
+  "a 32-bit int pack/unpack for ocaml bigarray" >:: test_binary_int32_pack_unpack_for_bigarray;
+  "a 32-bit ocaml int pack/unpack for ocaml bigarray" >:: test_binary_int_pack_unpack_for_bigarray;
+  "a 64-bit int pack/unpack for ocaml bigarray" >:: test_binary_int64_pack_unpack_for_bigarray;
+  "a float pack/unpack for ocaml bigarray" >:: test_binary_float_pack_unpack_for_bigarray;
+  "a C layout float pack/unpack for ocaml bigarray" >:: test_binary_c_layout_float_pack_unpack_for_array;
 ]
 
 let _ =
