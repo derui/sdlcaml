@@ -1,4 +1,4 @@
-module V = Gl_vector
+module V = Vector
 
 (* precise 4x4 matrix definition. *)
 type t = {
@@ -8,13 +8,24 @@ type t = {
   mutable m41 : float; mutable m42 : float; mutable m43 : float; mutable m44 : float;
 }
 
-let to_array mat =
-  [|
-    mat.m11; mat.m21; mat.m31; mat.m41;
-    mat.m12; mat.m22; mat.m32; mat.m42;
-    mat.m13; mat.m23; mat.m33; mat.m43;
-    mat.m14; mat.m24; mat.m34; mat.m44;
-  |]
+type conversion_order = Row | Column
+
+let to_array ?(order=Row) mat =
+  match order with
+  | Row ->
+    [|
+      mat.m11; mat.m12; mat.m13; mat.m14;
+      mat.m21; mat.m22; mat.m23; mat.m24;
+      mat.m31; mat.m32; mat.m33; mat.m34;
+      mat.m41; mat.m42; mat.m43; mat.m44;
+    |]
+  | Column ->
+    [|
+      mat.m11; mat.m21; mat.m31; mat.m41;
+      mat.m12; mat.m22; mat.m32; mat.m42;
+      mat.m13; mat.m23; mat.m33; mat.m43;
+      mat.m14; mat.m24; mat.m34; mat.m44;
+    |]
 
 (* convert type of t to array have two dimension as 4 * 4.
    The first index of the converted array is row, and
@@ -96,7 +107,7 @@ let multiply ~m1 ~m2 =
   }
 
 let mult_vec ~mat ~vec =
-  let open Gl_vector in
+  let open Vector in
   { x = mat.m11 *. vec.x +. mat.m12 *. vec.y +. mat.m13 *. vec.z +. mat.m14;
     y = mat.m21 *. vec.x +. mat.m22 *. vec.y +. mat.m23 *. vec.z +. mat.m24;
     z = mat.m31 *. vec.x +. mat.m32 *. vec.y +. mat.m33 *. vec.z +. mat.m34;

@@ -5,7 +5,7 @@
     - normalize
     - multiply
     - convert to matrix
-    Quaternion type provide from this module is depending on {!Gl_vector} and {!Gl_matrix}.
+    Quaternion type provide from this module is depending on {!Vector} and {!Gl_matrix}.
 
     @author derui
     @version 0.1
@@ -27,7 +27,7 @@ val identity : unit -> t
     change.
     To need unit axis, call `normalize' with target quaternion.
 *)
-val make : angle:float -> vector:Gl_vector.t -> t
+val make : angle:float -> vector:Vector.t -> t
 
 (** return a normalized quaternion.
     normalized quaternion has a unit axis.
@@ -49,14 +49,14 @@ val ( *> ) : t -> t -> t
 val ( *< ) : t -> t -> t
 
 (** extract informations from quaternion type variable. *)
-val axis : t -> Gl_vector.t
+val axis : t -> Vector.t
 val angle : t -> float
 
 (** create rotation matrix from given quaternion.
     if this quaternion is not unit, apply `normalize' for previous
     converting.
 *)
-val to_matrix : t -> Gl_matrix.t
+val to_matrix : t -> Matrix.t
 
 (** construct `obversing quaternion` between from and
     by obversing frequency.

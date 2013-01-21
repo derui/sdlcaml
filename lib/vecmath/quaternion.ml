@@ -1,5 +1,5 @@
-module M = Gl_matrix
-module V = Gl_vector
+module M = Matrix
+module V = Vector
 
 type t = {
   quat_angle:float;

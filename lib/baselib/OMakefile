@@ -18,13 +18,63 @@
 # The standard OMakefile.
 # You will usually need to modify this file for your project.
 
-.PHONY: all lib clean
-
 ################################################
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
+.PHONY: all lib
+#
+# This project requires ocamlfind (default - false).
+#
+USE_OCAMLFIND = true
+#
+OCAMLPACKS[] =
+     num
+#    pack2
+#
+if $(not $(OCAMLFIND_EXISTS))
+   eprintln(This project requires ocamlfind, but is was not found.)
+   eprintln(You need to install ocamlfind and run "omake --configure".)
+   exit 1
 
-.SUBDIRS: baselib vecmath
+#
+# Include path
+#
+# OCAMLINCLUDES += /usr/lib/ocaml
 
-.DEFAULT: baselib/baselib.cmxa vecmath/vecmath.cmxa
+#
+# Compile native or byte code?
+#
+# The default values are defined as follows:
+#
+NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
+BYTE_ENABLED = true
+
+#
+# Various options
+#
+OCAMLFLAGS    += -annot -bin-annot
+# OCAMLCFLAGS   +=
+# OCAMLOPTFLAGS +=
+# OCAML_LINK_FLAGS +=
+# OCAML_BYTE_LINK_FLAGS +=
+# OCAML_NATIVE_LINK_FLAGS +=
+
+################################################
+# Build an OCaml library
+#
+FILES[] = $(removesuffix $(ls *ml))
+#
+LIB = baselib
+#
+INSTALL_FILES = $(OCamlPackageGeneratedFiles $(LIB), $(EMPTY))
+INSTALL_FILES += $(ls *mli)
+
+MyOCamlPackage($(LIB), $(FILES), $(EMPTY), $(EMPTY), false)
+OCamlInstallParentPackage(sdlcaml, $(INSTALL_FILES))
+
+lib: $(OCamlPackageTargetFiles $(LIB), false)
+
+all: lib
+
+.DEFAULT: all

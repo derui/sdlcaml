@@ -1,6 +1,6 @@
-module Mat = Gl_matrix
-module Vec = Gl_vector
-module Qua = Gl_quaternion
+module Mat = Vecmath.Matrix
+module Vec = Vecmath.Vector
+module Qua = Vecmath.Quaternion
 module Loader = Gl_loader
 module Api = Gl_api
 

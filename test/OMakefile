@@ -44,7 +44,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += $(file ../src) $(file ../lib)
+OCAMLINCLUDES += $(file ../src) $(file ../lib/baselib) $(file ../lib/vecmath)
 
 #
 # Compile native or byte code?
@@ -88,7 +88,7 @@ OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src)"
 FILES = $(removesuffix $(ls *.ml))
 
 #
-OCAML_LIBS +=  ../lib/baselib ../src/sdlcaml
+OCAML_LIBS +=  ../lib/baselib/baselib ../lib/vecmath/vecmath ../src/sdlcaml
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl

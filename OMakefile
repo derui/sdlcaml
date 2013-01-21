@@ -23,8 +23,7 @@ open MyOCaml
 ########################################################################
 # Phony targets are scoped, so you probably want to declare them first.
 #
-.PHONY: test clean doc all prepare enums
-# .PHONY: all install clean
+.PHONY: test clean doc all lib
 
 ########################################################################
 # Subdirectories.
@@ -62,7 +61,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += src
+OCAMLINCLUDES += src lib/baselib lib/math
 
 #
 # Compile native or byte code?

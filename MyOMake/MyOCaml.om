@@ -495,9 +495,11 @@ public.OCamlPackageTargetFiles(name, has_cmodule) =
     protected.CMX       = $(file $(name).cmx)
     protected.CMI       = $(file $(name).cmi)
     protected.MLI       = $(file $(name).mli)
+    protected.CMA       = $(file $(name).cma)
+    protected.CMXA      = $(file $(name).cmxa)
 
-    protected.BYTE_TARGETS   = $(CMO)
-    protected.NATIVE_TARGETS = $(CMX) $(OBJ)
+    protected.BYTE_TARGETS   = $(CMO) $(CMA)
+    protected.NATIVE_TARGETS = $(CMX) $(OBJ) $(CMXA)
 
     protected.TARGETS = $(CMI)
 

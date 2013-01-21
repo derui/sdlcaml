@@ -19,7 +19,7 @@
    (Of course, you could look .ml file if you wish)
 
    Matrix provided this module is able to convert to string, converted
-   string format is as follows.
+   string format as row major order is as follows.
    | 11 | 12 | 13 | 14 |
    | 21 | 22 | 23 | 24 |
    | 31 | 32 | 33 | 34 |
@@ -37,11 +37,20 @@ type t = {
   mutable m41 : float; mutable m42 : float; mutable m43 : float; mutable m44 : float;
 }
 
+(** Type of conversion when matrix applies to convert to array.
+    Row is row major order, and Column is column major order.
+*)
+type conversion_order = Row | Column
+
 (** given matrix convert to primitive array.
     matrix of result is right hand coodinates and conjection right to
     left, and most warning point is to only multiply by `column vector'!
+
+    @param order A order to convert matrix to array. Row is default.
+    @param matrix A matrix to convert to array
+    @return array A array is converted from matrix as given order
 *)
-val to_array : t -> float array
+val to_array : ?order:conversion_order -> t -> float array
 
 (** construct a identity matrix.
     A identity matrix is unchanged matrix that multiply any matrix.
@@ -89,18 +98,18 @@ val multiply : m1:t -> m2:t -> t
     matrix.
     if using quatanion rotation matrix, use module of `quatanion` module.
 *)
-val rotation_matrix_of_axis : dir:Gl_vector.t -> angle:float -> t
+val rotation_matrix_of_axis : dir:Vector.t -> angle:float -> t
 
 (** create a translation matrix defined a vector is length of moving.  *)
-val translation : Gl_vector.t -> t
+val translation : Vector.t -> t
 
 (** create a scaling matrix defined a vector that each values are
     what scaling is along the axis.
 *)
-val scaling : Gl_vector.t -> t
+val scaling : Vector.t -> t
 
 (** multiply given vector with given matrix. *)
-val mult_vec: mat:t -> vec:Gl_vector.t -> Gl_vector.t
+val mult_vec: mat:t -> vec:Vector.t -> Vector.t
 
 (** construct inverse matrix.
     inverse matrix is usually used to unprojection matrix that
