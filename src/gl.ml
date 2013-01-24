@@ -1,4 +1,4 @@
-module Mat = Vecmath.Matrix
+module Mat = Vecmath.Matrix4
 module Vec = Vecmath.Vector
 module Qua = Vecmath.Quaternion
 module Loader = Gl_loader

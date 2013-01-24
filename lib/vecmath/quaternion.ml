@@ -1,4 +1,4 @@
-module M = Matrix
+module M = Matrix4
 module V = Vector
 
 type t = {

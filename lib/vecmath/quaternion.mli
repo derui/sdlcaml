@@ -5,7 +5,7 @@
     - normalize
     - multiply
     - convert to matrix
-    Quaternion type provide from this module is depending on {!Vector} and {!Gl_matrix}.
+    Quaternion type provide from this module is depending on {!Vector} and {!Matrix4}.
 
     @author derui
     @version 0.1
@@ -56,7 +56,7 @@ val angle : t -> float
     if this quaternion is not unit, apply `normalize' for previous
     converting.
 *)
-val to_matrix : t -> Matrix.t
+val to_matrix : t -> Matrix4.t
 
 (** construct `obversing quaternion` between from and
     by obversing frequency.

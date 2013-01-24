@@ -94,7 +94,6 @@ OCAML_LIBS +=  ../lib/baselib/baselib ../lib/vecmath/vecmath ../src/sdlcaml
 # OCAML_LIB_FLAGS += -cclib -lsdl
 # OCAML_LIB_FLAGS += -verbose
 #
-
 # need sdlcaml library
 
 PROGRAMS =

@@ -29,6 +29,8 @@
 
 (** precise 4x4 matrix definition.
     all attributes are mutable but not usually use this.
+    The first number of each elements is row, and the second number of they is
+    column.
 *)
 type t = {
   mutable m11 : float; mutable m12 : float; mutable m13 : float; mutable m14 : float;
@@ -126,4 +128,5 @@ val inverse : t -> t option
 *)
 val transpose : t -> t
 
-include Baselib.Stringable.Type with type t := t
+(** Convert matrix to string *)
+val to_string: t -> string
