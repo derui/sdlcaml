@@ -1,6 +1,6 @@
 open Sdlcaml
 open OUnit
-open Baselib
+open Sugarpot
 
 let test_set_up _ =
   Sdl_init.init [`AUDIO] ()

@@ -51,7 +51,7 @@ external compile_version: unit -> int * int * int = "sdlcaml_image_version"
     @return Right if all library loading successful. When failed some library return Left with
     error string.
 *)
-external init: imageinit list -> (unit, string) Baselib.Std.Either.t = "sdlcaml_image_init"
+external init: imageinit list -> (unit, string) Sugarpot.Std.Either.t = "sdlcaml_image_init"
 
 (** This function cleans up all dinamically loaded library handles.
     You only need to call this function once.

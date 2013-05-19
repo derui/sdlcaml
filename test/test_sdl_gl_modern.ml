@@ -1,7 +1,7 @@
 open Sdlcaml
 open Bigarray
 open OUnit
-module S = Baselib.Std
+module S = Sugarpot.Std
 
 let error _ =
   let open Gl.Api in

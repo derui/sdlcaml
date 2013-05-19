@@ -1,6 +1,6 @@
 open Sdlcaml
 open OUnit
-open Baselib
+open Sugarpot
 
 let test_set_up _ =
   Sdl_init.init [`VIDEO] ()
@@ -18,8 +18,8 @@ let test_image_basic _ =
     in assert_bool "valid linked version" (major >= 0 && minor >= 0 && patch
                                            >= 0);
     begin match init [INIT_JPG;INIT_PNG;INIT_TIF] with
-    | Baselib.Std.Either.Left s -> assert_failure s
-    | Baselib.Std.Either.Right _ -> ()
+    | Sugarpot.Std.Either.Left s -> assert_failure s
+    | Sugarpot.Std.Either.Right _ -> ()
     end;
 
     begin match load "nothing.png" with

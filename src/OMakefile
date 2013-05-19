@@ -32,6 +32,8 @@ open build/C
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
+    sugarpot
+    candyvec
 #
 if $(not $(OCAMLFIND_EXISTS))
    eprintln(This project requires ocamlfind, but is was not found.)

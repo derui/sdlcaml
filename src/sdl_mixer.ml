@@ -10,7 +10,7 @@
  * @since 0.1
  *)
 
-module S = Baselib.Std
+module S = Sugarpot.Std
 
 (** SDL_Mixer support libraries  *)
 type mixerinit = [

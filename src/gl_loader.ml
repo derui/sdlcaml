@@ -47,8 +47,8 @@ let correct_info img =
   }
 
 let load fname =
-  let open Baselib.Std.Option.Open in
-  let open Baselib.Std.Prelude in
+  let open Sugarpot.Std.Option.Open in
+  let open Sugarpot.Std.Prelude in
   if I.is_linked () then
     I.load fname >>= (return @< correct_info)
   else

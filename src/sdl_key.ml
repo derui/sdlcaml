@@ -300,9 +300,9 @@ module Compare =
       else 1
   end
 
-module Comparable = Baselib.Std.Comparable.Make(Compare)
+module Comparable = Sugarpot.Std.Comparable.Make(Compare)
 
-module StateMap = Baselib.Std.Map.Make (Compare)
+module StateMap = Sugarpot.Std.Map.Make (Compare)
 
 let to_state_map statelist =
   let make_map (key, state) map = StateMap.add map ~key ~data:state in

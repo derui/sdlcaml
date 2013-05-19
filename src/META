@@ -1,25 +1,7 @@
 version = "0.2"
 description = "SDL bindings for OCaml"
-requires = "num sdlcaml.baselib sdlcaml.math bigarray"
+requires = "num sugarpot candyvec bigarray"
 archive(byte) = "sdlcaml.cma"
 archive(byte, plugin) = "sdlcaml.cma"
 archive(native) = "sdlcaml.cmxa"
 exists_if = "sdlcaml.cma"
-package "baselib" (
-  requires = "num"
-  version = "[internal]"
-  description = "sdlcaml internal library"
-  archive(byte) = "baselib.cma"
-  archive(byte, plugin) = "baselib.cma"
-  archive(native) = "baselib.cmxa"
-  exists_if = "baselib.cma"
-)
-package "math" (
-  requires = ""
-  version = "[internal]"
-  description = "my mathmatic library"
-  archive(byte) = "math.cma"
-  archive(byte, plugin) = "math.cma"
-  archive(native) = "math.cmxa"
-  exists_if = "math.cma"
-)

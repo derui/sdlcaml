@@ -1,6 +1,6 @@
-module Mat = Vecmath.Matrix4
-module Vec = Vecmath.Vector
-module Qua = Vecmath.Quaternion
+module Mat = Candyvec.Matrix4
+module Vec = Candyvec.Vector
+module Qua = Candyvec.Quaternion
 module Loader = Gl_loader
 module Api = Gl_api
 

@@ -182,12 +182,12 @@ type key_info = {
 (** default {!key_info} *)
 val empty: key_info
 
-module Compare : Baselib.Std.Comparable.Type with type t := key_synonym
+module Compare : Sugarpot.Std.Comparable.Type with type t := key_synonym
 
-module Comparable : Baselib.Std.Comparable.S with type t := key_synonym
+module Comparable : Sugarpot.Std.Comparable.S with type t := key_synonym
 
 (** Map for key and key state. *)
-module StateMap : Baselib.Std.Map.S with type Key.t = key_synonym
+module StateMap : Sugarpot.Std.Map.S with type Key.t = key_synonym
 
 (**
    This function is provided to be used from C.

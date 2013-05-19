@@ -1,7 +1,7 @@
 open Sdlcaml
 open Bigarray
 open OUnit
-module S = Baselib.Std
+module S = Sugarpot.Std
 
 let test_set_up _ =
   begin
