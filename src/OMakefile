@@ -144,7 +144,7 @@ LIBRARY_NAME = sdlcaml
 # OCAML_LIB_FLAGS += -cclib -lsdlcaml
 #
 MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES),-linkall, true)
-TARGETS = $(OCamlPackageTargetFiles $(LIBRARY_NAME), true)
+TARGETS = $(OCamlPackageGeneratedFiles $(LIBRARY_NAME), true)
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
