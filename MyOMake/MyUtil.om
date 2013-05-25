@@ -35,4 +35,4 @@ IsWin() =
 	return $(equal $(PLATFORM_TYPE), Win32)
 
 IsCygwin() =
-	return $(equal $(PLATFORM_TYPE), Cyngwin)
+	return $(equal $(PLATFORM_TYPE), Cygwin)
