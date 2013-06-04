@@ -962,8 +962,11 @@ module DrawElements = Enums.DrawElements
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml}
     manual pages on opengl.org}
 *)
-external glDrawElements : mode:DrawElements.draw_mode ->
+external glDrawElements_with_array : mode:DrawElements.draw_mode ->
   elements_type:DrawElements.draw_elements_type -> list:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t -> unit
+    = "gl_api_glDrawElements_with_array"
+external glDrawElements : mode:DrawElements.draw_mode ->
+  elements_type:DrawElements.draw_elements_type -> size:int -> unit
     = "gl_api_glDrawElements"
 
 type tuple_type =

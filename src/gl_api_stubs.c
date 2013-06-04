@@ -880,7 +880,7 @@ t_prim gl_api_glSampleCoverage(value _v_value, value _v_invert) {
   CAMLreturn(Val_unit);
 }
 
-t_prim gl_api_glDrawElements(value mode, value elements_type, value indices) {
+t_prim gl_api_glDrawElements_with_array(value mode, value elements_type, value indices) {
   CAMLparam3(mode, elements_type, indices);
 #include "enums/draw_mode.inc"
 #include "enums/draw_elements_type.inc"
@@ -889,6 +889,18 @@ t_prim gl_api_glDrawElements(value mode, value elements_type, value indices) {
                  Caml_ba_array_val(indices)->dim[0],
                  draw_elements_type[Int_val(elements_type)],
                  Caml_ba_data_val(indices));
+  CAMLreturn(Val_unit);
+}
+
+t_prim gl_api_glDrawElements(value mode, value elements_type, value size) {
+  CAMLparam3(mode, elements_type, size);
+#include "enums/draw_mode.inc"
+#include "enums/draw_elements_type.inc"
+
+  glDrawElements(draw_mode[Int_val(mode)],
+                 Int_val(size), 
+                 draw_elements_type[Int_val(elements_type)],
+                 NULL);
   CAMLreturn(Val_unit);
 }
 

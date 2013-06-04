@@ -34,7 +34,7 @@ end
     manual pages on opengl.org}
 *)
 external glBufferData: target:BufferData.target_type -> size:int ->
-  data:(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t ->
+  data:('a, 'b, Bigarray.c_layout) Bigarray.Array1.t ->
     usage:BufferData.usage_type -> unit =
   "gl_api_glBufferData"
 

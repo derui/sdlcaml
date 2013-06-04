@@ -5,17 +5,18 @@ module Camera = struct
 
   let make_matrix ~pos ~at ~up =
     let camera_direct = V.normalize (V.sub at pos) in
-    let up = V.normalize up in
-    let camera_x = V.normalize (V.cross camera_direct up) in
-    let up = V.normalize (V.cross camera_x camera_direct) in
     (* for conversion left-hand coodinates to right-hand coodinates. *)
     let camera_direct = V.scale ~v:camera_direct ~scale:(-1.0) in
+    let up = V.normalize up in
+    let camera_x = V.normalize (V.cross camera_direct up) in
+    let up = V.normalize (V.cross camera_direct camera_x) in
+    let trans = M.translation (V.scale ~scale:(-1.0) ~v:pos) in
     let open V in
-    {M.m11 = camera_x.x; m12 = camera_x.y; m13 = camera_x.z; m14 = 0.0;
-     m21 = up.x; m22 = up.y; m23 = up.z; m24 = 0.0;
-     m31 = camera_direct.x; m32 = camera_direct.y; m33 = camera_direct.z; m34 = 0.0;
-     m41 = 0.0; m42 = 0.0; m43 = 0.0; m44 = 1.0}
-
+    let base = {M.m11 = camera_x.x; m12 = camera_x.y; m13 = camera_x.z; m14 = 0.0;
+                m21 = up.x; m22 = up.y; m23 = up.z; m24 = 0.0;
+                m31 = camera_direct.x; m32 = camera_direct.y; m33 = camera_direct.z; m34 = 0.0;
+                m41 = 0.0; m42 = 0.0; m43 = 0.0; m44 = 1.0} in
+    M.multiply ~m1:base ~m2:trans
 
 end
 

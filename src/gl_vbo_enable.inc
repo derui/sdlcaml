@@ -75,7 +75,7 @@ CAMLprim value gl_api_glBufferData(value target, value size, value data, value u
 
   CHECK_FUNC(glBufferData, PFNGLBUFFERDATAPROC);
 
-  glBufferData(target_type[Int_val(target)], Int_val(size) * sizeof(float),
+  glBufferData(target_type[Int_val(target)], Int_val(size),
                Caml_ba_data_val(data),
                usage_type[Int_val(usage)]);
 

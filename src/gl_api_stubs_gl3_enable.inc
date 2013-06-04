@@ -1643,15 +1643,15 @@ CAMLprim value gl_api_glUniformMatrix(value location, value transpose, value val
   int count = Caml_ba_array_val(val)->dim[0];
   switch (count) {
     case 4:
-      glUniformMatrix2fv(Int_val(location), count, gl_transpose,
+      glUniformMatrix2fv(Int_val(location), 1, gl_transpose,
                          Caml_ba_data_val(val));
       break;
     case 9:
-      glUniformMatrix3fv(Int_val(location), count, gl_transpose,
+      glUniformMatrix3fv(Int_val(location), 1, gl_transpose,
                          Caml_ba_data_val(val));
       break;
     case 16:
-      glUniformMatrix4fv(Int_val(location), count, gl_transpose,
+      glUniformMatrix4fv(Int_val(location), 1, gl_transpose,
                          Caml_ba_data_val(val));
       break;
     default: caml_failwith("glUniformMatrix can give only 2x2, 3x3 or 4x4 matrix.");
