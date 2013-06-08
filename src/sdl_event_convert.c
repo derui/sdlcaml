@@ -76,7 +76,7 @@ value caml_convert_c2m_keyboard_event(SDL_Event* event, value tag) {
   /* get current state of the modify keys including pressed now only */
   for (int i = ml_table_size(ml_modkey_trans_table); i > 0; --i) {
     if (event->key.keysym.mod & ml_modkey_trans_table[i].value) {
-      modkey = add_head(modkey, Val_int(ml_modkey_trans_table[i].key));
+      modkey = add_head(modkey, ml_modkey_trans_table[i].key);
     }
   }
 
