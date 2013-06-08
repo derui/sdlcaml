@@ -28,6 +28,22 @@ module Camera : sig
   val make_matrix: pos:Candyvec.Vector.t -> at:Candyvec.Vector.t -> up:Candyvec.Vector.t
     -> Candyvec.Matrix4.t
 
+  (**
+     construct a projection matrix.
+     `fov' is that the field of view angle in the y direction.
+     `ratio` is screen ratio that determines the field of view in the x direction.
+     near and far is clip that visible range along the Z axis.
+
+     @param fov Field Of View
+     @param the ratio of x to y
+     @param near near clip
+     @param far far clip
+  *)
+  val make_perspective_matrix : fov:float ->
+  ratio:float ->
+  near:float ->
+  far:float -> Candyvec.Matrix4.t
+
 end
 
 (**
@@ -42,18 +58,19 @@ val ortho_projection : left:float -> right:float ->
 
 (**
    construct a projection matrix.
-   `fov' is that the field of view angle in the y direction.
-   `ratio` is screen ratio that determines the field of view in the x direction.
+   left and right is each side of the screen.
+   top and bottom is each maximum and minimum height of the screen.
    near and far is clip that visible range along the Z axis.
 
-   @param fov Field Of View
-   @param the ratio of x to y
+   @param left minimum x of the screen
+   @param right maximum x of the screen
+   @param top maximum y of the screen
+   @param bottom minimum y of the screen
    @param near near clip
    @param far far clip
 *)
 val perspective_projection :
-  fov:float ->
-  ratio:float ->
+  left:float -> right:float -> top:float -> bottom:float ->
   near:float ->
   far:float -> Candyvec.Matrix4.t
 
