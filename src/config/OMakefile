@@ -111,8 +111,9 @@ GenerateFlags(output) =
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME =
 #
-GENERATE = $(GenerateFlags sdl_initflags.h)
-GENERATE += $(GenerateFlags sdl_mixer_flags.h)
+GENERATE[] =
+  $(GenerateFlags sdl_initflags.h)
+  $(GenerateFlags sdl_mixer_flags.h)
 
 all: $(GENERATE)
 .DEFAULT: all

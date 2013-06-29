@@ -68,6 +68,16 @@ CAMLprim value gl_api_glBindBuffer(value target, value buffer) {
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value gl_api_glUnbindBuffer(value target) {
+  CAMLparam1(target);
+#include "enums/buffer_type.inc"
+  CHECK_FUNC(glBindBuffer, PFNGLBINDBUFFERPROC);
+
+  glBindBuffer(buffer_type[Int_val(target)], 0);
+
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value gl_api_glBufferData(value target, value size, value data, value usage) {
   CAMLparam4(target, size, data, usage);
 #include "enums/target_type.inc"
@@ -75,7 +85,7 @@ CAMLprim value gl_api_glBufferData(value target, value size, value data, value u
 
   CHECK_FUNC(glBufferData, PFNGLBUFFERDATAPROC);
 
-  glBufferData(target_type[Int_val(target)], Int_val(size),
+  glBufferData(target_type[Int_val(target)], Int_val(size) * get_bigarray_kind_size(data), 
                Caml_ba_data_val(data),
                usage_type[Int_val(usage)]);
 

@@ -4,6 +4,12 @@ CAMLprim value gl_api_glBindBuffer(value unit) {
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value gl_api_glUnbindBuffer(value unit) {
+  CAMLparam1(unit);
+  caml_failwith("gl_api_glUnbindBuffer can not use if OpenGL3.* option did not set.");
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value gl_api_glBufferData(value unit) {
   CAMLparam1(unit);
   caml_failwith("gl_api_glBufferData can not use if OpenGL3.* option did not set.");

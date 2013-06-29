@@ -129,7 +129,7 @@ FILES[] +=
 	gl_vbo
 	gl_api
 	gl_loader
-	glUtil
+	gl_util
 	gl
 
 # files for building extend libraries are contained to dependencies.
@@ -148,4 +148,4 @@ TARGETS = $(OCamlPackageGeneratedFiles $(LIBRARY_NAME), true)
 
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
-all: $(TARGETS) $(RequireBuild enums.ml) $(RequireBuild baselib.cmxa) $(RequireBuild vecmath.cmxa) $(SUB_FILES)
+all: $(TARGETS) $(RequireBuild enums.ml) $(SUB_FILES)

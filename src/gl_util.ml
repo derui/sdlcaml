@@ -1,3 +1,5 @@
+open Sugarpot.Std
+open Sugarpot.Std.Prelude
 module V = Candyvec.Vector
 module M = Candyvec.Matrix4
 
@@ -29,6 +31,66 @@ module Camera = struct
       M.m31 = 0.0 ; M.m32 = 0.0; M.m33 = a;   M.m34 = b;
       M.m41 = 0.0 ; M.m42 = 0.0; M.m43 = -1.0;   M.m44 =  0.0;
     }
+end
+
+module Shader = struct
+
+  let vertex_suffix = "vert"
+  let fragment_suffix = "frag"
+
+  let compile_shader ty source =
+    let open Gl_api in
+    let id = glCreateShader ty in
+    match glGetError () with
+    | Get.GL_NO_ERROR ->
+      glShaderSource id source;
+      glCompileShader id;
+
+      if glGetShader_bool ~shader:id ~pname:GetShader.GL_COMPILE_STATUS then
+        Either.Right(id)
+      else
+        let info = glGetShaderInfoLog id in
+        glDeleteShader id;
+        Either.Left(info)
+    | _ -> Either.Left("Some error occurs")
+  ;;
+
+  let load ?shader_type filename =
+    let open Gl_api in
+    let load_file ty =
+      Input.open_with filename
+        (fun ch ->
+          compile_shader ty |< Input.get_contents ch) in
+    match shader_type with
+    | None ->
+      if Filename.check_suffix filename vertex_suffix then
+        load_file Shader.GL_VERTEX_SHADER
+      else if Filename.check_suffix filename fragment_suffix then
+        load_file Shader.GL_FRAGMENT_SHADER
+      else
+        failwith "unknown shader type"
+    | Some(ty) -> load_file ty
+  ;;
+
+  let info_log = Gl_api.glGetShaderInfoLog
+  let source = Gl_api.glGetShaderSource
+  let delete = Gl_api.glDeleteShader
+
+end
+
+module Program = struct
+
+  let create = Gl_api.glCreateProgram
+  let attach program shader = Gl_api.glAttachShader ~program ~shader
+  let link p = Gl_api.glLinkProgram p
+  let attrib_location program name = Gl_api.glGetAttribLocation ~program ~name
+  let uniform_location program name = Gl_api.glGetUniformLocation ~program ~name
+
+  let location program locate name =
+    match locate with
+    | `Attrib -> attrib_location program name
+    | `Uniform -> uniform_location program name
+
 end
 
 let ortho_projection ~left ~right ~top ~bottom ~near ~far =

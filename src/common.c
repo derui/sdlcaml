@@ -1,6 +1,7 @@
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>
+#include <caml/bigarray.h>
 #include "common.h"
 
 int ml_lookup_to_c(lookup_info *table, value key) {
@@ -149,4 +150,46 @@ value array_from_c(value* array, int size) {
     Store_field(ret, i, array[i]);
   }
   CAMLreturn(ret);
+}
+
+int get_bigarray_kind_size(value bigarray) {
+  CAMLparam1(bigarray);
+
+  int size = 0;
+  switch (Bigarray_val(bigarray)->flags & BIGARRAY_KIND_MASK) {
+    case BIGARRAY_FLOAT32:
+      size = sizeof(float);
+      break;
+    case BIGARRAY_FLOAT64:
+      size = sizeof(double);
+      break;
+    case BIGARRAY_SINT8:
+      size =  sizeof(char);
+      break;
+    case BIGARRAY_UINT8:
+      size =  sizeof(unsigned char);
+      break;
+    case BIGARRAY_SINT16:
+      size = sizeof(short);
+      break;
+    case BIGARRAY_UINT16:
+      size = sizeof(unsigned short);
+      break;
+    case BIGARRAY_INT32:
+      size = sizeof(int);
+      break;
+    case BIGARRAY_INT64:
+      size = sizeof(long);
+      break;
+    case BIGARRAY_CAML_INT:
+      size = sizeof(int) - 1;
+      break;
+    case BIGARRAY_NATIVE_INT:
+      size = sizeof(int);
+      break;
+    default:
+      break;
+  }
+  
+  CAMLreturnT(int, size);
 }

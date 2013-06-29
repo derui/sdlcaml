@@ -20,6 +20,10 @@ end
 external glBindBuffer: target:Buffer.buffer_type -> buffer:buffer -> unit =
   "gl_api_glBindBuffer"
 
+(** Unbind buffer to targetting buffer type. *)
+external glUnbindBuffer: target:Buffer.buffer_type -> unit =
+  "gl_api_glUnbindBuffer"
+
 (** {{:http://www.opengl.org/sdk/docs/man/xhtml/glGenBuffers.xml}
     manual pages on opengl.org}
 *)

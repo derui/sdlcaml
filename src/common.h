@@ -57,4 +57,7 @@ value Val_right(value);
 /* convert array as c layout to array of caml layout.  */
 value array_from_c(value* array, int size);
 
+ /* get a size for kind of given bigarray */
+int get_bigarray_kind_size(value bigarray);
+
 #endif /* __COMMON_H__ */

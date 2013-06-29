@@ -47,6 +47,87 @@ module Camera : sig
 end
 
 (**
+   Providing to is wrapped operations for shader to create and delete.
+*)
+module Shader : sig
+
+  (**
+     Suffix for judgement shader type of the file is "Vertex Shader"
+  *)
+  val vertex_suffix : string
+  (**
+     Suffix for judgement shader type of the file is "Fragment Shader"
+  *)
+  val fragment_suffix : string
+
+  (**
+     Load shader source what is in the outer file and compile it, then return shader id.
+     Return error message if raise some errors.
+
+     If you did not give shader_type argument, load function judge shader_type solery on
+     extension of the given filename.
+     Example, compile as Vertex Shader if extension is "vert", as Fragment Shader if extension
+     is "frag".
+
+     @param shader_type specified shader type to compile shader source.
+     @param filename specified shader source location and file name
+     @return shader id if load source and compile is successful 
+  *)
+  val load : ?shader_type:Gl_api.Shader.shader_type -> string ->
+    (Gl_api.shader, string) Sugarpot.Std.Either.t
+
+  (**
+     Getting information log from given shader.
+
+     @param shader shader to get information log
+     @return information log
+  *)
+  val info_log : Gl_api.shader -> string
+
+  (**
+     Get source from the shader given
+
+     @param shader shader to get source 
+     @return source of the shader given
+  *)
+  val source : Gl_api.shader -> string
+
+  (**
+     delete shader that is already created
+
+     @param shader shader to delete
+  *)
+  val delete : Gl_api.shader -> unit
+end
+
+(**
+   Providing whole operations for the program in OpenGL.
+*)
+module Program : sig
+
+  (** Attach shader program to the program *)
+  val attach : Gl_api.program -> Gl_api.shader -> unit
+
+  (** create program  *)
+  val create : unit -> Gl_api.program
+
+  (** link program. This function need to call after attachment
+      shaders to use in the program.
+  *)
+  val link : Gl_api.program -> unit
+
+  (** Get attribute location  *)
+  val attrib_location : Gl_api.program -> string -> int
+
+  (** Get uniform location  *)
+  val uniform_location : Gl_api.program -> string -> int
+
+  (** Get uniform or attribute location. *)
+  val location : Gl_api.program -> [< `Attrib | `Uniform] -> string -> int
+
+end
+
+(**
    construct a projection matrix for `ortho projection'.
    given parameters of near and far are mostly equivalant of
    perspective_projection arguments.
