@@ -92,7 +92,7 @@ enums.ml ../enums.ml: $(PROGRAM) enum_list.xml
 	cp ./enums.ml ../
 
 #
-# OCAML_LIBS += ../lib/extlib -custom
+# OCAML_LIBS += -custom
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += camlidl
 # OCAML_LIB_FLAGS += -cclib -lsdlcaml
