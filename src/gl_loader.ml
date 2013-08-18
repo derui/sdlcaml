@@ -30,11 +30,11 @@ let correct_info img =
   let internal_format =
     (* only 8, 16, 24, and 32. *)
     match pformat.V.bits_per_pixel with
-    | v when v = rgb8 -> G.InternalFormat.GL_RGB8
-    | v when v = rgb16 -> G.InternalFormat.GL_RGB16
-    | v when v = rgb -> G.InternalFormat.GL_RGB
-    | v when v = rgba -> G.InternalFormat.GL_RGBA
-    | _ -> G.InternalFormat.GL_RGB      (* for default *)
+    | v when v = rgb8 -> G.InternalFormat.GL_RGBA8
+    | v when v = rgb16 -> G.InternalFormat.GL_RGBA16
+    | v when v = rgb -> G.InternalFormat.GL_RGBA32UI
+    | v when v = rgba -> G.InternalFormat.GL_RGBA32UI
+    | _ -> G.InternalFormat.GL_RGBA32UI      (* for default *)
   and format =
     match get_surface_format pformat with
     | `RGB -> G.Tex.GL_RGB

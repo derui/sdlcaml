@@ -40,10 +40,6 @@ void * MyNSGLGetProcAddress (const char* name) {
   }
 #else /* for *nix. */
 
-#include <GL/glext.h>
-#include <GL/glx.h>
-#include <GL/glxext.h>
-
 /* If using nVidia, do not this need? */
 #define CHECK_FUNC(func, proto) \
   static proto func = NULL; \

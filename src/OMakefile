@@ -117,7 +117,7 @@ OCAMLFLAGS    += -annot -bin-annot -g
 	export
 
 INCLUDES += ../include $(shella $(OCAMLC) -config | grep standard_library: | cut -d' ' -f 2) 
-CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC -fnested-functions -framework OpenGL
+CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC -fnested-functions
 # %$(EXT_OBJ): %.c :scanner: scan-c-%.c
 # 	$(OCamlC) -ccopt "-std=c99 $(SDL_CONFIGURE) $(CFLAGS)" -o $@ -c $<
 

@@ -14,11 +14,11 @@
     else func##_is_loaded = 1; \
   }
 #else  /* for MacOS X */
-#if !defined(__APPLE__) && defined(VMDMESA)
+#if defined(__APPLE__) && !defined(VMDMESA)
 #include <mach-o/dyld.h>
 #include <string.h>
 
-void * MyNSGLGetProcAddress (const char* name) {
+void * MyNSGLGetProcAddress_ (const char* name) {
   NSSymbol symbol;
   char *symbolName;
   symbolName = malloc(strlen(name) + 2);
