@@ -18,7 +18,7 @@
 #include <mach-o/dyld.h>
 #include <string.h>
 
-void * MyNSGLGetProcAddress (const char* name) {
+void * MyNSGLGetProcAddress_ (const char* name) {
   NSSymbol symbol;
   char *symbolName;
   symbolName = malloc(strlen(name) + 2);
@@ -36,15 +36,11 @@ void * MyNSGLGetProcAddress (const char* name) {
   static proto func = NULL; \
   static unsigned int func##_is_loaded = 0; \
   if (!func##_is_loaded) { \
-    func = (proto) NSIsSymbolNameDefined(#func); \
+    func = (proto) MyNSGLGetProcAddress(#func); \
     if (func == NULL) { caml_failwith("Unable to load " #func);} \
     else func##_is_loaded = 1; \
   }
 #else /* for *nix. */
-
-#include <GL/glext.h>
-#include <GL/glx.h>
-#include <GL/glxext.h>
 
 /* If using nVidia, do not this need? */
 #define CHECK_FUNC(func, proto) \

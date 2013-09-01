@@ -98,7 +98,6 @@ OCAMLOPTFLAGS +=
 .PHONY: doc clean
 
 generated = $(GenerateOcamldoc sdlcaml, $(dir sdlcaml/), $(removesuffix $(ls R, ../src/*ml)))
-generated += $(GenerateOcamldoc extlib, $(dir extlib/), $(removesuffix $(ls R, ../lib/*ml)))
 
 doc: $(generated)
 	dot -Tpng depend.dot -o depend.png
