@@ -2,9 +2,8 @@ let variants = [
   "TIMER";
   "VIDEO";
   "AUDIO";
-  "CDROM";
   "JOYSTICK";
-  "EVENTTHREAD";
+  "EVENTS";
   "NOPARACHUTE";
   "EVERYTHING";
 ]

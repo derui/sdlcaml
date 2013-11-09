@@ -11,7 +11,6 @@ type subsystem = [
 | `TIMER
 | `VIDEO
 | `AUDIO
-| `CDROM
 | `JOYSTICK
 ]
 
@@ -31,7 +30,7 @@ exception Sdl_init_exception of string
  *  @since 0.1
  *)
 external init : ?auto_clean:bool ->
-  flags:[< subsystem | `EVENTTHREAD | `NOPARACHUTE | `EVERYTHING] list -> unit ->
+  flags:[< subsystem | `EVENTS | `NOPARACHUTE | `EVERYTHING] list -> unit ->
     unit = "sdlcaml_init"
 (**
  * This function is wrapper of {b SDL_Quit}.

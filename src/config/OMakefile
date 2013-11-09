@@ -76,8 +76,8 @@ OCAMLOPTFLAGS += -linkpkg
 INCLUDES += /usr/include/caml
 
 GenerateFlags(output) =
-	FLAG_GENERATE_PROG_NAME = $(removesuffix $(output))
-	FLAG_GENERATE_PROG = $(addsuffix $(EXE), $(removesuffix $(output)))
+	protected.FLAG_GENERATE_PROG_NAME = $(removesuffix $(output))
+	protected.FLAG_GENERATE_PROG = $(addsuffix $(EXE), $(removesuffix $(output)))
 
 	$(output): $(FLAG_GENERATE_PROG) $(output).in
 		section
@@ -104,6 +104,33 @@ GenerateFlags(output) =
 
 	return $(array $(FLAG_GENERATE_PROG), $(output), ../$(output))
 
+GenerateTypeFlags(output, suffix) =
+	protected.OUTPUT_NAME = $(removesuffix $(output))
+	protected.FLAG_GENERATE_PROG_NAME = $(addsuffix $(suffix).ml, $(removesuffix $(output)))
+	protected.FLAG_GENERATE_PROG = $(addsuffix $(suffix)$(EXE), $(removesuffix $(output)))
+
+	$(output): $(FLAG_GENERATE_PROG) $(output).in
+		section
+			initflags = $(shella $<)
+			stdout = $(fopen $(output), w)
+			fsubst($(string $(nth 1, $+)))
+			case $"^#FLAGS"
+				foreach(x, $(initflags))
+					println($x)
+				value
+			cp $@ ../$@
+
+	../$(output): $(output)
+		section
+			cp $(output) $@
+
+	$(FLAG_GENERATE_PROG): $(FLAG_GENERATE_PROG_NAME)
+		section
+			TARGET = $@
+			$(OCAMLOPT) -o $(TARGET) $+
+	export
+
+	return $(array $(FLAG_GENERATE_PROG), $(output), ../$(output))
 #
 # OCAML_LIBS += ../lib/mylib
 # OCAML_CLIBS +=
@@ -112,8 +139,20 @@ GenerateFlags(output) =
 # OCAML_PACKAGE_NAME =
 #
 GENERATE[] =
-  $(GenerateFlags sdl_initflags.h)
-  $(GenerateFlags sdl_mixer_flags.h)
+	$(GenerateFlags sdl_initflags.h)
+	$(GenerateFlags sdl_mixer_flags.h)
+	$(GenerateTypeFlags sdl_window_event_id.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_window_event_id.c, _binding)
+	$(GenerateTypeFlags sdl_gl_context_flags.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_gl_context_flags.c, _binding)
+	$(GenerateTypeFlags sdl_gl_profile.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_gl_profile.c, _binding)
+	$(GenerateTypeFlags sdl_gl_attr.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_gl_attr.c, _binding)
+	$(GenerateTypeFlags sdl_blendmode.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_blendmode.c, _binding)
+	$(GenerateTypeFlags sdl_window_flags.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_window_flags.c, _binding)
 
 all: $(GENERATE)
 .DEFAULT: all

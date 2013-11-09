@@ -14,25 +14,12 @@
 (** array of image pixels on the surface  *)
 type image_type = (int, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Genarray.t
 
-(**
- * Binding of {b SDL_Surface}'s flags.
- *)
-type videomodes =
-  SDL_SWSURFACE    (** Surface is stored in system memory *)
-| SDL_HWSURFACE    (** Surface is stored in video memory *)
-| SDL_ASYNCBLIT    (** Surface uses asynchronous blits if possible *)
-| SDL_ANYFORMAT    (** Allows any pixel-format (Display surface) *)
-| SDL_HWPALETTE    (** Surface has exclusive palette *)
-| SDL_DOUBLEBUF    (** Surface is double buffered (Display surface) *)
-| SDL_FULLSCREEN   (** Surface is full screen (Display Surface) *)
-| SDL_OPENGL       (** Surface has an OpenGL context (Display Surface) *)
-| SDL_OPENGLBLIT   (** Surface supports OpenGL blitting (Display Surface) *)
-| SDL_RESIZABLE    (** Surface is resizable (Display Surface) *)
-| SDL_HWACCEL      (** Surface blit uses hardware acceleration *)
-| SDL_SRCCOLORKEY  (** Surface use colorkey blitting *)
-| SDL_RLEACCEL     (** Colorkey blitting is accelerated with RLE *)
-| SDL_SRCALPHA     (** Surface blit uses alpha blending *)
-| SDL_PREALLOC     (** Surface uses preallocated memory *)
+(** binding of {b SDL_BlendMode} *)
+type blendmode =
+  BLENDMODE_NONE
+| BLENDMODE_BLEND
+| BLENDMODE_ADD
+| BLENDMODE_MOD
 
 (** binding of {b SDL_GLattr}  *)
 type gl_attr =
@@ -48,6 +35,65 @@ type gl_attr =
 | GL_ACCUM_GREEN_SIZE (** Size of the accumulation buffer green component, in bits *)
 | GL_ACCUM_BLUE_SIZE  (** Size of the accumulation buffer blue component, in bits *)
 | GL_ACCUM_ALPHA_SIZE (** Size of the accumulation buffer alpha component, in bits *)
+| GL_STEREO           (** whether the output is stereo 3D; defaults to off *)
+| GL_MULTISAMPLEBUFFERS   (** the number of buffers used for multisample anti-aliasing;  *)
+| GL_MULTISAMPLESAMPLES   (** the number of samples used around the current pixel  *)
+| GL_ACCELERATED_VISUAL   (** set to 1 to require hard ware acceleration. *)
+| GL_CONTEXT_MAJOR_VERSION              (** OpenGL context major version *)
+| GL_CONTEXT_MINOR_VERSION              (** OpenGL context minor version *)
+| GL_CONTEXT_EGL                        (** set to 1 to use EGL *)
+(** GL_CONTEXT_FLAGS can not use in this library. Use set_context_flags function. *)
+(* | GL_CONTEXT_FLAGS                      (\** some combination of 0 or more of elements *\) *)
+(** GL_CONTEXT_PROFILE_MASK can not use in this library. Use set_context_mask function.*)
+(* | GL_CONTEXT_PROFILE_MASK               (\** one of the members of the glprofile. *\) *)
+| GL_SHARE_WITH_CURRENT_CONTEXT         (** OpenGL context sharing; default to 0 *)
+| GL_FRAMEBUFFER_SRGB_CAPABLE           (** requests sRGB capable visual; *)
+
+(** Flags to context status *)
+type gl_context_flag =
+  GL_CONTEXT_DEBUG_FLAG
+| GL_CONTEXT_FORWARD_COMPATIBLE_FLAGS
+| GL_CONTEXT_ROBUST_ACCESS_FLAG
+| GL_CONTEXT_RESET_ISOLATION_FLAG
+
+(** binding to SDL_GLprofile *)
+type gl_profile =
+  GL_CONTEXT_PROFILE_CORE
+| GL_CONTEXT_PROFILE_COMPATIBILITY
+| GL_CONTEXT_PROFILE_ES
+
+(** binding to SDL_WindowEventID *)
+type window_event =
+  WINDOWEVENT_SHOWN (** window has been shown *)
+| WINDOWEVENT_HIDDEN (** window has been hidden *)
+| WINDOWEVENT_EXPOSED (** window has been exposed and should be redrawn *)
+| WINDOWEVENT_MOVED (** window has been moved to data1, data2 *)
+| WINDOWEVENT_RESIZED (** window has been resized to data1xdata2; this is event is always preceded by SDL_WINDOWEVENT_SIZE_CHANGED *)
+| WINDOWEVENT_SIZE_CHANGED (** window size has changed, either as a result of an API call or through the system or user changing the window size; this event is followed by SDL_WINDOWEVENT_RESIZED if the size was changed by an external event, i.e. the user or the window manager *)
+| WINDOWEVENT_MINIMIZED (** window has been minimized *)
+| WINDOWEVENT_MAXIMIZED (** window has been maximized *)
+| WINDOWEVENT_RESTORED (** window has been restored to normal size and position *)
+| WINDOWEVENT_ENTER (** window has gained mouse focus *)
+| WINDOWEVENT_LEAVE (** window has lost mouse focus *)
+| WINDOWEVENT_FOCUS_GAINED (** window has gained keyboard focus *)
+| WINDOWEVENT_FOCUS_LOST (** window has lost keyboard focus *)
+| WINDOWEVENT_CLOSE (** the window manager requests that the window be closed *)
+
+(** binding to SDL_WindowFlags *)
+type window_flags =
+  WINDOW_FULLSCREEN (** fullscreen window *)
+| WINDOW_FULLSCREEN_DESKTOP (** fullscreen window at the current desktop resolution *)
+| WINDOW_OPENGL (** window usable with OpenGL context *)
+| WINDOW_SHOWN (** window is visible *)
+| WINDOW_HIDDEN (** window is not visible *)
+| WINDOW_BORDERLESS (** no window decoration *)
+| WINDOW_RESIZABLE (** window can be resized *)
+| WINDOW_MINIMIZED (** window is minimized *)
+| WINDOW_MAXIMIZED (** window is maximized *)
+| WINDOW_INPUT_GRABBED (** window has grabbed input focus *)
+| WINDOW_INPUT_FOCUS (** window has input focus *)
+| WINDOW_MOUSE_FOCUS (** window has mouse focus *)
+| WINDOW_FOREIGN (** window not created by SDL *)
 
 exception Sdl_video_exception of string
 

@@ -37,18 +37,27 @@ int ml_convert_gl_attr_to_c(value attr) {
   CAMLparam1(attr);
 
   switch (Int_val(attr)) {
-    case  0: CAMLreturnT(int, SDL_GL_RED_SIZE);
-    case  1: CAMLreturnT(int, SDL_GL_GREEN_SIZE);
-    case  2: CAMLreturnT(int, SDL_GL_BLUE_SIZE);
-    case  3: CAMLreturnT(int, SDL_GL_ALPHA_SIZE);
-    case  4: CAMLreturnT(int, SDL_GL_DOUBLEBUFFER);
-    case  5: CAMLreturnT(int, SDL_GL_BUFFER_SIZE);
-    case  6: CAMLreturnT(int, SDL_GL_DEPTH_SIZE);
-    case  7: CAMLreturnT(int, SDL_GL_STENCIL_SIZE);
-    case  8: CAMLreturnT(int, SDL_GL_ACCUM_RED_SIZE);
-    case  9: CAMLreturnT(int, SDL_GL_ACCUM_GREEN_SIZE);
-    case 10: CAMLreturnT(int, SDL_GL_ACCUM_BLUE_SIZE);
-    case 11: CAMLreturnT(int, SDL_GL_ACCUM_ALPHA_SIZE);
+    case  0 : CAMLreturnT(int, SDL_GL_RED_SIZE);
+    case  1 : CAMLreturnT(int, SDL_GL_GREEN_SIZE);
+    case  2 : CAMLreturnT(int, SDL_GL_BLUE_SIZE);
+    case  3 : CAMLreturnT(int, SDL_GL_ALPHA_SIZE);
+    case  4 : CAMLreturnT(int, SDL_GL_DOUBLEBUFFER);
+    case  5 : CAMLreturnT(int, SDL_GL_BUFFER_SIZE);
+    case  6 : CAMLreturnT(int, SDL_GL_DEPTH_SIZE);
+    case  7 : CAMLreturnT(int, SDL_GL_STENCIL_SIZE);
+    case  8 : CAMLreturnT(int, SDL_GL_ACCUM_RED_SIZE);
+    case  9 : CAMLreturnT(int, SDL_GL_ACCUM_GREEN_SIZE);
+    case 10 : CAMLreturnT(int, SDL_GL_ACCUM_BLUE_SIZE);
+    case 11 : CAMLreturnT(int, SDL_GL_ACCUM_ALPHA_SIZE);
+    case 12 : CAMLreturnT(int, SDL_GL_STEREO);
+    case 13 : CAMLreturnT(int, SDL_GL_MULTISAMPLEBUFFERS);
+    case 14 : CAMLreturnT(int, SDL_GL_MULTISAMPLESAMPLES);
+    case 15 : CAMLreturnT(int, SDL_GL_ACCELERATED_VISUAL);
+    case 16 : CAMLreturnT(int, SDL_GL_CONTEXT_MAJOR_VERSION);
+    case 17 : CAMLreturnT(int, SDL_GL_CONTEXT_MINOR_VERSION);
+    case 18 : CAMLreturnT(int, SDL_GL_CONTEXT_EGL);
+    case 19 : CAMLreturnT(int, SDL_GL_SHARE_WITH_CURRENT_CONTEXT);
+    case 20 : CAMLreturnT(int, SDL_GL_FRAMEBUFFER_SRGB_CAPABLE);
   }
   caml_failwith("Can not convert between attr of C and attr of Caml");
 }

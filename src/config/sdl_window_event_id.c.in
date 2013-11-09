@@ -1,0 +1,7 @@
+#include "sdl_window_event_id.h"
+
+#include <SDL_video.h>
+
+lookup_info ml_window_event_id_table[] = {
+#FLAGS
+};
