@@ -14,12 +14,12 @@ module Camera = struct
     let ex = -. (pos.x *. camera_x.x +. pos.y *. camera_x.y +. pos.z *. camera_x.z)
     and ey = -. (pos.x *. up.x +. pos.y *. up.y +. pos.z *. up.z)
     and ez = -. (pos.x *. camera_direct.x +. pos.y *. camera_direct.y +. pos.z *. camera_direct.z) in
-    let base = {M.m11 = camera_x.x; m12 = camera_x.y; m13 = camera_x.z; m14 = ex;
-                m21 = up.x; m22 = up.y; m23 = up.z; m24 = ey;
-                m31 = camera_direct.x; m32 = camera_direct.y; m33 = camera_direct.z; m34 = ez;
-                m41 = 0.0; m42 = 0.0; m43 = 0.0; m44 = 1.0} in
-    base
-  ;;
+    { M.m11 = camera_x.x; m12 = camera_x.y; m13 = camera_x.z; m14 = ex;
+      m21 = up.x; m22 = up.y; m23 = up.z; m24 = ey;
+      m31 = camera_direct.x; m32 = camera_direct.y; m33 = camera_direct.z; m34 = ez;
+      m41 = 0.0; m42 = 0.0; m43 = 0.0; m44 = 1.0
+    }
+  
 
   let make_perspective_matrix ~fov ~ratio ~near ~far =
     let pi = 3.14159265358979323846 in
@@ -53,7 +53,6 @@ module Shader = struct
         glDeleteShader id;
         Either.Left(info)
     | _ -> Either.Left("Some error occurs")
-  ;;
 
   let load ?shader_type filename =
     let open Gl_api in
@@ -70,7 +69,6 @@ module Shader = struct
       else
         failwith "unknown shader type"
     | Some(ty) -> load_file ty
-  ;;
 
   let info_log = Gl_api.glGetShaderInfoLog
   let source = Gl_api.glGetShaderSource
