@@ -1,0 +1,22 @@
+let flags = [
+  "SDL_WINDOW_FULLSCREEN";
+  "SDL_WINDOW_FULLSCREEN_DESKTOP";
+  "SDL_WINDOW_OPENGL";
+  "SDL_WINDOW_SHOWN";
+  "SDL_WINDOW_HIDDEN";
+  "SDL_WINDOW_BORDERLESS";
+  "SDL_WINDOW_RESIZABLE";
+  "SDL_WINDOW_MINIMIZED";
+  "SDL_WINDOW_MAXIMIZED";
+  "SDL_WINDOW_INPUT_GRABBED";
+  "SDL_WINDOW_INPUT_FOCUS";
+  "SDL_WINDOW_MOUSE_FOCUS";
+  "SDL_WINDOW_FOREIGN";
+  "SDL_WINDOW_ALLOW_HIGHDPI";
+]
+
+let () =
+  ignore (List.fold_left (fun n flag ->
+    Printf.printf "#define MLTAG_%s (%d)\n" flag n;
+    succ n
+  ) 0 flags)

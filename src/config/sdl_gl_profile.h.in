@@ -1,0 +1,10 @@
+#ifndef __SDL_GL_PROFILE_H__
+#define __SDL_GL_PROFILE_H__
+
+#include "common.h"
+
+#FLAGS
+
+extern lookup_info ml_gl_profile_table[];
+
+#endif /*__SDL_WINDOW_EVENT_ID_H__*/

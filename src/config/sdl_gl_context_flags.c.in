@@ -1,0 +1,7 @@
+#include "sdl_gl_context_flags.h"
+
+#include <SDL_video.h>
+
+lookup_info ml_gl_context_flags_table[] = {
+#FLAGS
+};

@@ -54,7 +54,7 @@ BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 #
 # Various options
 #
-OCAMLFLAGS    += -annot
+OCAMLFLAGS    += -annot-bin
 # OCAMLCFLAGS   +=
 OCAMLOPTFLAGS += -linkpkg
 # OCAML_LINK_FLAGS +=
@@ -74,35 +74,6 @@ OCAMLOPTFLAGS += -linkpkg
 #
 
 INCLUDES += /usr/include/caml
-
-GenerateFlags(output) =
-	protected.FLAG_GENERATE_PROG_NAME = $(removesuffix $(output))
-	protected.FLAG_GENERATE_PROG = $(addsuffix $(EXE), $(removesuffix $(output)))
-
-	$(output): $(FLAG_GENERATE_PROG) $(output).in
-		section
-			initflags = $(shella $<)
-			stdout = $(fopen $(output), w)
-			fsubst($(string $(nth 1, $+)))
-			case $"^#FLAGS"
-				foreach(x, $(initflags))
-					println($x)
-				value
-			cp $@ ../$@
-
-	../$(output): $(output)
-		section
-			cp $(output) $@
-
-	$(FLAG_GENERATE_PROG): outputflag.c $(FLAG_GENERATE_PROG_NAME).ml
-		section
-			TARGET = $@
-			$(OCAMLC) -ccopt "$(PREFIXED_INCLUDES)" -o $(addsuffix $(EXT_OBJ), $(removesuffix $<)) -c $<
-			$(OCAMLMKLIB) -o $(removesuffix $@) $(addsuffix $(EXT_OBJ), $(removesuffix $<))
-			$(OCAMLOPT) -o $@ $(nth 1, $+) -cclib "$(absname lib$(removesuffix $(TARGET))$(EXT_LIB))"
-	export
-
-	return $(array $(FLAG_GENERATE_PROG), $(output), ../$(output))
 
 GenerateTypeFlags(output, suffix) =
 	protected.OUTPUT_NAME = $(removesuffix $(output))
@@ -139,8 +110,6 @@ GenerateTypeFlags(output, suffix) =
 # OCAML_PACKAGE_NAME =
 #
 GENERATE[] =
-	$(GenerateFlags sdl_initflags.h)
-	$(GenerateFlags sdl_mixer_flags.h)
 	$(GenerateTypeFlags sdl_window_event_id.h, $(EMPTY))
 	$(GenerateTypeFlags sdl_window_event_id.c, _binding)
 	$(GenerateTypeFlags sdl_gl_context_flags.h, $(EMPTY))

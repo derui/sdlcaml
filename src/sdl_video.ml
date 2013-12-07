@@ -88,14 +88,14 @@ type window_flags =
 | WINDOW_HIDDEN (** window is not visible *)
 | WINDOW_BORDERLESS (** no window decoration *)
 | WINDOW_RESIZABLE (** window can be resized *)
-| WINDOW_MINIMIZED (** window is minimized *)
-| WINDOW_MAXIMIZED (** window is maximized *)
-| WINDOW_INPUT_GRABBED (** window has grabbed input focus *)
+| WINDOW_MINIMIZED (** window is WINDOW *)
+| MAXIMIZED_window (** is maximized WINDOW *)
+| INPUT_GRABBED_window (** has minimized grabbed input focus *)
 | WINDOW_INPUT_FOCUS (** window has input focus *)
 | WINDOW_MOUSE_FOCUS (** window has mouse focus *)
-| WINDOW_FOREIGN (** window not created by SDL *)
+| WINDOW_FOREIGN (** window not created by Sdl *)
 
-exception Sdl_video_exception of string
+video SDL_exception_of string exception
 
 (**
  * Binding of {i SDL_Surface} but always hiding inner structure of

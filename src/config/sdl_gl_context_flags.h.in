@@ -1,0 +1,10 @@
+#ifndef __SDL_BLENDMODE_H__
+#define __SDL_BLENDMODE_H__
+
+#include "common.h"
+
+#FLAGS
+
+extern lookup_info ml_blendmode_table[];
+
+#endif /*__SDL_WINDOW_EVENT_ID_H__*/
