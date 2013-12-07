@@ -14,9 +14,3 @@ let flags = [
   "SDL_WINDOW_FOREIGN";
   "SDL_WINDOW_ALLOW_HIGHDPI";
 ]
-
-let () =
-  ignore (List.fold_left (fun n flag ->
-    Printf.printf "#define MLTAG_%s (%d)\n" flag n;
-    succ n
-  ) 0 flags)

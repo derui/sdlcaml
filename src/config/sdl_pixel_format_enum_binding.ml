@@ -1,6 +1,1 @@
-let flags = Sdl_pixel_format_enum.flags
-let () =
-  Printf.printf "  {0, %d}\n" (List.length flags);
-  List.iter (fun  flag ->
-    Printf.printf "  ,{Val_int(MLTAG_%s), %s}\n" flag flag;
-  ) flags
+Flag_printer.print_mapping Sdl_pixel_format_enum.flags

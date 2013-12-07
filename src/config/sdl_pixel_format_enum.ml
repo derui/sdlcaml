@@ -32,9 +32,3 @@ let flags = [
   "SDL_PIXELFORMAT_UYVY";
   "SDL_PIXELFORMAT_YVYU";
 ]
-
-let () =
-  ignore (List.fold_left (fun n flag ->
-    Printf.printf "#define MLTAG_%s (%d)\n" flag n;
-    succ n
-  ) 0 flags)

@@ -24,9 +24,3 @@ let flags = [
   "SDL_GL_SHARE_WITH_CURRENT_CONTEXT";
   "SDL_GL_FRAMEBUFFER_SRGB_CAPABLE";
 ]
-
-let () =
-  ignore (List.fold_left (fun n flag ->
-    Printf.printf "#define MLTAG_%s (%d)\n" flag n;
-    succ n
-  ) 0 flags)

@@ -54,7 +54,7 @@ BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
 #
 # Various options
 #
-OCAMLFLAGS    += -annot-bin
+OCAMLFLAGS    += -bin-annot
 # OCAMLCFLAGS   +=
 OCAMLOPTFLAGS += -linkpkg
 # OCAML_LINK_FLAGS +=
@@ -78,8 +78,9 @@ INCLUDES += /usr/include/caml
 GenerateTypeFlags(output, suffix) =
 	protected.OUTPUT_NAME = $(removesuffix $(output))
 	protected.FLAG_GENERATE_PROG_NAME[] =
+		flag_printer.ml
 		$(addsuffix .ml, $(removesuffix $(output)))
-		$(addsuffix _binding.ml, $(removesuffix $(output)))
+		$(addsuffix $(suffix).ml, $(removesuffix $(output)))
 
 	protected.FLAG_GENERATE_PROG = $(addsuffix $(suffix)$(EXE), $(removesuffix $(output)))
 
@@ -113,19 +114,19 @@ GenerateTypeFlags(output, suffix) =
 # OCAML_PACKAGE_NAME =
 #
 GENERATE[] =
-	$(GenerateTypeFlags sdl_window_event_id.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_window_event_id.h, _header)
 	$(GenerateTypeFlags sdl_window_event_id.c, _binding)
-	$(GenerateTypeFlags sdl_gl_context_flags.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_gl_context_flags.h, _header)
 	$(GenerateTypeFlags sdl_gl_context_flags.c, _binding)
-	$(GenerateTypeFlags sdl_gl_profile.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_gl_profile.h, _header)
 	$(GenerateTypeFlags sdl_gl_profile.c, _binding)
-	$(GenerateTypeFlags sdl_gl_attr.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_gl_attr.h, _header)
 	$(GenerateTypeFlags sdl_gl_attr.c, _binding)
-	$(GenerateTypeFlags sdl_blendmode.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_blendmode.h, _header)
 	$(GenerateTypeFlags sdl_blendmode.c, _binding)
-	$(GenerateTypeFlags sdl_window_flags.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_window_flags.h, _header)
 	$(GenerateTypeFlags sdl_window_flags.c, _binding)
-	$(GenerateTypeFlags sdl_pixel_format_enum.h, $(EMPTY))
+	$(GenerateTypeFlags sdl_pixel_format_enum.h, _header)
 	$(GenerateTypeFlags sdl_pixel_format_enum.c, _binding)
 
 all: $(GENERATE)

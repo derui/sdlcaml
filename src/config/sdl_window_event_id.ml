@@ -14,9 +14,3 @@ let flags = [
   "SDL_WINDOWEVENT_FOCUS_LOST";
   "SDL_WINDOWEVENT_CLOSE";
 ]
-
-let () =
-  ignore (List.fold_left (fun n flag ->
-    Printf.printf "#define MLTAG_%s (%d)\n" flag n;
-    succ n
-  ) 0 flags)
