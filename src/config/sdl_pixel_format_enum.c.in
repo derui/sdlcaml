@@ -1,0 +1,7 @@
+#include "sdl_pixel_format_enum.h"
+
+#include <SDL_video.h>
+
+lookup_info ml_pixel_format_enum_table[] = {
+#FLAGS
+};

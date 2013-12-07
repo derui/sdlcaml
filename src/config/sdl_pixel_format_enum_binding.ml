@@ -1,4 +1,4 @@
-let flags = Sdl_window_event_id.flags
+let flags = Sdl_pixel_format_enum.flags
 let () =
   Printf.printf "  {0, %d}\n" (List.length flags);
   List.iter (fun  flag ->

@@ -34,8 +34,7 @@
 *.css
 
 # generated header file:no tracking
-src/config/sdl_init_flags.h
-src/config/sdl_mixer_flags.h
-src/config/gl_flags.h
+src/config/*.h
+src/config/*.c
 
 src/enums/*.inc
