@@ -1,0 +1,24 @@
+type t =
+    SDL_RWOPS_UNKNOWN
+  | SDL_RWOPS_WINFILE
+  | SDL_RWOPS_STDFILE
+  | SDL_RWOPS_INIFILE
+  | SDL_RWOPS_MEMORY
+  | SDL_RWOPS_MEMORY_RO
+
+let to_int = function
+  | SDL_RWOPS_UNKNOWN -> 0
+  | SDL_RWOPS_WINFILE -> 1
+  | SDL_RWOPS_STDFILE -> 2
+  | SDL_RWOPS_INIFILE -> 3
+  | SDL_RWOPS_MEMORY -> 4
+  | SDL_RWOPS_MEMORY_RO -> 5
+
+let of_int = function
+  | 0 -> SDL_RWOPS_UNKNOWN
+  | 1 -> SDL_RWOPS_WINFILE
+  | 2 -> SDL_RWOPS_STDFILE
+  | 3 -> SDL_RWOPS_INIFILE
+  | 4 -> SDL_RWOPS_MEMORY
+  | 5 -> SDL_RWOPS_MEMORY_RO
+  | _ -> failwith "Unknow value for stream type"

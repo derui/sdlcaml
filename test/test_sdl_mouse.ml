@@ -1,29 +1,60 @@
-open Sdlcaml
-open OUnit
+open Ctypes
+open Core.Std
+open Sdlcaml.Std
 
-let test_set_up _ =
-  Sdl_init.init [`VIDEO] ()
+let with_sdl f =
+  Init.init Flags.Sdl_init_flags.([SDL_INIT_VIDEO]);
+  protect ~f ~finally:Init.quit |> ignore
 
-let test_tear_down _ =
-  Sdl_init.quit ()
+let%spec "SDL Mouse module can get mouse state" =
+  with_sdl (fun () ->
+    let mouse_state = Mouse.get_state () in
+    let point = Mouse.State.point mouse_state in
+    let open Structures in
+    Point.(point.x >= 0) [@true "valid X coordinate of mouse"];
+    Point.(point.y >= 0) [@true "valid Y coordinate of mouse"];
+    [] [@eq []];
+  )
 
-let test_mouse_state _ =
-  let open Sdl_mouse in
-  let mouse_state = get_mouse_state () in
-  let pressed {state;index} = state in
-  begin
-    assert_bool "valid X coordinate of mouse" (mouse_state.x >= 0);
-    assert_bool "valid Y coordinate of mouse" (mouse_state.y >= 0);
-    assert_bool "there is no pressed mouse button"
-      (List.for_all pressed (mouse_state.button_states));
-  end
+let%spec "SDL Mouse module can create system cursor" =
+  with_sdl (fun () ->
+    let open Flags in
+    let cursor = Mouse.create_system_cursor Sdl_system_cursor.SDL_SYSTEM_CURSOR_ARROW in
+    let open Types.Result.Monad_infix in
+    let s = cursor >>= (fun cursor ->
+      Mouse.set cursor;
+      Types.Result.return ()
+    ) in
+    match s with
+    | Types.Result.Success _ -> ()
+    | Types.Result.Failure s -> s [@fail]
+  ) 
 
-let tmp_bracket f = bracket test_set_up f test_tear_down
+let%spec "SDL Mouse module can toggle what cursor is shown" =
+  with_sdl (fun () ->
+    let open Types.Result.Monad_infix in
+    Mouse.show () >>= (fun s ->
+      Mouse.hide () >>= (fun h ->
+        Mouse.is_showing () >>= (fun q ->
+          s [@eq `SHOWN];
+          h [@eq `SHOWN];
+          q [@eq `HIDDEN];
+          Types.Result.return ()
+        )
+      )
+    )
+  )
 
-let suite = "SDL mouse functions specs" >::: [
-  "getting mouse state " >:: (tmp_bracket test_mouse_state);
-]
-
-
-let _ =
-  run_test_tt_main suite
+let%spec "SDL Mouse module can warp to the point" =
+  with_sdl (fun () ->
+    let open Types.Result.Monad_infix in
+    let open Structures in
+    Mouse.warp_global Point.({x = 10;y = 100}) >>= (fun () ->
+      let s = Mouse.get_global_state () in
+      let module S = Mouse.State in
+      let point = S.point s in
+      point.Point.x [@eq 10];
+      point.Point.y [@eq 100];
+      Types.Result.return ()
+    )
+  )

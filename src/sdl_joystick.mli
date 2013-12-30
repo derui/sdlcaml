@@ -1,189 +1,85 @@
 (**
- * this module provide lowlevel SDL bindings for SDL Joystick. this don't include
- * high level API for user. these functions are often use only inner library.
- *
- * @author derui
- * @since 0.1
- *)
+   Define module to provide joystick API wrapper and helpers.
 
-(**
-   joystick axis. almost modern joystick has no less than 3 axis and
-   more.
-   Axis index in the modern joystick are X is 0, Y is 1, Z is 2...
-   but few joysticks has different index of axis then use OTHER_AXIS.
+   @author derui
+   @since 0.2
 *)
-type axis =
-| X_AXIS
-| Y_AXIS
-| Z_AXIS
-| OTHER_AXIS of int
 
-(** Variant for hat values *)
-type hat =
-| HAT_CENTERED
-| HAT_UP
-| HAT_RIGHT
-| HAT_DOWN
-| HAT_LEFT
-| HAT_RIGHTUP
-| HAT_RIGHTDOWN
-| HAT_LEFTUP
-| HAT_LEFTDOWN
+type t = Sdl_types.Joystick.t
+(** The type of Joystick instance *)
 
-(** joystick button state.  *)
-type button = {
-  num:int;
-  state:bool;
-}
+type id = int32
 
-(**
-   Wrapped to raw {b SDL_Joystick}.
-*)
-type joystick
+type state = Ignore | Enable
 
-(**
-   Get counts the number of joysticks attached to the system
+type axis = Axis1 | Axis2 | Axis3 | Axis4 | AxisX of int
+(** An axis of the joystick. If the joystick has axis greater than 4, use AxisX constructor. *)
 
-   @return the number of attached joysticks
-*)
-external get_num: unit -> int = "sdlcaml_num_joystick"
+type button = Button of int
+(** The button of a Joystick *)
 
-(**
-   Get implementation dependent name of joystick. Tne {!index}
-   parameter refers to the N'th joystick on the system.
+val close : t -> unit
+(** Close the specified joystick. *)
 
-   @param index refer N'th joystick
-   @return joystick name
-*)
-external get_name: int -> string = "sdlcaml_joystick_name"
+val is_ignored : unit -> bool Sdl_types.Result.t
+(** Get current state whether is ignore or not *)
 
-(**
-   Open a joystick for use within SDL.
-   Returned joystick from this function have to apply
-   to {!joystick_close} end of program or unwanted.
+val is_enabled : unit -> bool Sdl_types.Result.t
+(** Get current state whether is enable or not *)
 
-   @param index index refers to N'th joystick in the system
-   @return return Some if on success
-*)
-external joystick_open:int -> joystick option =
-  "sdlcaml_joystick_open"
+val get_current_state: unit -> state Sdl_types.Result.t
+(** Get current state for the specified joystick *)
 
-(**
-   Closes a previously opened joystick.
+val is_attached: t -> bool Sdl_types.Result.t
+(** Get the status of a specified joystick *)
 
-   @param joystick opened joystick
-*)
-external joystick_close:joystick -> unit = "sdlcaml_joystick_close"
+val get_axis : joystick:t -> axis:axis -> int Sdl_types.Result.t
+(** Get the current state of an axis control on a joystick *)
 
-(**
-   Determine if a joystick has been opened.
+val get_ball: joystick:t -> ball:int -> Sdlcaml_structures.Point.t Sdl_types.Result.t
+  (** Get the ball axis change since the last poll *)
 
-   @param index refers to the N'th joystick on the system
-   @return true if the joystick has been opened
-*)
-external opened: int -> bool = "sdlcaml_joystick_opened"
+val get_button: joystick:t -> button:button -> Sdl_types.button_state
+(** Get the current state of a button on a joystick *)
 
-(**
-   Get the index of given joystick.
+val get_guid: t -> Sdlcaml_structures.Joystick_guid.t Sdl_types.Result.t
+(** Get the GUID for the joystick *)
 
-   @param joystick opened joystick
-   @return index number of the joystick
-*)
-external index: joystick -> int = "sdlcaml_joystick_index"
+val get_guid_string: Sdlcaml_structures.Joystick_guid.t -> string
+(** Get the ASCII string of the specified GUID *)
 
-(**
-   Get the number of joystick axis.
+val get_hat: joystick:t -> hat:int -> Sdlcaml_flags.Sdl_hat.t Sdl_types.Result.t
+(** Get the ball axis change since the last poll *)
 
-   @param joystick previously opened joystick
-   @return axis number of the joystick
-*)
-external num_axis: joystick -> int = "sdlcaml_joystick_num_axis"
+val get_instance_id: t -> id Sdl_types.Result.t
+(** Get the device index of an opened joystick *)
 
-(**
-   Get the number of joystick trackballs.
+val name: t -> string
+(** Get the name of a joystick *)
 
-   @param joystick previously opened joystick
-   @return trackball number of the joystick
-*)
-external num_balls: joystick -> int = "sdlcaml_joystick_num_balls"
+val num_axes: t -> int Sdl_types.Result.t
+(** Get the number of general axis onctrols on a joystick *)
 
-(**
-   Get the number of joystick hats.
+val num_balls: t -> int Sdl_types.Result.t
+(** Get the number of general trackball on a joystick *)
 
-   @param joystick previously opened joystick
-   @return hats number of the joystick
-*)
-external num_hats: joystick -> int = "sdlcaml_joystick_num_hats"
+val num_buttons: t -> int Sdl_types.Result.t
+(** Get the number of buttons on a joystick *)
 
-(**
-   Get the number of joystick buttons.
+val num_hats: t -> int Sdl_types.Result.t
+(** Get the number of POV hats on a joystick *)
 
-   @param joystick previously opened joystick
-   @return buttons number of the joystick
-*)
-external num_buttons: joystick -> int = "sdlcaml_joystick_num_buttons"
+val open_device: int -> t Sdl_types.Result.t
+(** open a joystick for use *)
 
-(**
-   Update the state(position, buttons, etc.) of all open joysticks.
-   If joystick events have been enabled with {!event_state} then this is
-   called automatically in the event loop
-*)
-external update: unit -> unit = "sdlcaml_joystick_update"
+val update : unit -> unit
+(** Update the current state of the open joysticks *)
 
-(**
-   Get the current state of an axis. The value returned by this
-   function is a signed int of 16bit representing the current position
-   of the axis.
+val num_joysticks: unit -> int Sdl_types.Result.t
+(** Count the number of joysticks attached to the system *)
 
-   @param js a joystick
-   @param axis any {!axis} to want to take.
-   @return current state of an axis
-*)
-external get_axis: js:joystick -> axis:axis -> int = "sdlcaml_joystick_get_axis"
+  (** Not implement yet functions below.
 
-(**
-   Get the current state of a joystick hat.
-
-   @param js joystick
-   @param hat index of hat on joystick
-   @return one or more listed {!hat}
-*)
-external get_hat: js:joystick -> hat:int -> hat list = "sdlcaml_joystick_get_hat"
-
-(**
-   Get relative trackball motion.
-   Return relative motion since the last call this, these motion are
-   tuple as (dx, dy).
-
-   @param js joystick is surmounted by trackball
-   @param ball index of trackball on the joystick
-   @return relative motion since the last call this.
-*)
-external get_ball: js:joystick -> ball:int -> int * int = "sdlcaml_joystick_get_ball"
-
-(**
-   Get the current state of a given button on a given joystick.
-
-   @param js joystick
-   @param button number of button on the joystick
-   @return true if pressed, false if released
-*)
-external get_button: js:joystick -> button:int -> bool = "sdlcaml_joystick_get_button"
-
-(**
-   Get the current state of all axis. The value returned by this
-   function is a signed int of 16bit representing the current position
-   of the axis.
-   the return values contains X, Y and Z_AXIS which they correspond each 0, 1 and 2 number of axis.
-
-   @param js a joystick
-   @return current state of all axes
-*)
-val get_axis_all: js:joystick -> (axis * int) list
-
-(** Get the current state of all buttons on a give joystick.
-
-    @param js joystick
-    @return current state of all buttons, values are tuple of number of button and state.
-*)
-val get_button_all: js:joystick -> (int * bool) list
+      SDL_JoystickGetDeviceGUID
+      SDL_JoystickNameForIndex
+  *)

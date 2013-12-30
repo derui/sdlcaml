@@ -1,201 +1,139 @@
-(**
- * this module provide lowlevel SDL bindings for SDL Joystick. this don't include
- * high level API for user. these functions are often use only inner library.
- *
- * @author derui
- * @since 0.1
- *)
+open Core.Std
+open Ctypes
+open Foreign
+open Sdlcaml_flags
+open Sdlcaml_structures
 
-(**
-   joystick axis. almost modern joystick has no less than 3 axis and
-   more.
-   Axis index in the modern joystick are X is 0, Y is 1, Z is 2...
-   but few joysticks has different index of axis then use OTHER_AXIS.
-*)
-type axis =
-| X_AXIS
-| Y_AXIS
-| Z_AXIS
-| OTHER_AXIS of int
+module A = CArray
 
-(** Variant for hat values *)
-type hat =
-| HAT_CENTERED
-| HAT_UP
-| HAT_RIGHT
-| HAT_DOWN
-| HAT_LEFT
-| HAT_RIGHTUP
-| HAT_RIGHTDOWN
-| HAT_LEFTUP
-| HAT_LEFTDOWN
+type t = Sdl_types.Joystick.t
+let t = Sdl_types.Joystick.t
 
-(** joystick button state.  *)
-type button = {
-  num:int;
-  state:bool;
-}
+(** The type of Joystick instance *)
+type id = int32
 
-(**
-   Wrapped to raw {b SDL_Joystick}.
-*)
-type joystick
+type state = Ignore | Enable
 
-(**
-   Get counts the number of joysticks attached to the system
+type axis = Axis1 | Axis2 | Axis3 | Axis4 | AxisX of int
+(** An axis of the joystick. If the joystick has axis greater than 4, use AxisX constructor. *)
 
-   @return the number of attached joysticks
-*)
-external get_num: unit -> int = "sdlcaml_num_joystick"
+type button = Button of int
+(** The button of a Joystick *)
 
-(**
-   Get implementation dependent name of joystick. Tne {!index}
-   parameter refers to the N'th joystick on the system.
+module Inner = struct
+  let joystick_close = foreign "SDL_JoystickClose" (t @-> returning void)
+  let joystick_event_state = foreign "SDL_JoystickEventState" (int @-> returning int)
+  let joystick_get_attached = foreign "SDL_JoystickGetAttached" (t @-> returning int)
+  let joystick_get_axis = foreign "SDL_JoystickGetAxis" (t @-> int @-> returning int16_t)
+  let joystick_get_ball = foreign "SDL_JoystickGetBall" (t @-> int @-> ptr int @-> ptr int @-> returning int)
+  let joystick_get_button = foreign "SDL_JoystickGetButton" (t @-> int @-> returning uint8_t)
+  let joystick_get_guid = foreign "SDL_JoystickGetGUID" (t @-> returning Joystick_guid.t)
+  let joystick_get_guid_string = foreign "SDL_JoystickGetGUIDString"
+      (Joystick_guid.t @-> ptr char @-> int @-> returning void)
+  let joystick_get_hat = foreign "SDL_JoystickGetHat" (t @-> int @-> returning uint8_t)
+  let joystick_instance_id = foreign "SDL_JoystickInstanceID" (t @-> returning uint32_t)
+  let joystick_name = foreign "SDL_JoystickName" (t @-> returning string)
+  let joystick_num_axes = foreign "SDL_JoystickNumAxes" (t @-> returning int)
+  let joystick_num_balls = foreign "SDL_JoystickNumBalls" (t @-> returning int)
+  let joystick_num_buttons = foreign "SDL_JoystickNumButtons" (t @-> returning int)
+  let joystick_num_hats = foreign "SDL_JoystickNumHats" (t @-> returning int)
+  let joystick_open = foreign "SDL_JoystickOpen" (void @-> returning t)
+  let joystick_update = foreign "SDL_JoystickUpdate" (void @-> returning void)
+  let num_joysticks = foreign "SDL_NumJoysticks" (void @-> returning int)
+end
 
-   @param index refer N'th joystick
-   @return joystick name
-*)
-external get_name: int -> string = "sdlcaml_joystick_name"
+let close js = Inner.joystick_close js
 
-(**
-   Open a joystick for use within SDL.
-   Returned joystick from this function have to apply
-   to {!joystick_close} end of program or unwanted.
+let is_ignored () =
+  let ret = Inner.joystick_event_state 0 in
+  Sdl_util.catch (fun () -> ret = 0) (fun () -> Sdl_helper.int_to_bool ret)
 
-   @param index index refers to N'th joystick in the system
-   @return return Some if on success
-*)
-external joystick_open:int -> joystick option =
-  "sdlcaml_joystick_open"
+let is_enabled () = 
+  let ret = Inner.joystick_event_state 1 in
+  Sdl_util.catch (fun () -> ret = 0) (fun () -> Sdl_helper.int_to_bool ret)
 
-(**
-   Closes a previously opened joystick.
+let get_current_state () =
+  let ret = Inner.joystick_event_state 1 in
+  Sdl_util.catch (fun () -> ret = 0) (fun () -> match ret with
+      | 0 -> Ignore
+      | 1 -> Enable
+      | _ -> failwith "Unknown joystick status"
+    )
 
-   @param joystick opened joystick
-*)
-external joystick_close:joystick -> unit = "sdlcaml_joystick_close"
+let is_attached js =
+  let ret = Inner.joystick_get_attached js in
+  Sdl_util.catch (Fn.const true) (fun () -> Sdl_helper.int_to_bool ret)
 
-(**
-   Determine if a joystick has been opened.
+let axis_to_num = function
+  | Axis1 -> 0
+  | Axis2 -> 1
+  | Axis3 -> 2
+  | Axis4 -> 3
+  | AxisX(num) -> num
 
-   @param index refers to the N'th joystick on the system
-   @return true if the joystick has been opened
-*)
-external opened: int -> bool = "sdlcaml_joystick_opened"
+let get_axis ~joystick ~axis =
+  let axis = axis_to_num axis in
+  let ret = Inner.joystick_get_axis joystick axis in
+  Sdl_util.catch (fun () -> ret <> 0) (fun () -> ret)
 
-(**
-   Get the index of given joystick.
+let get_ball ~joystick ~ball =
+  let dx = A.make int 1
+  and dy = A.make int 1 in
+  let ret = Inner.joystick_get_ball joystick ball (A.start dx) (A.start dy) in
+  Sdl_helper.ret_to_result ret (fun () ->
+      {Point.x = A.get dx 0;y = A.get dy 0}
+    )
 
-   @param joystick opened joystick
-   @return index number of the joystick
-*)
-external index: joystick -> int = "sdlcaml_joystick_index"
+let button_to_int = function
+  | Button (index) -> index
 
-(**
-   Get the number of joystick axis.
+let get_button ~joystick ~button =
+  let ret = Inner.joystick_get_button joystick (button_to_int button) in
+  match Unsigned.UInt8.to_int ret with
+  | 1 -> Sdl_types.Pressed
+  | _ -> Sdl_types.Released
 
-   @param joystick previously opened joystick
-   @return axis number of the joystick
-*)
-external num_axis: joystick -> int = "sdlcaml_joystick_num_axis"
+let get_guid js =
+  let guid = Inner.joystick_get_guid js in
+  let guid = Joystick_guid.to_ocaml guid in
+  let data = guid.Joystick_guid.data in
+  let exist_not_zero = Array.exists data ~f:(fun e -> e <> 0) in
+  Sdl_util.catch (fun () -> exist_not_zero) (fun () -> guid)
 
-(**
-   Get the number of joystick trackballs.
+let get_guid_string guid =
+  let guid = Joystick_guid.of_ocaml guid in
+  let str = A.make char 256 in
+  Inner.joystick_get_guid_string guid (A.start str) (A.length str);
+  string_from_ptr (A.start str) (A.length str)
 
-   @param joystick previously opened joystick
-   @return trackball number of the joystick
-*)
-external num_balls: joystick -> int = "sdlcaml_joystick_num_balls"
+let get_hat ~joystick ~hat =
+  let hat = Inner.joystick_get_hat joystick hat in
+  Sdl_types.Result.return (Unsigned.UInt8.to_int hat |> Sdl_hat.of_int)
 
-(**
-   Get the number of joystick hats.
+let get_instance_id joystick =
+  let id = Inner.joystick_instance_id joystick in
+  let id = Unsigned.UInt32.to_int32 id in
+  Sdl_util.catch (fun () -> id >= 0l) (fun () -> id)
 
-   @param joystick previously opened joystick
-   @return hats number of the joystick
-*)
-external num_hats: joystick -> int = "sdlcaml_joystick_num_hats"
+let name joystick =
+  let name = Inner.joystick_name joystick in
+  name
 
-(**
-   Get the number of joystick buttons.
+let get_num_with_fun f joystick =
+  let num = f joystick in
+  Sdl_util.catch (fun () -> num >= 0) (fun () -> num)
 
-   @param joystick previously opened joystick
-   @return buttons number of the joystick
-*)
-external num_buttons: joystick -> int = "sdlcaml_joystick_num_buttons"
+let num_axes = get_num_with_fun Inner.joystick_num_axes
+let num_balls = get_num_with_fun Inner.joystick_num_balls
+let num_buttons = get_num_with_fun Inner.joystick_num_buttons
+let num_hats = get_num_with_fun Inner.joystick_num_hats
 
-(**
-   Update the state(position, buttons, etc.) of all open joysticks.
-   If joystick events have been enabled with {!event_state} then this is
-   called automatically in the event loop
-*)
-external update: unit -> unit = "sdlcaml_joystick_update"
+let open_device index =
+  let joystick = Inner.joystick_open () in
+  Sdl_util.catch (fun () -> to_voidp joystick <> null) (fun () -> joystick)
 
-(**
-   Get the current state of an axis. The value returned by this
-   function is a signed int of 16bit representing the current position
-   of the axis.
+let update = Inner.joystick_update
 
-   @param js a joystick
-   @param axis any {!axis} to want to take.
-   @return current state of an axis
-*)
-external get_axis: js:joystick -> axis:axis -> int = "sdlcaml_joystick_get_axis"
-
-(**
-   Get the current state of a joystick hat.
-
-   @param js joystick
-   @param hat index of hat on joystick
-   @return one or more listed {!hat}
-*)
-external get_hat: js:joystick -> hat:int -> hat list = "sdlcaml_joystick_get_hat"
-
-(**
-   Get relative trackball motion.
-   Return relative motion since the last call this, these motion are
-   tuple as (dx, dy).
-
-   @param js joystick is surmounted by trackball
-   @param ball index of trackball on the joystick
-   @return relative motion since the last call this.
-*)
-external get_ball: js:joystick -> ball:int -> int * int = "sdlcaml_joystick_get_ball"
-
-(**
-   Get the current state of a given button on a given joystick.
-
-   @param js joystick
-   @param button number of button on the joystick
-   @return true if pressed, false if released
-*)
-external get_button: js:joystick -> button:int -> bool = "sdlcaml_joystick_get_button"
-
-(**
-   Get the current state of all axis. The value returned by this
-   function is a signed int of 16bit representing the current position
-   of the axis.
-   the return values contains X, Y and Z_AXIS which they correspond each 0, 1 and 2 number of axis.
-
-   @param js a joystick
-   @return current state of all axes
-*)
-let get_axis_all ~js =
-  let open Sugarpot.Std.List in
-  let axis_list = 0 -- ((num_axis js) - 1) in
-  List.map (fun axis ->
-    match axis with
-    | axis when axis = 0 -> (X_AXIS, get_axis ~js ~axis:X_AXIS)
-    | axis when axis = 1 -> (Y_AXIS, get_axis ~js ~axis:Y_AXIS)
-    | axis when axis = 2 -> (Z_AXIS, get_axis ~js ~axis:Z_AXIS)
-    | axis -> (OTHER_AXIS axis, get_axis ~js ~axis:(OTHER_AXIS axis))
-  ) axis_list
-
-(** Get the current state of all buttons on a give joystick.
-
-    @param js joystick
-    @return current state of all buttons, values are tuple of number of button and state.
-*)
-let get_button_all ~js =
-  let open Sugarpot.Std.List in
-  let num_list = 0 -- ((num_buttons js) - 1) in
-  List.map (fun button -> (button, get_button ~js ~button)) num_list
+let num_joysticks () =
+  let num = Inner.num_joysticks () in
+  Sdl_util.catch (fun () -> num >= 0) (fun () -> num)

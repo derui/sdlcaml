@@ -1,1 +1,0 @@
-Flag_printer.print_mapping Sdl_window_flags.flags

@@ -1,7 +1,0 @@
-#include "sdl_blendmode.h"
-
-#include <SDL_video.h>
-
-lookup_info ml_blendmode_table[] = {
-#FLAGS
-};

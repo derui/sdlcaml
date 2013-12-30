@@ -1,197 +1,178 @@
-open Sdlcaml
-open OUnit
+open Core.Std
+open Sdlcaml.Std
+module S = Structures
+module E = Structures.Events
+module F = Flags
 
-let test_set_up _ =
-  Sdl_init.init [`VIDEO] ();
-  Sdl_video.set_video_mode ~width:100 ~height:100 ~depth:32
-    ~flags:[Sdl_video.SDL_SWSURFACE]
+let%spec "The SDL event management should be able to push events anywhere to the event queue" =
+  let events = [
+    E.ControllerAxis({
+      E.ControllerAxisEvent.timestamp = 1l;
+      which = 1;
+      axis = `RIGHTY;
+      value = 10;
+    });
 
-let test_tear_down s =
-  Sdl_video.free_surface s;
-  Sdl_init.quit ()
+    E.ControllerButton({
+      E.ControllerButtonEvent.timestamp = 1l;
+      which = 1;
+      button = `A;
+      state = F.Sdl_button_state.SDL_PRESSED;
+    });
 
-let test_push_event _ =
-  let open Sdl_event in
-  begin
-    let active = Active {
-      gain = true; active_state = [APPACTIVE]
-    } in
-    Sdl_event.push_event active;
-    let keydown = KeyDown {
-      keysym = (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []});
-      key_state = false
-    }
-    in Sdl_event.push_event keydown;
-    let keyup = KeyUp {
-      keysym = (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []});
-      key_state = true
-    }
-    in
-    Sdl_event.push_event keyup;
-    let motion = Motion {
-      motion_x = 100; motion_y = 100; motion_xrel = 1; motion_yrel = 1;
-      motion_states = [];
-    }
-    in
-    Sdl_event.push_event motion;
-    let button = ButtonDown {
-      mouse_x = 100; mouse_y = 100;
-      mouse_button = Sdl_mouse.MOUSE_LEFT; mouse_state = true
-    } in
-    Sdl_event.push_event button;
-    let button =  ButtonUp {
-      mouse_x = 100; mouse_y = 100;
-      mouse_button = Sdl_mouse.MOUSE_RIGHT; mouse_state = false
-    } in
-    Sdl_event.push_event button;
-    let resize = Resize {width = 100; height = 100} in
-    Sdl_event.push_event resize;
-    Sdl_event.push_event Expose;
-    Sdl_event.push_event Quit;
-  end
+    E.ControllerDevice({
+      E.ControllerDeviceEvent.timestamp = 1l;
+      event_type = `ADDED;
+      which = 32
+    });
 
-let test_pump_event _ =
-  let open Sdl_event in
-  begin
-    let keydown = KeyDown {
-      keysym = (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []});
-      key_state = true
-    }
-    in Sdl_event.push_event keydown;
-    Sdl_event.pump_events ()
-  end
+    E.DollarGesture({
+      E.DollarGestureEvent.timestamp = 2l;
+      action_type = `RECORD;
+      touch_id = 0L;
+      gesture_id = 0L;
+      num_fingers = 1l;
+      error = 0.1;
+      x = 1.0;
+      y = 2.0;
+    });
 
-let test_poll_event _ =
-  let open Sdl_event in
-  let assert_event event f =
-    match event with
-    | None -> assert_failure "can't receive any event"
-    | Some e -> f e
-  in
-  begin
-    ignore (Sdl_event.poll_event ());
-    let active = Active {
-      gain = true; active_state = [APPACTIVE]
-    } in
-    Sdl_timer.delay 1;
-    Sdl_event.push_event active;
-    assert_event (Sdl_event.poll_event ()) (fun e ->
-      match e with
-      | Active e ->
-          begin
-            assert_bool "window do not gained" e.gain;
-            assert_equal [APPACTIVE] e.active_state;
-          end
-      | _ -> assert_failure "unrecognized data for ActiveEvent"
-    );
+    E.Drop({
+      E.DropEvent.timestamp = 3l;
+      file = "test.file";
+    });
 
-    let keydown = KeyDown {
-      keysym = (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []});
-      key_state = true
-    }
-    in Sdl_event.push_event keydown;
-    assert_event (poll_event ()) (fun e ->
-      match e with
-      | KeyDown e ->
-          begin
-            assert_equal Sdl_key.SDLK_A e.keysym.Sdl_key.synonym;
-          end
-      | _ -> assert_failure "unrecognized keydown keysym"
-    );
+    E.JoyAxis({
+      E.JoyAxisEvent.timestamp = 4l;
+      which = 0;
+      axis = 1;
+      value = 2;
+    });
 
-    let keyup = KeyUp {
-      keysym = (let open Sdl_key in {synonym = SDLK_A;
-                                     modify_state = []});
-      key_state = false
-    }
-    in Sdl_event.push_event keyup;
-    assert_event (poll_event ()) (fun e ->
-      match e with
-      | KeyUp e ->
-          begin
-            assert_equal Sdl_key.SDLK_A e.keysym.Sdl_key.synonym;
-          end
-      | _ -> assert_failure "unrecognized keyup keysym"
-    );
+    E.JoyBall({
+      E.JoyBallEvent.timestamp = 5l;
+      which = 0;
+      ball = 0;
+      xrel = 1;
+      yrel = 2;
+    });
 
-    let motion = Motion {
-      motion_x = 100; motion_y = 100; motion_xrel = 0; motion_yrel = 0;
-      motion_states = [];
-    } in
-    Sdl_event.push_event motion;
-    assert_event (poll_event ()) (fun e ->
-      match e with
-      | Motion e ->
-          begin
-            assert_equal 100 e.motion_x;
-            assert_equal 100 e.motion_y;
-            assert_equal 0 e.motion_xrel;
-            assert_equal 0 e.motion_yrel;
-            assert_equal [] e.motion_states;
-          end
-      | _ -> assert_failure "unrecognized data for MotionEvent"
-    );
-    let button = ButtonDown {
-      mouse_x = 100; mouse_y = 100;
-      mouse_button = Sdl_mouse.MOUSE_LEFT;
-      mouse_state = true
-    } in
-    Sdl_event.push_event button;
-    assert_event (poll_event ()) (fun e ->
-      match e with
-      | ButtonDown e ->
-          begin
-            assert_equal 100 e.mouse_x;
-            assert_equal 100 e.mouse_y;
-            assert_equal Sdl_mouse.MOUSE_LEFT e.mouse_button
-          end
-      | _ -> assert_failure "unrecognized data for MouseButton"
-    );
+    E.JoyButton({
+      E.JoyButtonEvent.timestamp = 5l;
+      which = 0;
+      button = 0;
+      state = F.Sdl_button_state.SDL_PRESSED;
+    });
 
-    let button = ButtonUp {
-      mouse_x = 100; mouse_y = 100;
-      mouse_button = Sdl_mouse.MOUSE_LEFT;
-      mouse_state = false
-    } in
-    Sdl_event.push_event button;
-    assert_event (poll_event ()) (fun e ->
-      match e with
-      | ButtonUp e ->
-          begin
-            assert_equal 100 e.mouse_x;
-            assert_equal 100 e.mouse_y;
-            assert_equal Sdl_mouse.MOUSE_LEFT e.mouse_button
-          end
-      | _ -> assert_failure "unrecognized data for MouseButton"
-    );
+    E.JoyDevice({
+      E.JoyDeviceEvent.timestamp = 6l;
+      action_type = `ADDED;
+      which = 4;
+    });
 
-    let resize = Resize {width = 100; height = 200;} in
-    Sdl_event.push_event resize;
-    assert_event (poll_event ()) (fun e ->
-      match e with
-      | Resize e ->
-          begin
-            assert_equal 100 e.width;
-            assert_equal 200 e.height;
-          end
-      | _ -> assert_failure "not recognized data for Resize"
-    );
+    E.JoyHat({
+      E.JoyHatEvent.timestamp = 7l;
+      which = 0;
+      hat = 0;
+      value = F.Sdl_hat.SDL_HAT_LEFTUP;
+    });
 
-  end
+    E.Keyboard({
+      E.KeyboardEvent.timestamp = 8l;
+      event_type = F.Sdl_event_type.SDL_KEYDOWN;
+      window_id = 5l;
+      state = F.Sdl_button_state.SDL_PRESSED;
+      repeat = true;
+      keysym = {
+        S.Keysym.scancode = F.Sdl_scancode.SDL_SCANCODE_0;
+        sym = F.Sdl_keycode.SDLK_0;
+        keymod = [F.Sdl_keymod.KMOD_NONE];
+      }
+    });
 
+    E.MouseButton({
+      E.MouseButtonEvent.timestamp = 9l;
+      window_id = 10l;
+      which = 0l;
+      button = F.Sdl_mousebutton.SDL_BUTTON_L;
+      state = F.Sdl_button_state.SDL_PRESSED;
+      clicks = 3;
+      x = 10;
+      y = 12;
+    });
 
-let tmp_bracket f = bracket test_set_up f test_tear_down
+    E.MouseMotion({
+      E.MouseMotionEvent.timestamp = 11l;
+      window_id = 12l;
+      which = 0l;
+      state = [Flags.Sdl_mousebutton.SDL_BUTTON_L];
+      x = 12;
+      y = 13;
+      xrel = 14;
+      yrel = 15;
+    });
 
-let suite = "SDL Event system specs" >:::
-  [
-    "SDL event pushing" >:: (tmp_bracket test_push_event);
-    "SDL event pumping" >:: (tmp_bracket test_pump_event);
-    "SDL event polling" >:: (tmp_bracket test_poll_event);
-  ]
+    E.MouseWheel({
+      E.MouseWheelEvent.timestamp = 12l;
+      window_id = 13l;
+      which = 0l;
+      x = 14;
+      y = 15;
+      direction = F.Sdl_mousewheel.SDL_MOUSEWHEEL_NORMAL;
+    });
 
-let _ =
-  run_test_tt_main suite
+    E.MultiGesture({
+      E.MultiGestureEvent.timestamp = 13l;
+      touch_id = 0L;
+      delta_theta = 1.0;
+      delta_dist = 4.0;
+      x = 2.0;
+      y = 56.0;
+      num_fingers = 1;
+    });
+
+    E.Quit({
+      E.QuitEvent.timestamp = 14l;
+    });
+
+    E.SysWM({
+      E.SysWMEvent.timestamp = 15l;
+    });
+
+    E.TextEditing({
+      E.TextEditingEvent.timestamp = 17l;
+      window_id = 18l;
+      text = "h";
+      start = 12;
+      length = 3;
+    });
+
+    E.TextInput({
+      E.TextInputEvent.timestamp = 17l;
+      window_id = 18l;
+      text = "inputted"
+    });
+
+    E.TouchFinger({
+      E.TouchFingerEvent.timestamp = 18l;
+      touch_id = 0L;
+      finger_id = 1L;
+      x = 1.0;
+      y = 2.0;
+      dx = 3.0;
+      dy = 4.0;
+      pressure = 5.0;
+      motion = `MOTION;
+    });
+
+    E.Window({
+      E.WindowEvent.timestamp = 19l;
+      window_id = 20l;
+      event = E.Window_event.HIDDEN;
+    })
+  ] in
+  List.iter ~f:(fun e ->
+    let ret = Event.push e in
+    ret [@eq Types.Result.Success ()]
+  ) events
+

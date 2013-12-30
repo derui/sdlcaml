@@ -1,0 +1,9 @@
+S src
+S gen/structures
+S gen/flags
+B src
+B gen/structures
+B gen/flags
+EXT spec
+PKG core
+PKG ctypes

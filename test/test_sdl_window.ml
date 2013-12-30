@@ -1,75 +1,156 @@
-open Sdlcaml
-open OUnit
+open Core.Std
+open Sdlcaml.Std
 
-let test_set_up _ =
-  begin
-    Sdl_init.init [`VIDEO] ();
-    Sdl_video.set_video_mode ~width:640 ~height:480 ~depth:32
-      ~flags:[Sdl_video.SDL_SWSURFACE]
-  end
+let with_init f =
+  Init.init Flags.Sdl_init_flags.([SDL_INIT_VIDEO]);
+  protect ~f ~finally:Init.quit
 
-let test_tear_down surface =
-  begin
-    Sdl_video.free_surface surface;
-    Sdl_init.quit ();
-  end
+let with_win w f =
+  protect ~f:(fun () -> f w) ~finally:(fun () -> Window.destroy w) |> ignore
 
-let test_change_window_caption _ =
-  let open Sdl_window in
-  let (prev_title, prev_icon) = get_caption () in
-  begin
-    set_caption ~title:"hoge" ~icon:"huga" ();
-    let (after_title, after_icon) = get_caption () in
-    assert_equal "hoge" after_title;
-    assert_equal "huga" after_icon;
-    "prev_title differ from after one" @? (prev_title <> after_title);
-    "prev_icon differ from after one" @? (prev_icon <> after_icon);
-  end
+let%spec "The SDL Window module should be able to get flags when initialize it" =
+  let module W = Window in
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:200 ~flags:[`RESIZABLE;] in
+    with_win window (fun window -> 
+      let f = List.exists ~f:(fun x -> x = `RESIZABLE) in
+      f (W.get_window_flags window) [@true "exists"];
+    )
+  )
 
-let test_change_window_title _ =
-  let open Sdl_window in
-  let prev_title = get_title () in
-  begin
-    set_caption ~title:"hoge" ();
-    let after_title = get_title () in
-    assert_equal "hoge" after_title;
-    "prev_title differ from after one" @? (prev_title <> after_title);
-  end
+let%spec "The SDL Window module can create a window with options, then can destroy it" =
+  let module W = Window in
 
-let test_change_window_icon _ =
-  let open Sdl_window in
-  let prev_icon = get_icon_name () in
-  begin
-    set_caption ~icon:"huga" ();
-    let after_icon = get_icon_name () in
-    assert_equal "huga" after_icon;
-    "prev_icon differ from after one" @? (prev_icon <> after_icon);
-  end
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:200 ~flags:[] in
+    with_win window (fun window -> 
 
+      (W.get_title window) [@eq "test"];
+      let size = W.get_size window in
+      (size.Structures.Size.width) [@eq 100];
+      (size.Structures.Size.height) [@eq 200];
+    )
+  )
 
-let test_toggle_fullscreen _ =
-  let open Sdl_window in
-  begin
-  (* ignore (toggle_fullscreen ()); *)
-  (* ignore (toggle_fullscreen ()); *)
-  end
+let%spec "The SDL Window module can set and get the size of the window" =
+  let module W = Window in
 
-let test_grab_input _ =
-  let open Sdl_window in
-  begin
-    assert_equal SDL_GRAB_ON (grab_input SDL_GRAB_ON);
-    assert_equal SDL_GRAB_ON (grab_input SDL_GRAB_QUERY);
-  end
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:200 ~flags:[] in
+    with_win window (fun window ->
 
-let suite = "SDL WM binding tests" >:::
-  [
-    "change window caption" >:: (bracket test_set_up test_change_window_caption test_tear_down);
-    "change only window title" >:: (bracket test_set_up test_change_window_title test_tear_down);
-    "change only window icon" >:: (bracket test_set_up test_change_window_icon test_tear_down);
-    "toggle fullscreen" >:: (bracket test_set_up test_toggle_fullscreen test_tear_down);
-    "change grab mode" >:: (bracket test_set_up test_grab_input test_tear_down);
-  ]
+      let size = W.get_size window in
+      (size.Structures.Size.width) [@eq 100];
+      (size.Structures.Size.height) [@eq 200];
 
+      W.set_size window {Structures.Size.width = 200; height = 400};
+      let size = W.get_size window in
+      (size.Structures.Size.width) [@eq 200];
+      (size.Structures.Size.height) [@eq 400]
+    )
+  )
 
-let _ =
-  run_test_tt_main suite
+let%spec "The SDL Window module can set and get maximize size of the window" =
+  let module W = Window in
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:200 ~flags:[] in
+    with_win window (fun window ->
+      W.set_maximum_size window {Structures.Size.width = 300; height = 400};
+      W.maximize window;
+      let size = W.get_maximum_size window in
+      (size.Structures.Size.width) [@eq 300];
+      (size.Structures.Size.height) [@eq 400]
+    )
+  )
+
+let%spec "The SDL Window module can set and get minimize size of the window" =
+  let module W = Window in
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:200 ~flags:[] in
+    with_win window (fun window ->
+
+      W.set_minimum_size window {Structures.Size.width = 30; height = 40};
+      W.minimize window;
+      let size = W.get_minimum_size window in
+      (size.Structures.Size.width) [@eq 30];
+      (size.Structures.Size.height) [@eq 40]
+    )
+  )
+
+let%spec "The SDL Window module should get ID of the window and get window from it" =
+  let module W = Window in
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:100 ~flags:[] in
+    with_win window (fun window ->
+      let id = W.get_id window in
+      (W.get_from_id id |> W.get_id) [@eq id]
+    )
+  )
+
+let%spec "The SDL Window module should hide and show window" =
+  let module W = Window in
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:100 ~flags:[] in
+    with_win window (fun window ->
+      W.show window;
+      W.hide window
+    )
+  )
+
+let%spec "The SDL Window module should set and get brightness of the window" =
+  let module W = Window in
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:100 ~flags:[] in
+    with_win window (fun window ->
+      W.set_brightness window 1.0;
+      (W.get_brightness window) [@eq 1.0]
+    )
+  )
+
+let%spec "The SDL Window module can set and get bordered property" =
+  let module W = Window in
+  (* borderless flags must be set on initialize *)
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:100 ~flags:[`BORDERLESS] in
+    with_win window (fun window ->
+
+      let bordered_not_found = List.exists ~f:(fun x -> x = `BORDERLESS) in
+      bordered_not_found (W.get_window_flags window) [@eq true];
+
+      W.set_bordered window true;
+      let bordered_found = Fn.compose not bordered_not_found in
+      bordered_found (W.get_window_flags window) [@eq true]
+    )
+  )
+
+let%spec "The SDL Window module can update surface of it owning" =
+  let module W = Window in
+  
+  with_init (fun () ->
+    let window = W.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:100 ~flags:[] in
+    with_win window (fun window ->
+    (* First, get_surface execute before do update_surface. *)
+      W.get_surface window |> ignore;
+
+      W.update_surface window
+    )
+  )
+
+let%spec "The SDL Window module can set and get position of the window" =
+  let module W = Window in
+  with_init (fun () ->
+
+    let window = W.create ~title:"test" ~x:100 ~y:110 ~w:100 ~h:100 ~flags:[] in
+    with_win window (fun window ->
+
+      let pos = W.get_position window in
+      (pos.Structures.Point.x) [@eq 100];
+      (pos.Structures.Point.y) [@eq 110];
+      
+      W.set_position window {Structures.Point.x = 200; y = 300};
+
+      let pos = W.get_position window in
+      (pos.Structures.Point.x) [@eq 200];
+      (pos.Structures.Point.y) [@eq 300]
+    )
+  )

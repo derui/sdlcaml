@@ -1,0 +1,15 @@
+type t =
+    SDL_TEXTUREACCESS_TARGET
+  | SDL_TEXTUREACCESS_STREAMING
+  | SDL_TEXTUREACCESS_STATIC
+
+let to_int = function
+  | SDL_TEXTUREACCESS_STATIC -> 0
+  | SDL_TEXTUREACCESS_STREAMING -> 1
+  | SDL_TEXTUREACCESS_TARGET -> 2
+
+let of_int = function
+  | 0 -> SDL_TEXTUREACCESS_STATIC
+  | 1 -> SDL_TEXTUREACCESS_STREAMING
+  | 2 -> SDL_TEXTUREACCESS_TARGET
+  | _ -> failwith "No variant to match given value"

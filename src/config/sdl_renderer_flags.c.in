@@ -1,7 +1,0 @@
-#include "sdl_window_flags.h"
-
-#include <SDL_video.h>
-
-lookup_info ml_renderer_flags_table[] = {
-#FLAGS
-};

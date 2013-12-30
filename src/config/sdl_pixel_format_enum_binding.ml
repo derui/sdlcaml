@@ -1,1 +1,0 @@
-Flag_printer.print_mapping Sdl_pixel_format_enum.flags

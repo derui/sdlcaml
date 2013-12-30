@@ -40,6 +40,22 @@ value ml_lookup_from_c(lookup_info *table, int val) {
   CAMLreturn(Val_int(0));
 }
 
+static int ml_make_init_flag(lookup_info* table, value flags) {
+  CAMLparam1(flags);
+  CAMLlocal1(tag);
+  value list = flags;
+  int flag = 0;
+
+  while (is_not_nil(list)) {
+    tag = head(list);
+    int converted_tag = ml_lookup_to_c(table, tag);
+    flag |= converted_tag;
+    list = tail(list);
+  }
+  CAMLnoreturn;
+  return flag;
+}
+
 int ml_table_size(lookup_info* table) {
   CAMLparam0();
   if (table == NULL) {
@@ -47,6 +63,21 @@ int ml_table_size(lookup_info* table) {
   }
 
   CAMLreturnT(int, table[0].value);
+}
+
+value ml_make_list_from_combined_flag(lookup_info* table, int flag) {
+  CAMLparam0();
+  CAMLlocal2(list, f);
+  list = Val_int(0);
+
+  for (int i = 0; i < ml_table_size(table); ++i) {
+    if (table[i + 1].value & flag) {
+      f = ml_lookup_from_c(table, table[i + 1].value & flag);
+      list = add_head(list, f);
+    }
+  }
+
+  CAMLreturn(list);
 }
 
 /* this is pure C function. */
@@ -192,4 +223,21 @@ int get_bigarray_kind_size(value bigarray) {
   }
   
   CAMLreturnT(int, size);
+}
+
+int ml_make_combined_flag(lookup_info* table, value flags) {
+  
+  CAMLparam1(flags);
+  CAMLlocal1(tag);
+  value list = flags;
+  int flag = 0;
+
+  while (is_not_nil(list)) {
+    tag = head(list);
+    int converted_tag = ml_lookup_to_c(table, tag);
+    flag |= converted_tag;
+    list = tail(list);
+  }
+
+  CAMLreturnT(int, flag);
 }

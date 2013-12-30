@@ -1,7 +1,0 @@
-#include "sdl_gl_attr.h"
-
-#include <SDL_video.h>
-
-lookup_info ml_gl_attr_table[] = {
-#FLAGS
-};

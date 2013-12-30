@@ -23,6 +23,8 @@
 
 # compiled omake files
 *.omc
+.omakedb
+.omakedb.lock
 
 # executable
 *.opt
@@ -33,8 +35,12 @@
 *.dot
 *.css
 
-# generated header file:no tracking
-src/config/*.h
-src/config/*.c
+# installed information
+installed/
 
-src/enums/*.inc
+# generated header file:no tracking
+gen/enums.ml
+gen/enums/enums.ml
+gen/enums/make_enums
+
+gen/enums/*.inc

@@ -31,9 +31,38 @@
 #
 open configure/Configure
 open build/Common
+open build/C
 
 OMAKEPATH += $(dir ./MyOMake)
 
+.STATIC:
+	SDL2_CONFIG_FOUND = $(CheckProg sdl2-config)
+	SDL2_CONFIG = $(if $(SDL2_CONFIG_FOUND), sdl2-config, "")
+
+	if $(not $(SDL2_CONFIG_FOUND))
+		eprintln(can not build because sdl2-config is not found. Please check to valid SDL installed)
+		$(exit 1)
+	SDL_CONFIGURE = $(shell $(SDL2_CONFIG) --cflags)
+	SDL_MIXER_AVAILABLE = $(VerboseCheckCLib SDL_mixer, Mix_Init)
+	SDL_IMAGE_AVALIABLE = $(VerboseCheckCLib SDL_image, IMG_Init)
+	SDL_TTF_AVALIABLE = $(VerboseCheckCLib SDL_ttf, TTF_Init)
+
+	if $(SDL_MIXER_AVAILABLE)
+		SDL_CONFIGURE += -DSDLCAML_MIXER_ENABLE
+		CFLAGS += -DSDLCAML_MIXER_ENABLE
+		setenv("SDLCAML_MIXER_ENABLE", $(EMPTY))
+		export
+	if $(SDL_IMAGE_AVALIABLE)
+		SDL_CONFIGURE += -DSDLCAML_IMAGE_ENABLE
+		CFLAGS += -DSDLCAML_IMAGE_ENABLE
+		setenv("SDLCAML_IMAGE_ENABLE", $(EMPTY))
+		export
+	if $(SDL_TTF_AVALIABLE)
+		SDL_CONFIGURE += -DSDLCAML_TTF_ENABLE
+		CFLAGS += -DSDLCAML_TTF_ENABLE
+		setenv("SDLCAML_TTF_ENABLE", $(EMPTY))
+		export
+	export
 #
 # The command-line variables are defined *after* the
 # standard configuration has been loaded.

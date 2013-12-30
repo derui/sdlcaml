@@ -31,22 +31,26 @@ open MyUtil
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
-    threads
-    oUnit
-    num
-    bigarray
-    sugarpot
-    candyvec
+	threads
+	oUnit
+	num
+	bigarray
+	typedvec
+	ctypes
+	ctypes.foreign
+	ppx_simplespec
 #
 if $(not $(OCAMLFIND_EXISTS))
    eprintln(This project requires ocamlfind, but is was not found.)
    eprintln(You need to install ocamlfind and run "omake --configure".)
    exit 1
 
+OCAMLFINDFLAGS = 
+
 #
 # Include path
 #
-OCAMLINCLUDES += $(file ../src)
+OCAMLINCLUDES += $(file ../src) $(file ../gen/flags) $(file ../gen/structures)
 
 #
 # Compile native or byte code?
@@ -59,10 +63,10 @@ BYTE_ENABLED = true
 #
 # Various options
 #
-OCAMLFLAGS    += -annot -thread
+OCAMLFLAGS    += -annot -thread -g
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
-MY_LINK_FLAGS = $(shell sdl-config --cflags --libs) -logg -lSDL_mixer -lSDL_image -lSDL_ttf -DDEBUG
+MY_LINK_FLAGS = $(shell sdl2-config --cflags --libs) -DDEBUG
 if $(IsMac)
 	MY_LINK_FLAGS += -framework OpenGL
 	export
@@ -70,8 +74,7 @@ else
 	MY_LINK_FLAGS += -lGL
 	export
 
-OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src)"
-#OCAML_LINK_FLAGS += -cclib "-L/usr/lib -lSDLmain -lSDL -mwindows"
+OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src) -L$(file ../gen/flags) -L$(file ../gen/types)"
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=
 
@@ -87,10 +90,22 @@ OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src)"
 # Build bindings for OCaml to C.
 #
 
-FILES = $(removesuffix $(ls *.ml))
+FILES[] =
+	test_sdl_log
+	test_sdl_window
+	test_sdl_init
+	test_sdl_renderer
+	test_sdl_texture
+	test_sdl_error
+	test_sdl_surface
+	test_sdl_rect
+	test_sdl_event
+	test_sdl_mouse
+	test_sdl_timer
+	test_sdl_rwops
 
 #
-OCAML_LIBS += ../src/sdlcaml
+OCAML_LIBS += ../gen/flags/sdlcaml_flags ../gen/structures/sdlcaml_structures ../src/sdlcaml 
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl
@@ -98,34 +113,10 @@ OCAML_LIBS += ../src/sdlcaml
 #
 # need sdlcaml library
 
-PROGRAMS =
-	foreach(x, $(FILES))
-		.PHONY: run-$(removeprefix test_sdl_, $x)
-		run-$(removeprefix test_sdl_, $x):
-			./$x$(EXE)
-		export
-		value $(OCamlProgram $x, $x)
+foreach(x => ..., $(FILES))
+	OCamlProgram($x, $x)
+	export
 
-test: $(PROGRAMS)
-
-run-all:
-	foreach(x, $(FILES))
-		./$x
-
-clean:
-	foreach(x, $(PROGRAMS))
-		rm -rf $x
-	rm -f *o
-	rm -f *cmx
-	rm -f *cmo
-	rm -f *cmi
-	rm -f *annot
-
-test-clean:
-	foreach(x, $(PROGRAMS))
-		rm -rf $x
-	rm -f *o
-	rm -f *cmx
-	rm -f *cmo
-	rm -f *cmi
-	rm -f *annot
+test: $(addsuffix $(EXE), $(FILES))
+	foreach(x => ..., $(FILES))
+		./$x$(EXE)

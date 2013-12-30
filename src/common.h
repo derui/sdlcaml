@@ -5,6 +5,8 @@
 
 #define Val_none (Val_int(0))
 
+#define t_prim CAMLprim value
+
 typedef struct lookup_info {
   value key;
   int value;
@@ -23,6 +25,17 @@ typedef struct generic_lookup_info {
 int ml_lookup_to_c(lookup_info *table, value key);
 value ml_lookup_from_c(lookup_info *table, int value);
 int ml_table_size(lookup_info *table);
+
+/**
+ * Make conbined flag by given flags and lookup table.
+ * Flags is given have to be a list of OCaml
+ */
+int ml_make_combined_flag(lookup_info* table, value flags);
+
+/**
+ * Make list of flag from combined flag.
+ */
+value ml_make_list_from_combined_flag(lookup_info* table, int flag);
 
 /* privide to look up data from table of associating key with generic data
    (void*).

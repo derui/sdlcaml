@@ -1,7 +1,0 @@
-#include "sdl_gl_profile.h"
-
-#include <SDL_video.h>
-
-lookup_info ml_gl_profile_table[] = {
-#FLAGS
-};

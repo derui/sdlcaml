@@ -1,38 +1,37 @@
-open Sdlcaml
-open OUnit
+open Core.Std
+open Sdlcaml.Std
+open Flags
 
-let test_set_up _ =
-  Sdl_init.init [`TIMER] ()
+let with_sdl f =
+  Init.init [Sdl_init_flags.SDL_INIT_TIMER];
+  protect ~f:(Fn.compose ignore f) ~finally:Init.quit
 
-let test_tear_up _ =
-  Sdl_init.quit ()
+let%spec "SDL Timer module can get the count per second of the high resolution counter" =
+  with_sdl (fun () ->
+    let counter = Timer.get_performance_counter () in
+    let counter2 = Timer.get_performance_counter () in
+    (counter < counter2) [@eq true]
+  )
 
+let%spec "SDL Timer module can get the second between two counter" =
+  with_sdl (fun () ->
+    let counter = Timer.get_performance_counter () in
+    let counter2 = Timer.get_performance_counter () in
+    let freq = Timer.get_performance_frequency () |> Int64.to_float in
+    let second = Int64.(counter2 - counter |> to_float) /. freq in
+    (second >= 0.0) [@true "must greater than 0"]
+  )
 
-let test_get_tick_timer _ =
-  let open Sdl_timer in
-  begin
-    Thread.delay 1.0;
-    let now = Sdl_timer.get_ticks () in
-    "tick is over 1000ms " @? (now >= 1000);
-  end
+let%spec "SDL Timer module can get the number of milliseconds and delay current thread" =
+  with_sdl (fun () ->
+    let start = Timer.get_ticks () in
+    Timer.delay 100l;
+    let now = Timer.get_ticks () in
+    (Int32.(now - start) >= 100l) [@true "must greater than 100l"]
+  )
 
-let test_delay _ =
-  let open Sdl_timer in
-  begin
-    let prev = get_ticks () in
-    begin
-      delay 100;
-      let now = get_ticks () in
-      "compare previous time before delay to time after delay" @?
-        ((now - prev) >= 100)
-    end
-  end
-
-let suite = "timer tests" >:::
-  [ "get tick time" >:: (bracket test_set_up test_get_tick_timer
-                           test_tear_up);
-    "delay with SDL" >:: (bracket test_set_up test_delay test_tear_up)
-  ]
-
-let _ =
-  run_test_tt_main suite
+let%spec "SDL Timer module provide function to profile a function" =
+  with_sdl (fun () ->
+    let time = Timer.profile ~count:10 ~f:(fun () -> Timer.delay 10l) in
+    Float.(time >= 0.1) [@true "must greater than 100"]
+  )

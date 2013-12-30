@@ -1,0 +1,15 @@
+type t =
+    SDL_TEXTUREMODULATE_ALPHA
+  | SDL_TEXTUREMODULATE_COLOR
+  | SDL_TEXTUREMODULATE_NONE
+
+let to_int = function
+  | SDL_TEXTUREMODULATE_ALPHA -> 0x2
+  | SDL_TEXTUREMODULATE_COLOR -> 0x1
+  | SDL_TEXTUREMODULATE_NONE -> 0x0
+
+let of_int = function
+  | 0x2 -> SDL_TEXTUREMODULATE_ALPHA
+  | 0x1 -> SDL_TEXTUREMODULATE_COLOR
+  | 0x0 -> SDL_TEXTUREMODULATE_NONE
+  | _ -> failwith "No variant to match given value"
