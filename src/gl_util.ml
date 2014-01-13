@@ -1,7 +1,7 @@
 open Sugarpot.Std
 open Sugarpot.Std.Prelude
 module V = Candyvec.Vector
-module M = Candyvec.Matrix4
+module M = Candyvec.Matrix
 
 module Camera = struct
 
@@ -106,9 +106,9 @@ let ortho_projection ~left ~right ~top ~bottom ~near ~far =
   }
 
 let perspective_projection ~left ~right ~top ~bottom ~near ~far =
-  let maxY = top 
-  and minY = -. top 
-  and minX = left 
+  let maxY = top
+  and minY = -. top
+  and minX = left
   and maxX = right in
 
   let x_diff = maxX -. minX in
