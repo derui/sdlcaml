@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "gl_macros.h"
 
+#if defined(__APPLE__) && !defined(VMDMESA)
 void * MyNSGLGetProcAddress (const char* name) {
   void *symbol = NULL;
   char *symbolName;
@@ -13,3 +14,4 @@ void * MyNSGLGetProcAddress (const char* name) {
   return symbol ? symbol : NULL;
 }
 
+#endif
