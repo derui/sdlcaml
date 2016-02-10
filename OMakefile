@@ -4,7 +4,7 @@ open MyOCaml
 ########################################################################
 # Phony targets are scoped, so you probably want to declare them first.
 #
-.PHONY: test clean doc all gen
+.PHONY: test clean doc all gen exec
 
 ########################################################################
 # Subdirectories.

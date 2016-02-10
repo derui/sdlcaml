@@ -7,7 +7,7 @@ module T = Sdl_types
 
 module Inner = struct
   let get_key_from_name = foreign "SDL_GetKeyFromName" (string @-> returning int32_t)
-  let get_key_from_scan_code = foreign "SDL_GetKeyFromScanCode" (int @-> returning int32_t)
+  let get_key_from_scancode = foreign "SDL_GetKeyFromScancode" (int @-> returning int32_t)
   let get_key_name = foreign "SDL_GetKeyName" (int32_t @-> returning string)
   let get_keyboard_focus = foreign "SDL_GetKeyboardFocus" (void @-> returning T.Window.t)
   let get_keyboard_state = foreign "SDL_GetKeyboardState" (ptr int @-> returning (ptr uint8_t))
@@ -26,7 +26,7 @@ let get_key_from_name name =
 
 let get_key_from_scan_code scancode =
   let scancode = Sdl_scancode.to_int scancode in
-  let key = Inner.get_key_from_scan_code scancode in
+  let key = Inner.get_key_from_scancode scancode in
   Sdl_keycode.of_int (Signed.Int32.to_int key)
 
 let get_name keycode =

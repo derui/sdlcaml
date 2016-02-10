@@ -14,6 +14,16 @@ type t = {
   callback: callback option;
 }
 
+let empty = {
+  freq = 0;
+  format = Sdlcaml_flags.Sdl_audio_format.AUDIO_F32LSB;
+  channels = 0;
+  silence = 0;
+  samples = 0;
+  size = 0l;
+  callback = None;
+}
+
 let t : t structure typ = structure "SDL_AudioSpec"
 
 let (|-) fld ty = field t fld ty

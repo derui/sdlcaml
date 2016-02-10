@@ -104,6 +104,9 @@ FILES[] =
 	test_sdl_timer
 	test_sdl_rwops
 
+MANUAL_EXEC_FILE[] =
+	test_sdl_audio
+
 #
 OCAML_LIBS += ../gen/flags/sdlcaml_flags ../gen/structures/sdlcaml_structures ../src/sdlcaml 
 # OCAML_CLIBS +=
@@ -117,6 +120,14 @@ foreach(x => ..., $(FILES))
 	OCamlProgram($x, $x)
 	export
 
+foreach(x => ..., $(MANUAL_EXEC_FILE))
+	OCamlProgram($x, $x)
+	export
+
 test: $(addsuffix $(EXE), $(FILES))
 	foreach(x => ..., $(FILES))
+		./$x$(EXE)
+
+exec: $(addsuffix $(EXE), $(MANUAL_EXEC_FILE))
+	foreach(x => ..., $(MANUAL_EXEC_FILE))
 		./$x$(EXE)

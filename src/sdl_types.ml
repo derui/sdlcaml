@@ -16,6 +16,12 @@ module Result = struct
     let is_success = function
       | Success _ -> true
       | Failure _ -> false
+
+    (* Trap failure and do anything, then continue monad. *)
+    let tap ~f m =
+      match m with
+      | Success _ -> m
+      | Failure s -> f s; m
   end
 
   include Core

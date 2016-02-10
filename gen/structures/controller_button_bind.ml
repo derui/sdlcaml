@@ -28,3 +28,5 @@ let to_ocaml s =
      let hat = getf s button
      and hat_mask = getf s axis in
      {bind_type; value = Some(Hat (Sdl_hat.of_int hat, hat_mask))}
+
+let () = seal t
