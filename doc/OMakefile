@@ -46,6 +46,9 @@
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
+	ctypes
+	ctypes.foreign
+	core
 #    glMlite
 #    pack2
 #
@@ -57,7 +60,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES = ../src ../lib
+OCAMLINCLUDES = ../src ../gen/flags ../gen/structures 
 
 #
 # Compile native or byte code?

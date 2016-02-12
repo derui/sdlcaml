@@ -8,14 +8,9 @@
    @since 0.1
 *)
 
-let (|>) f g = g f
-let (<|) f g = f g
-
 type output_type =
   | Module of string * string list
   | Alone of string
-
-let output_module_name = "enums.ml"
 
 let xml_file = ref ""
 let major_version = ref 0
@@ -41,7 +36,7 @@ let extract_modules xml =
     List.iter (fun x ->
         match Xml.tag x with
         | "module" -> let name = Xml.attrib x "name" in
-          let types = List.concat <| Xml.map (fun x -> Xml.map Xml.pcdata x) x in
+          let types = Xml.map (fun x -> Xml.map Xml.pcdata x) x |> List.concat in
           modules := Module (name, types) :: !modules
         | "alone-type" ->
           let name = Xml.fold (fun s x -> s ^ Xml.to_string x) "" x in
@@ -55,9 +50,9 @@ let extract_sections xml =
   let sects = child xml "section" in
   let extract x =
     let name = Xml.attrib x "name" in
-    let pnames = List.concat <| Xml.map (fun x ->
+    let pnames = Xml.map (fun x ->
         let version = Xml.attrib x "version" in
-        Xml.map (fun x -> (Xml.pcdata x, version)) x) x in
+        Xml.map (fun x -> (Xml.pcdata x, version)) x) x |> List.concat in
     if List.mem_assoc name !sections then
       failwith (Printf.sprintf "%s already exists." name)
     else
@@ -76,23 +71,7 @@ let extract_sections xml =
       sections := (name, List.map fst pnames) :: !sections in
   List.iter extract sects
 
-let construct_includes () =
-  let construct (name, pnames) =
-    let file = open_out (name ^ ".inc") in
-    let per_line output p = output_string output (Printf.sprintf "%s,\n" p) in
-    begin
-      output_string file (Printf.sprintf "static unsigned int %s[] = {\n" name);
-      List.iter (per_line file) pnames;
-      output_string file "};\n";
-      close_out file;
-    end
-  in
-  List.iter construct !sections
-
-let common_construct name func =
-  let file = open_out name in
-  List.iter (func file) !modules;
-  close_out file
+let common_construct func = List.iter (func stdout) !modules
 
 let construct_modules () =
   let per_type file t =
@@ -118,7 +97,7 @@ let construct_modules () =
     | Alone name -> per_type file name
   in
 
-  common_construct output_module_name construct
+  common_construct construct
 
 let () =
   arg_parse ();
@@ -127,6 +106,5 @@ let () =
     extract_modules xml;
     extract_sections xml;
 
-    construct_includes ();
     construct_modules ();
   with Xml.Not_element s -> failwith (Printf.sprintf "%s do not have element is %s " !xml_file (Xml.to_string s))

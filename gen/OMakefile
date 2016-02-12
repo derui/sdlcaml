@@ -1,5 +1,5 @@
 
-.SUBDIRS: structures flags enums
+.SUBDIRS: structures flags gl_flags
 
 #
 # This project requires ocamlfind (default - false).

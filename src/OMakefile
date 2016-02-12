@@ -45,7 +45,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += ../gen/structures ../gen/flags ../gen
+OCAMLINCLUDES += ../gen/structures ../gen/flags ../gen/gl_flags
 
 #
 # Compile native or byte code?
