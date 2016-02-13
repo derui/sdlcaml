@@ -96,3 +96,7 @@ end)
 module GameController = SDL_TYPE(struct
   let name = "SDL_GameController"
 end)
+
+module Thread = SDL_TYPE(struct
+  let name = "SDL_Thread"
+end)
