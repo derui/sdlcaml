@@ -50,46 +50,7 @@ OCAMLFLAGS    += -bin-annot
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME = sdl_flags
 #
-FILES[] =
-	sdl_window_event_id
-	sdl_gl_context_flags
-	sdl_gl_profile
-	sdl_gl_attr
-	sdl_blendmode
-	sdl_pixel_format_enum
-	sdl_syswm_type
-	sdl_messagebox_flags
-	sdl_renderer_flags
-	sdl_renderer_flip
-	sdl_texture_access
-	sdl_texture_modulate
-	sdl_init_flags
-	sdl_event_type
-	sdl_hat
-	sdl_keymod
-	sdl_mousebutton
-	sdl_scancode
-	sdl_keycode
-	sdl_window_flags
-	sdl_log_category
-	sdl_log_priority
-	sdl_game_controller_button
-	sdl_availability
-	sdl_controller_axis
-	sdl_controller_device
-	sdl_button_state
-	sdl_dollar
-	sdl_joy_device
-	sdl_mousewheel
-	sdl_finger
-	sdl_state
-	sdl_audio_device
-	sdl_system_cursor
-	sdl_audio_status
-	sdl_audio_format
-	sdl_audio_allow_status
-	sdl_rwops_type
-	sdl_controller_bind_type
+FILES[] = $(removesuffix $(ls *.ml)) 
 
 MyOCamlPackage(sdlcaml_flags, $(FILES), $(EMPTY), $(EMPTY), false)
 gen: $(OCamlPackageGeneratedFiles sdlcaml_flags, false)

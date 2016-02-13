@@ -48,9 +48,9 @@ let get_priority category =
 
 let reset_priorities () = ignore (Inner.reset_priorities ())
 let set_all_priority priority =
-  ignore (Inner.set_all_priority (Sdl_log_priority.to_int priority))
+  Inner.set_all_priority (Sdl_log_priority.to_int priority)
 let set_priority ~category ~priority () =
-  ignore (Inner.set_priority (Sdl_log_category.to_int category) (Sdl_log_priority.to_int priority))
+  Inner.set_priority (Sdl_log_category.to_int category) (Sdl_log_priority.to_int priority)
 
 let set_output_function f =
   let output_function _ cat pri mes =

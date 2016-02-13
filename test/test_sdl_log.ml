@@ -1,16 +1,5 @@
 open Sdlcaml.Std
 
-let%spec "The SDL Log module can set log output function" =
-  let open Flags in
-
-  Log.set_output_function (fun incat inpri mes ->
-    incat [@eq `INPUT];
-    inpri [@eq `ERROR];
-    mes [@eq "test1"]
-  );
-  Log.set_priority ~category:`INPUT ~priority:`ERROR ();
-  Log.log "test%d" 1 ()
-
 let%spec "The SDL Log module can log that proirotiy is critical for each category" =
   let categories = [`INPUT;`RENDER;`VIDEO;`AUDIO;`SYSTEM;`ERROR;`APPLICATION] in
   List.iter (fun cat ->
