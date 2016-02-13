@@ -17,7 +17,7 @@ module Event = Sdl_event
 module Mouse = Sdl_mouse
 module Timer = Sdl_timer
 module Audio = Sdl_audio
-module Rw_ops = Sdl_rwops
+module RWops = Sdl_rwops
 module Keyboard = Sdl_keyboard
 module Game_controller = Sdl_game_controller
 

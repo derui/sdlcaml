@@ -8,7 +8,13 @@
 
 (* Initialization audio subsystem is always executed [Sdl_init.init] or [Sdl_init.init_subsystem]. *)
 
+open Sdlcaml_structures
+open Ctypes
+open Foreign
+
 type id
+
+type buf = Unsigned.UInt8.t carray
 
 val get_device_names: unit -> string list
 (* [get_device_names ()] get names of all available audio devices. *)
@@ -18,6 +24,19 @@ val open_device: ?device:string ->
   allowed:Sdlcaml_flags.Sdl_audio_allow_status.t list -> unit ->
   (id * Sdlcaml_structures.Audio_spec.t) Sdl_types.Result.t
 (* [open_device ?device ~desired ~allowed ()] open a specifie audio device. *)
+
+val load_wav: ?auto_clean:bool -> Sdl_rwops.t ->
+  unit -> (buf * int32 * Audio_spec.t) Sdl_types.Result.t
+(* [load_wav ?auto_clean src ()] load a WAVE from the data source,
+   automatically freeing that source if [auto_clean] is true.
+   The default value of [auto_clean] is true, so default behaviour that is this free that source.
+
+   If you want to free anytime what you want, [auto_clean] specified false and call [free_wav] with
+   returned buffer from this.
+*)
+
+val free_wav: buf -> unit
+(* [free_wav buf] free data previously allocated with [load_wav] *)
 
 val close_device: id -> unit
 (* [close_device id] shut down audio processing and close the audio device *)

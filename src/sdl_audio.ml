@@ -4,6 +4,7 @@ open Foreign
 open Sdlcaml_structures
 
 type id = int32
+type buf = Unsigned.UInt8.t carray
 
 module Inner = struct
   let get_audio_device_name = foreign "SDL_GetAudioDeviceName" (int @-> int @-> returning string)
@@ -17,6 +18,12 @@ module Inner = struct
   let lock_audio_device = foreign "SDL_LockAudioDevice" (uint32_t @-> returning void)
   let unlock_audio_device = foreign "SDL_UnlockAudioDevice" (uint32_t @-> returning void)
   let queue_audio = foreign "SDL_QueueAudio" (uint32_t @-> ptr void @-> uint32_t @-> returning int)
+
+  let load_wav_rw = foreign "SDL_LoadWAV_RW" (ptr Rw_ops.t @-> int @-> ptr Audio_spec.t
+                                              @-> ptr (ptr uint8_t) @-> ptr uint32_t
+                                              @-> returning (ptr Audio_spec.t)
+  )
+  let free_wav = foreign "SDL_FreeWAV" (ptr uint8_t @-> returning void)
 end
 
 let catch = Sdl_util.catch
@@ -36,6 +43,23 @@ let open_device ?device ~desired ~allowed () =
   catch (fun () -> UInt32.(to_int32 id) <> 0l) (fun () ->
     (UInt32.(to_int32 id), Audio_spec.to_ocaml obtained)
   )
+
+let load_wav ?(auto_clean=true) src () =
+  let spec = make Audio_spec.t in
+  let buf = CArray.make (ptr uint8_t) 1 |> CArray.start in
+  let length = CArray.make uint32_t 1 |> CArray.start in
+  let auto_clean = if auto_clean then 1 else 0 in
+  let ret = Inner.load_wav_rw src auto_clean (addr spec) buf length in
+  catch (fun () -> to_voidp ret <> null) (fun () ->
+    let open Unsigned in
+    let buf = !@buf
+    and length = UInt32.to_int32 !@length
+    and spec = Audio_spec.to_ocaml spec in
+    let buf = CArray.from_ptr buf (Int32.to_int length |> Option.value ~default:0) in
+    (buf, length, spec)
+  )
+
+let free_wav buf = Inner.free_wav (CArray.start buf)
 
 let close_device id = Inner.close_audio_device Unsigned.UInt32.(of_int32 id)
 
@@ -61,4 +85,4 @@ let queue ~id ~data =
   let size_of_type = sizeof (CArray.element_type data) in
   let data = CArray.start data |> to_voidp in
   let ret = Inner.queue_audio UInt32.(of_int32 id) data (len * size_of_type |> UInt32.of_int) in
-  catch (fun () -> ret <> 0) ignore
+  catch (fun () -> ret = 0) ignore
