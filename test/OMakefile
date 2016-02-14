@@ -103,6 +103,7 @@ FILES[] =
 	test_sdl_mouse
 	test_sdl_timer
 	test_sdl_rwops
+	test_sdl_thread
 
 MANUAL_EXEC_FILE[] =
 	test_sdl_audio
