@@ -10,7 +10,7 @@ open Foreign
 type 'a log_fmt = ('a, unit, string, unit -> unit) format4 -> 'a
 
 type log_fun = Sdlcaml_flags.Sdl_log_category.t -> Sdlcaml_flags.Sdl_log_priority.t -> string -> unit
-(* A type of function used to output function *)
+(** A type of function used to output function *)
 
 val log : 'a log_fmt
 (** [log ~category ~priority "format" ...] log a message with SDL_LOG_CATEGORY_APPLICATION and SDL_LOG_PRIORITY_INFO *)
@@ -46,4 +46,4 @@ val get_priority : [<Sdlcaml_flags.Sdl_log_category.t] -> [>Sdlcaml_flags.Sdl_lo
 (** [get_priority category] get the priority of the specified category. *)
 
 val set_output_function: log_fun -> unit
-(* [set_output_function f] replace the default logOutput function with one of your own *)
+(** [set_output_function f] replace the default logOutput function with one of your own *)

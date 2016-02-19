@@ -1,5 +1,5 @@
 (**
- * this module provide lowlevel SDL bindings for SDL WM. this don't include
+ * This module provide lowlevel SDL bindings for SDL WM. this don't include
  * high level API for user. these functions are often use only inner library.
  *
  * @author derui
@@ -16,7 +16,7 @@ exception Sdl_window_exception of string
 
 val create : title:string -> x:int -> y:int -> w:int -> h:int
   -> flags:[> Sdlcaml_flags.Sdl_window_flags.t] list -> t
-(** [create ~title:"test" ~x:0 ~y:0 ~w:320 ~h:240 ~flags:[] create a widnow with the
+(** [create ~title ~x ~y ~w ~h ~flags] create a widnow with the
     specified position, dimensions, and flags.
 
     @param title title of a window created

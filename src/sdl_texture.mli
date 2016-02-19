@@ -2,7 +2,7 @@
   Define texture module to provide some operations for SDL_Texture
 
   @author derui
-  @sinse 0.2
+  @since 0.2
 *)
 open Ctypes
 

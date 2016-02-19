@@ -20,7 +20,7 @@ val blit_surface : src:t -> ?srcrect:Sdlcaml_structures.Rect.t -> dst:t
   -> ?dstrect:Sdlcaml_structures.Rect.t -> unit -> unit Sdl_types.Result.t
 (** [blit_surface ~src ~srcrect ~dst ~destrect] perform a fast surface copy to a destination surface.
 
-    {!Remark} if [srcrect] is not passed, this copy the entire surface to dest.
+    {!Remark} if [srcrect] is not passed, this function copy the entire surface to dest.
 *)
 
 val convert : src:t -> format:Sdlcaml_structures.Pixel_format.t -> unit -> t Sdl_types.Result.t

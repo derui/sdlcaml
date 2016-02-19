@@ -1,5 +1,5 @@
 (**
-   this module provide lowlevel SDL bindings for SDL Renderer.
+   This module provide lowlevel SDL bindings for SDL Renderer.
 
    @author derui
    @since 0.2
