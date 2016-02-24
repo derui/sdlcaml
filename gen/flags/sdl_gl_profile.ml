@@ -1,15 +1,16 @@
 type t =
-    SDL_GL_CONTEXT_PROFILE_ES
-  | SDL_GL_CONTEXT_PROFILE_COMPATIBILITY
-  | SDL_GL_CONTEXT_PROFILE_CORE
+  [ `ES
+  | `COMPATIBILITY
+  | `CORE
+  ]
 
 let to_int = function
-  | SDL_GL_CONTEXT_PROFILE_ES -> 0x4
-  | SDL_GL_CONTEXT_PROFILE_COMPATIBILITY -> 0x2
-  | SDL_GL_CONTEXT_PROFILE_CORE -> 0x1
+  | `ES -> 0x4
+  | `COMPATIBILITY -> 0x2
+  | `CORE -> 0x1
 
 let of_int = function
-  | 0x4 -> SDL_GL_CONTEXT_PROFILE_ES
-  | 0x2 -> SDL_GL_CONTEXT_PROFILE_COMPATIBILITY
-  | 0x1 -> SDL_GL_CONTEXT_PROFILE_CORE
+  | 0x4 -> `ES
+  | 0x2 -> `COMPATIBILITY
+  | 0x1 -> `CORE
   | _ -> failwith "No variant to match given value"

@@ -100,3 +100,7 @@ end)
 module Thread = SDL_TYPE(struct
   let name = "SDL_Thread"
 end)
+
+module GLContext = SDL_TYPE(struct
+  let name = "SDL_GLContext"
+end)
