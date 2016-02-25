@@ -44,7 +44,7 @@ let use_version ?(core_profile=true) ~major ~minor =
   Sdl_util.catch (fun () -> core_setting = 0 && major = 0 && minor = 0) ignore
 
 let get_attribute attr =
-  let buf = CArray.make int 1 in
+  let buf = CArray.make int 2 in
   let ret = Inner.get_attribute Sdl_gl_attr.(to_int attr) (CArray.start buf) in
   Sdl_util.catch (fun () -> ret = 0) (fun () -> CArray.get buf 0)
 

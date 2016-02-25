@@ -20,6 +20,7 @@ module Audio = Sdl_audio
 module RWops = Sdl_rwops
 module Keyboard = Sdl_keyboard
 module Game_controller = Sdl_game_controller
+module Gl = Sdl_gl
 
 module Flags = struct
   include Sdlcaml_flags

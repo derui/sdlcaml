@@ -106,6 +106,7 @@ FILES[] =
 
 MANUAL_EXEC_FILE[] =
 	test_sdl_audio
+	test_sdl_gl
 
 #
 OCAML_LIBS += ../gen/flags/sdlcaml_flags ../gen/structures/sdlcaml_structures ../src/sdlcaml 
