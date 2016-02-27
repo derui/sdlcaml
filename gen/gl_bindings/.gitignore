@@ -1,0 +1,7 @@
+sdlcaml_gl_bindings.*
+gl_enums.ml
+gl_commands.ml
+gen_enums*
+!gen_enums.ml
+gen_commands*
+!gen_commands.ml

@@ -7,3 +7,4 @@ B gen/flags
 EXT spec
 PKG core
 PKG ctypes
+PKG xml-light
