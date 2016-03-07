@@ -84,8 +84,8 @@ OCAML_LINK_FLAGS += -linkall
 	GL_MAJOR_VERSION = $(int $(match $(USE_GL_VERSION), \\\([0-9]+\\\)_\\\([0-9]+\\\), $1))
 	GL_MINOR_VERSION = $(int $(match $(USE_GL_VERSION), \\\([0-9]+\\\)_\\\([0-9]+\\\), $2))
 
-OCamlProgram(gen_enums, gen_enums util)
-OCamlProgram(gen_commands, gen_commands util)
+OCamlProgram(gen_enums, enums capi util)
+OCamlProgram(gen_commands, commands capi util)
 
 section:
 	private.PROGRAM = gen_enums$(EXE)
@@ -108,7 +108,7 @@ section:
 	export
 
 section:
-	private.FILES = gl_commands gl_enums gl_types
+	private.FILES = gl_commands gl_enums
 	MyOCamlPackage(sdlcaml_gl_bindings, $(FILES), $(EMPTY), $(EMPTY), false)
 
 	gen-library: $(OCamlPackageGeneratedFiles sdlcaml_gl_bindings, false)

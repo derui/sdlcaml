@@ -45,7 +45,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += ../gen/structures ../gen/flags ../gen/gl_flags
+OCAMLINCLUDES += ../gen/structures ../gen/flags ../gen/gl_bindings
 
 #
 # Compile native or byte code?
@@ -92,7 +92,7 @@ OCAMLFLAGS    += -annot -bin-annot -g -thread
 		setenv("GL3_ENABLE", $(EMPTY))
 		export
 
-INCLUDES += ../include $(shella $(OCAMLC) -config | grep standard_library: | cut -d' ' -f 2) ../gen
+INCLUDES += ../include $(shella $(OCAMLC) -config | grep standard_library: | cut -d' ' -f 2)
 CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC -g
 
 if $(IsMac)

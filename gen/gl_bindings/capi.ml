@@ -26,7 +26,7 @@ module Base_type = struct
   | `Void
   ]
 
-  let t_of_string = function
+  let of_string = function
     | "GLenum" -> `GLenum
     | "GLboolean" -> `GLboolean
     | "GLbitfield" -> `GLbitfield
@@ -45,11 +45,7 @@ module Base_type = struct
     | "GLclampf" -> `GLclampf
     | "GLdouble" -> `GLdouble
     | "GLclampd" -> `GLclampd
-    | "GLeglImageOES" -> `GLeglImageOES
     | "GLchar" -> `GLchar
-    | "GLcharARB" -> `GLcharARB
-    | "GLhalfARB" -> `GLhalfARB
-    | "GLhalf" -> `GLhalf
     | "GLfixed" -> `GLfixed
     | "GLint64" -> `GLint64
     | "GLuint64" -> `GLuint64
@@ -57,7 +53,7 @@ module Base_type = struct
     | "void" -> `Void
     | s -> failwith (Printf.sprintf "Unknown base type %s" s)
 
-  let string_of_t = function
+  let string_of = function
     | `GLenum -> "GLenum"
     | `GLboolean -> "GLboolean"
     | `GLbitfield -> "GLbitfield"
@@ -76,11 +72,7 @@ module Base_type = struct
     | `GLclampf -> "GLclampf"
     | `GLdouble -> "GLdouble"
     | `GLclampd -> "GLclampd"
-    | `GLeglImageOES -> "GLeglImageOES"
     | `GLchar -> "GLchar"
-    | `GLcharARB -> "GLcharARB"
-    | `GLhalfARB -> "GLhalfARB"
-    | `GLhalf -> "GLhalf"
     | `GLfixed -> "GLfixed"
     | `GLint64 -> "GLint64"
     | `GLuint64 -> "GLuint64"
@@ -98,7 +90,7 @@ module Capi_type = struct
 
   let to_string t = 
     let rec loop acc = function
-      | `Base t -> acc ^ (Base_type.string_of_t t)
+      | `Base t -> acc ^ (Base_type.string_of t)
       | `Const t -> loop ("const" ^ acc) t
       | `Ptr t -> loop ("ptr" ^ acc) t
     in
