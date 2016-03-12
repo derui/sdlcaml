@@ -1,3 +1,3 @@
 sdlcaml_gl_bindings.*
-enum_bindings.ml
-command_bindings.ml
+gl_bindings.*
+gen_gl*

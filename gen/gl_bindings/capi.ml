@@ -91,8 +91,8 @@ module Capi_type = struct
   let to_string t = 
     let rec loop acc = function
       | `Base t -> acc ^ (Base_type.string_of t)
-      | `Const t -> loop ("const" ^ acc) t
-      | `Ptr t -> loop ("ptr" ^ acc) t
+      | `Const t -> loop ("const " ^ acc) t
+      | `Ptr t -> loop ("ptr " ^ acc) t
     in
     loop "" t
 end
@@ -114,7 +114,7 @@ module Ocaml_type = struct
 
   (* for GLchar *)
   let gl_char = {
-    name = "gl_char";
+    name = "char";
     def = `Builtin;
     ctypes = `Builtin "uchar";
   }
@@ -258,8 +258,8 @@ module Ocaml_type = struct
     name = "gl_sync";
     def = `Abstract "unit ptr";
     ctypes = `Def ("gl_sync",
-                   "let sync : sync typ = ptr void\n \
- let sync_opt : sync option typ = ptr_opt void"
+                   "let gl_sync : gl_sync typ = ptr void\n \
+ let gl_sync_opt : gl_sync option typ = ptr_opt void"
     )
   }
 
@@ -281,6 +281,13 @@ module Ocaml_type = struct
     name = "(char, Bigarray.int8_unsigned_elt) bigarray";
     def = `Builtin;
     ctypes = ctype_ba_as_voidp "ba_as_charp"
+  }
+
+  (* for char **/const char ** *)
+  let ba_as_stringp = {
+    name = "(string, Bigarray.int8_unsigned_elt) bigarray";
+    def = `Builtin;
+    ctypes = ctype_ba_as_voidp "ba_as_stringp"
   }
 
   let ba_as_int8p = {
@@ -397,8 +404,10 @@ let capi_to_ocaml_type_def t =
   end
   (* char * *)
   | `Ptr (`Base `GLchar) -> `Ok Ocaml_type.ba_as_charp
+  | `Ptr (`Ptr (`Base `GLchar)) -> `Ok Ocaml_type.ba_as_stringp
   (* void ** *)
   | `Ptr (`Ptr (`Base `Void)) -> `Ok Ocaml_type.ba_as_nativeintp
+  | `Const (`Ptr (`Ptr (`Base `GLchar))) -> `Ok Ocaml_type.ba_as_stringp
   | `Ptr (`Base base)
   | `Const (`Ptr (`Base base)) -> begin match base with
     (* const char * as string. *)

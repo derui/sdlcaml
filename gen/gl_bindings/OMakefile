@@ -85,31 +85,29 @@ OCAML_LINK_FLAGS += -linkall
 	GL_MINOR_VERSION = $(int $(match $(USE_GL_VERSION), \\\([0-9]+\\\)_\\\([0-9]+\\\), $2))
 
 PROGRAM = gen_gl$(EXE)
-OCamlProgram(gen_gl, glreg_parser command enum capi util)
+OCamlProgram(gen_gl, main glreg_parser command enum capi util gen_mli)
 
 section:
-	private.LIB = enum_bindings
-	private.OUTPUT = $(LIB).ml
+	private.LIB = gl_bindings
+	private.OUTPUT = $(LIB).mli
 
 	$(file $(OUTPUT)): $(PROGRAM) gl.xml
-		./$< gl.xml -major $(GL_MAJOR_VERSION) -minor $(GL_MINOR_VERSION) > $@
+		./$< -type mli -major $(GL_MAJOR_VERSION) -minor $(GL_MINOR_VERSION) gl.xml > $@
 
 	export
 
 section:
-	private.LIB = command_bindings
+	private.LIB = gl_bindings
 	private.OUTPUT = $(LIB).ml
 
 	$(file $(OUTPUT)): $(PROGRAM) gl.xml
-		./$< gl.xml -major $(GL_MAJOR_VERSION) -minor $(GL_MINOR_VERSION) > $@
+		./$< gl.xml -type ml -major $(GL_MAJOR_VERSION) -minor $(GL_MINOR_VERSION) gl.xml > $@
 
 	export
 
 section:
-	private.FILES = command_bindings enum_bindings
-	MyOCamlPackage(sdlcaml_gl_bindings, $(FILES), $(EMPTY), $(EMPTY), false)
-
-	gen-library: $(OCamlPackageGeneratedFiles sdlcaml_gl_bindings, false)
+	MyOCamlLibrary(sdlcaml_gl_bindings, gl_bindings)
+	gen-library: $(OCamlLibrary sdlcaml_gl_bindings, gl_bindings)
 	export
 
 #

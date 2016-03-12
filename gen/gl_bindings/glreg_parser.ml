@@ -13,6 +13,8 @@ module Fn = Core.Std.Fn
 module Set = Core.Std.Set
 module Option = Core.Std.Option
 
+exception Parse_error of string
+
 module Type_map = Map.Make(String)
 module Type_set = Set.Make(String)
 type t = {
@@ -24,8 +26,12 @@ let filter_feature xml major minor =
   let feature_version = float_of_string (Printf.sprintf "%d.%d" major minor) in
   let features = Util.children xml "feature" in
   List.filter features ~f:(fun feature ->
-    let version' = Xml.attrib feature "number" |> float_of_string in
-    feature_version >= version'
+    let api = Xml.attrib feature "api" in
+    if api = "gl" then
+      let version' = Xml.attrib feature "number" |> float_of_string in
+      feature_version >= version'
+    else
+      false
   )
 
 (* extract commands in the feature and merge into a large commands *)
@@ -55,13 +61,12 @@ let parse_commands xml commands =
   let command_map = Type_map.empty in
   let command_elements = Util.child_exn xml "commands" |> Fn.flip Util.children "command" in 
   let command_map = List.fold_left command_elements ~f:(fun map data ->
-    let command' = Command.parse data in
-    let _, name = command'.Command.proto in 
+    let name, command' = Command.parse data in
     Type_map.add map ~key:name ~data:command'
   ) ~init:command_map in
 
   Type_map.fold commands ~f:(fun ~key ~data map ->
-    Type_map.add map ~key ~data:(Type_map.find_exn command_map key)
+    Type_map.add map ~key ~data:((Type_map.find_exn command_map key) ())
   ) ~init:Type_map.empty
 
 let collect_required_enums features =
@@ -98,14 +103,12 @@ let filter_enums enum_map required =
         Option.value_map ~f:(fun data -> Type_map.add map ~key:enum ~data) ~default:map
   ) ~init:map
 
-let parse xml ~major ~minor = 
-  try
-    let features = filter_feature xml major minor in
-    let commands = collect_required_commands features |> parse_commands xml in
-    let enums = Enum.parse xml in 
-    let enums = collect_required_enums features |> filter_enums enums in
-    {
-      commands;
-      enums;
-    }
-  with _ -> failwith (Printf.sprintf "Error of parse %s" (Xml.to_string xml))
+let parse ~xml ~major ~minor = 
+  let features = filter_feature xml major minor in
+  let commands = collect_required_commands features |> parse_commands xml in
+  let enums = Enum.parse xml in 
+  let enums = collect_required_enums features |> filter_enums enums in
+  {
+    commands;
+    enums;
+  }
