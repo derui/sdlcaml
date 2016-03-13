@@ -5,26 +5,6 @@ module C = Command
 open Core.Std
 module Type_map = Map.Make(String)
 
-let replace_reserved_word = function
-  | "type" -> "typ"
-  | "end" -> "end_"
-  | "val" -> "val_"
-  | s -> s
-
-let normalize_name name = 
-  let open Core.Std in
-  String.fold name ~f:(fun accum c ->
-    if Char.is_uppercase c then (Char.lowercase c) :: '_' :: accum
-    else c :: accum
-  ) ~init:[]
-  |> List.rev
-  |> String.of_char_list
-  |> replace_reserved_word
-
-let convert_gl_to_ocaml_name name =
-  let open Core.Std in
-  normalize_name name |> Fn.flip String.drop_prefix 3
-
 let convert_type_to_type_annotation typ =
   let open Capi in
   match typ.Ocaml_type.def with
@@ -37,7 +17,7 @@ let convert_param_to_type_annotation param =
   match Capi.capi_to_ocaml_type_def typ with
   | `Unknown s -> failwith s
   | `Ok typ -> let typ = convert_type_to_type_annotation typ in
-               let name = normalize_name name in 
+               let name = Util.convert_gl_to_ocaml_name name in 
                Format.asprintf "%s:%s -> " name typ
 
 (* Command generator *)
@@ -45,7 +25,7 @@ let generate_commands ppf commands =
   let open Core.Std in
   let generate_command ppf command =
     let ret_typ, name = command.C.proto in
-    let name = convert_gl_to_ocaml_name name in
+    let name = Util.convert_gl_to_ocaml_name name in
     let ret_typ = Capi.capi_to_ocaml_type_def ret_typ in
     match ret_typ with
     | `Unknown s -> failwith s

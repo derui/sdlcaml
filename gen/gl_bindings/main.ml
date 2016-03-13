@@ -27,5 +27,5 @@ let () =
     match !gen_type with
     | None -> failwith "No target type specifies to generate"
     | Some Mli -> Gen_mli.generate_mli Format.std_formatter commands
-    | Some Ml -> failwith "Not implemented yet"
+    | Some Ml -> Gen_ml.generate_ml Format.std_formatter commands
   with Failure s -> Printf.fprintf stderr "%s%s" (Exn.backtrace ()) s; exit 1

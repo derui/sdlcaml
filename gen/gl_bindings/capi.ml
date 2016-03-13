@@ -432,3 +432,9 @@ let capi_to_ocaml_type_def t =
   end
   | t -> unknown_def t
 
+let ocaml_type_to_ctype_name typ = 
+  match typ.Ocaml_type.ctypes with
+  | `Builtin n -> n
+  | `View (n, _, _, _) -> n
+  | `Def (n, _) -> n
+  | `Conversion (t, _) -> t
