@@ -131,7 +131,7 @@ module Ocaml_type = struct
     name = "gl_ubyte";
     def = `Alias "int";
     ctypes = `View ("int_as_gl_ubyte_t",
-                    "Unsigned.UInt8.of_int", "Unsigned.UInt8.to_int",
+                    "Unsigned.UInt8.to_int", "Unsigned.UInt8.of_int",
                     "uint8_t")
   }
 
@@ -148,7 +148,7 @@ module Ocaml_type = struct
     def = `Builtin;
     ctypes = `View ("bool_as_uint8_t",
                     "(fun v -> Unsigned.UChar.(compare v zero <> 0))",
-                    "(fun v -> Unsigned.UChar.(of_int (Pervasives.compare b false)))",
+                    "(fun b -> Unsigned.UChar.(of_int (Pervasives.compare b false)))",
                     "uchar")
   }
 
@@ -164,7 +164,7 @@ module Ocaml_type = struct
     name = "int";
     def = `Builtin;
     ctypes = `View ("int_as_uint",
-                    "Unsigned.UInt.of_int", "Unsigned.UInt.to_int",
+                    "Unsigned.UInt.to_int", "Unsigned.UInt.of_int",
                     "uint")
   }
 
@@ -237,7 +237,7 @@ module Ocaml_type = struct
     name = "int64";
     def = `Builtin;
     ctypes = `View ("int64_as_uint64_t",
-                    "Unsigned.UInt64.of_int64", "Unsigned.UInt64.to_int64",
+                    "Unsigned.UInt64.to_int64", "Unsigned.UInt64.of_int64",
                     "uint64_t")
   }
 

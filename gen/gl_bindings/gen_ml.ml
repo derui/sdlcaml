@@ -5,25 +5,40 @@ module C = Command
 open Core.Std
 module Type_map = Map.Make(String)
 
-let print_types ppf =
-  Format.fprintf ppf "@[\
-(* #1 types for bindings *)
-type ('a, 'b) bigarray = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
-@]@\n"
-
-let print_ctype_definitions ppf commands =
+let to_ocaml_types commands =
   let open Core.Std in 
-  let module M = Map.Make(String) in
+  let module M = Type_map in
   let params = List.map commands ~f:(fun command -> command.C.params)
   |> List.join |> List.map ~f:Tuple2.get1 in
   let ret_types = List.map commands ~f:(fun command -> command.C.proto) |> List.map ~f:Tuple2.get1 in
 
-  let ctypes = List.join [params;ret_types] |> List.map ~f:Capi.capi_to_ocaml_type_def
+  List.join [params;ret_types] |> List.map ~f:Capi.capi_to_ocaml_type_def
   |> List.fold_left ~f:(fun map typ ->
     match typ with
     | `Unknown s -> Printf.fprintf stderr "%s" s; map
     | `Ok s -> M.add map ~key:s.Capi.Ocaml_type.name ~data:s
-  ) ~init:M.empty in
+  ) ~init:M.empty
+
+let print_types ppf commands =
+  let open Core.Std in 
+  Format.fprintf ppf "@[\
+(* #1 types for bindings *)
+type ('a, 'b) bigarray = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
+@]@\n";
+
+  let ctypes = to_ocaml_types commands in
+  Type_map.data ctypes |> List.iter ~f:(fun ctype ->
+    let module O = Capi.Ocaml_type in 
+    match ctype.O.def with
+    | `Abstract typ -> Format.fprintf ppf "@[type %s = %s@\n@]" ctype.O.name typ
+    | `Builtin | `Alias _ -> ()
+  )
+
+let print_ctype_definitions ppf commands =
+  let open Core.Std in 
+  let module M = Type_map in
+
+  let ctypes = to_ocaml_types commands in 
 
   M.data ctypes |> List.iter ~f:(fun typ ->
     let module O = Capi.Ocaml_type in
@@ -55,6 +70,7 @@ let generate_foreign ppf command =
       | `Unknown s -> failwith s
       | `Ok t -> t :: lst
     ) ~init: [] |> List.map ~f:Capi.ocaml_type_to_ctype_name |> List.rev
+      |> (fun lst -> if List.is_empty lst then ["void"] else lst)
       |> String.concat ~sep:" @-> " 
     in
 
@@ -72,5 +88,6 @@ let generate_foreigns ppf commands =
 
 let generate_ml ppf commands =
   print_packages ppf;
-  print_types ppf;
+  print_types ppf commands;
+  print_ctype_definitions ppf commands;
   generate_foreigns ppf commands
