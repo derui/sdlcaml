@@ -139,7 +139,9 @@ module Ocaml_type = struct
   let gl_enum = {
     name = "gl_enum";
     def = `Alias "int32";
-    ctypes = `Builtin "uint32_t";
+    ctypes = `View ("int32_as_uint32_t",
+                    "Unsigned.UInt32.to_int32", "Unsigned.UInt32.of_int32",
+                    "uint32_t");
   }
 
   (* for GLboolean *)
@@ -207,7 +209,7 @@ module Ocaml_type = struct
     name = "uint32";
     def = `Alias "int32";
     ctypes = `View ("int32_as_uint32_t",
-                    "Unsigned.UInt32.of_int32", "Unsigned.UInt32.to_int32",
+                    "Unsigned.UInt32.to_int32", "Unsigned.UInt32.of_int32",
                     "uint32_t");
   }
 
@@ -359,7 +361,7 @@ module Ocaml_type = struct
   let ba_as_voidp =
     let pp_wrap f arg =
       Format.fprintf f
-        "@[let %s = to_voidp (bigarray_start array1 %s) in@]" arg arg
+        "@[let %s = to_voidp (bigarray_start array1 %s) in\n@]" arg arg
     in
     {
       name = "('a, 'b) bigarray";

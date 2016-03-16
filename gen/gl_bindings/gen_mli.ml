@@ -34,11 +34,14 @@ let generate_commands ppf commands =
       let params = List.map command.C.params ~f:(fun param ->
         convert_param_to_type_annotation param
       ) in
-      Format.fprintf ppf "@[val %s: %s %s@]@\n" name (String.concat params) typ_name
+      let params = if List.is_empty params then ["unit -> "] else params in 
+      Format.fprintf ppf "@[val %s: %s %s@]@ " name (String.concat params) typ_name
     end
   in
-  Format.fprintf ppf "@[ (* {2:binding_types Types used by bindings} *) @]";
-  List.iter commands ~f:(generate_command ppf)
+  Format.fprintf ppf "@[<hov 0>\
+@[(* {2:binding_types Types used by bindings} *)@]";
+  List.iter commands ~f:(generate_command ppf);
+  Format.fprintf ppf "@]"
 
 let print_types ppf =
   Format.fprintf ppf "@[\

@@ -24,13 +24,13 @@ let print_types ppf commands =
   Format.fprintf ppf "@[\
 (* #1 types for bindings *)
 type ('a, 'b) bigarray = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
-@]@\n";
+@]\n";
 
   let ctypes = to_ocaml_types commands in
   Type_map.data ctypes |> List.iter ~f:(fun ctype ->
     let module O = Capi.Ocaml_type in 
     match ctype.O.def with
-    | `Abstract typ -> Format.fprintf ppf "@[type %s = %s@\n@]" ctype.O.name typ
+    | `Abstract typ -> Format.fprintf ppf "@[type %s = %s@.@]" ctype.O.name typ
     | `Builtin | `Alias _ -> ()
   )
 
@@ -45,14 +45,14 @@ let print_ctype_definitions ppf commands =
     match typ.O.ctypes with
     | `Builtin _ -> ()
     | `View (name, read, write, typ) ->
-       Format.fprintf ppf "@[let %s = view ~read:%s ~write:%s %s@\n@]" name read write typ
-    | `Def (name, def) -> Format.fprintf ppf "@[%s@\n@]" def
+       Format.fprintf ppf "@[let %s = view ~read:%s ~write:%s %s@]" name read write typ
+    | `Def (name, def) -> Format.fprintf ppf "@[%s@]" def
     | `Conversion _ -> ()
   )
 
 let print_packages ppf =
-  Format.fprintf ppf "@[open Ctypes@\n\
-open Foreign@\n
+  Format.fprintf ppf "@[open Ctypes\n\
+open Foreign\n
 @]"
 
 (* Ctypes foreign bindings generator *)
@@ -74,20 +74,51 @@ let generate_foreign ppf command =
       |> String.concat ~sep:" @-> " 
     in
 
-    Format.fprintf ppf "@[let %s = foreign \"%s\" (%s @-> returning %s)@\n@]"
+    Format.fprintf ppf "@[let %s = foreign \"%s\" (%s @-> returning %s)@]"
       name orig_name params typ_name
   end
 
 let generate_foreigns ppf commands =
   let open Core.Std in 
-  Format.fprintf ppf "@[module Inner = struct@\n";
+  Format.fprintf ppf "@[<hov 2>module Inner = struct@ ";
 
   List.iter commands ~f:(generate_foreign ppf);
 
-  Format.fprintf ppf "end@\n@]"
+  Format.fprintf ppf "@]@[<hov 0>end@]@."
+
+(* OCaml bindings generator *)
+let generate_ocaml_binding ppf command =
+  let open Core.Std in 
+  let ret_typ, orig_name = command.C.proto in
+  let name = Util.convert_gl_to_ocaml_name orig_name in
+  match Capi.capi_to_ocaml_type_def ret_typ with
+  | `Unknown s -> failwith s
+  | `Ok typ -> begin
+    let args = List.map command.C.params ~f:Tuple2.get2 |> List.map ~f:Util.convert_gl_to_ocaml_name in 
+    let labeled_args = List.map args ~f:(fun arg -> "~" ^ arg) in
+
+    Format.fprintf ppf "@[<hov 2>let %s %s = @ " name (String.concat ~sep:" " labeled_args);
+    List.iter command.C.params ~f:(fun (typ, name) ->
+      let name = Util.convert_gl_to_ocaml_name name in
+      match Capi.capi_to_ocaml_type_def typ with
+      | `Unknown s -> Printf.fprintf stderr "%s" s 
+      | `Ok typ -> begin
+        let module O = Capi.Ocaml_type in 
+        match typ.O.ctypes with
+        | `Conversion (_, wrap) -> wrap ppf name;
+        | _ -> ()
+      end
+    );
+    Format.fprintf ppf "@[Inner.%s %s@]" name (String.concat ~sep:" " args);
+    Format.fprintf ppf "@]@."
+  end
+
+let generate_ocaml_bindings ppf commands =
+  List.iter commands ~f:(generate_ocaml_binding ppf)
 
 let generate_ml ppf commands =
   print_packages ppf;
   print_types ppf commands;
   print_ctype_definitions ppf commands;
-  generate_foreigns ppf commands
+  generate_foreigns ppf commands;
+  generate_ocaml_bindings ppf commands
