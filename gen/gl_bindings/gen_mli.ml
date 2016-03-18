@@ -25,17 +25,21 @@ let generate_commands ppf commands =
   let open Core.Std in
   let generate_command ppf command =
     let ret_typ, name = command.C.proto in
-    let name = Util.convert_gl_to_ocaml_name name in
-    let ret_typ = Capi.capi_to_ocaml_type_def ret_typ in
-    match ret_typ with
-    | `Unknown s -> failwith s
-    | `Ok typ -> begin
-      let typ_name = convert_type_to_type_annotation typ in
-      let params = List.map command.C.params ~f:(fun param ->
-        convert_param_to_type_annotation param
-      ) in
-      let params = if List.is_empty params then ["unit -> "] else params in 
-      Format.fprintf ppf "@[val %s: %s %s@]@ " name (String.concat params) typ_name
+    match Special_defs.command_declarations name with
+    | Some f -> Format.fprintf ppf f
+    | None -> begin
+      let name = Util.convert_gl_to_ocaml_name name in
+      let ret_typ = Capi.capi_to_ocaml_type_def ret_typ in
+      match ret_typ with
+      | `Unknown s -> failwith s
+      | `Ok typ -> begin
+        let typ_name = convert_type_to_type_annotation typ in
+        let params = List.map command.C.params ~f:(fun param ->
+          convert_param_to_type_annotation param
+        ) in
+        let params = if List.is_empty params then ["unit -> "] else params in 
+        Format.fprintf ppf "@[val %s: %s %s@]@ " name (String.concat params) typ_name
+      end
     end
   in
   Format.fprintf ppf "@[<hov 0>\

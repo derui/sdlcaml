@@ -91,26 +91,30 @@ let generate_ocaml_binding ppf command =
   let open Core.Std in 
   let ret_typ, orig_name = command.C.proto in
   let name = Util.convert_gl_to_ocaml_name orig_name in
-  match Capi.capi_to_ocaml_type_def ret_typ with
-  | `Unknown s -> failwith s
-  | `Ok typ -> begin
-    let args = List.map command.C.params ~f:Tuple2.get2 |> List.map ~f:Util.convert_gl_to_ocaml_name in 
-    let labeled_args = List.map args ~f:(fun arg -> "~" ^ arg) in
+  match Special_defs.command_definitions orig_name with
+  | Some f -> Format.fprintf ppf f
+  | None -> begin
+    match Capi.capi_to_ocaml_type_def ret_typ with
+    | `Unknown s -> failwith s
+    | `Ok typ -> begin
+      let args = List.map command.C.params ~f:Tuple2.get2 |> List.map ~f:Util.convert_gl_to_ocaml_name in 
+      let labeled_args = List.map args ~f:(fun arg -> "~" ^ arg) in
 
-    Format.fprintf ppf "@[<hov 2>let %s %s = @ " name (String.concat ~sep:" " labeled_args);
-    List.iter command.C.params ~f:(fun (typ, name) ->
-      let name = Util.convert_gl_to_ocaml_name name in
-      match Capi.capi_to_ocaml_type_def typ with
-      | `Unknown s -> Printf.fprintf stderr "%s" s 
-      | `Ok typ -> begin
-        let module O = Capi.Ocaml_type in 
-        match typ.O.ctypes with
-        | `Conversion (_, wrap) -> wrap ppf name;
-        | _ -> ()
-      end
-    );
-    Format.fprintf ppf "@[Inner.%s %s@]" name (String.concat ~sep:" " args);
-    Format.fprintf ppf "@]@."
+      Format.fprintf ppf "@[<hov 2>let %s %s = @ " name (String.concat ~sep:" " labeled_args);
+      List.iter command.C.params ~f:(fun (typ, name) ->
+        let name = Util.convert_gl_to_ocaml_name name in
+        match Capi.capi_to_ocaml_type_def typ with
+        | `Unknown s -> Printf.fprintf stderr "%s" s 
+        | `Ok typ -> begin
+          let module O = Capi.Ocaml_type in 
+          match typ.O.ctypes with
+          | `Conversion (_, wrap) -> wrap ppf name;
+          | _ -> ()
+        end
+      );
+      Format.fprintf ppf "@[Inner.%s %s@]" name (String.concat ~sep:" " args);
+      Format.fprintf ppf "@]@."
+    end
   end
 
 let generate_ocaml_bindings ppf commands =

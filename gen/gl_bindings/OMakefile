@@ -85,7 +85,18 @@ OCAML_LINK_FLAGS += -linkall
 	GL_MINOR_VERSION = $(int $(match $(USE_GL_VERSION), \\\([0-9]+\\\)_\\\([0-9]+\\\), $2))
 
 PROGRAM = gen_gl$(EXE)
-OCamlProgram(gen_gl, main glreg_parser command enum capi util gen_mli gen_ml)
+FILES[]=
+    main
+    glreg_parser
+    command
+    enum
+    capi
+    util
+    gen_mli
+    gen_ml
+    special_defs
+
+OCamlProgram(gen_gl, $(FILES))
 
 section:
 	private.LIB = gl_bindings
