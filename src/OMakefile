@@ -25,7 +25,7 @@
 open build/C
 open MyUtil
 
-.PHONY: gen
+.PHONY: gen all
 #
 # This project requires ocamlfind (default - false).
 #
@@ -45,7 +45,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += ../gen/structures ../gen/flags ../gen/gl_bindings
+OCAMLINCLUDES += ../gen/structures ../gen/flags
 
 #
 # Compile native or byte code?
@@ -98,11 +98,6 @@ CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC -g
 if $(IsMac)
 	CFLAGS += -fnexted-functions
 
-CFILES = $(removesuffix $(ls *.c))
-
-enums.ml: gen
-	cp ../gen/enums.ml .
-
 FILES = $(removesuffix $(ls sdl*.ml))
 FILES[] +=
 	std
@@ -119,7 +114,9 @@ OCAML_LIB_FLAGS += -cclib -lsdlcaml
 # As gl_enum.h is referenced by already existed .c file,
 # need to add generated files by camlidl to adependency for .DEFAULT.
 
-MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(CFILES), -linkall, true)
-TARGETS = $(OCamlPackageGeneratedFiles $(LIBRARY_NAME), true)
+MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(EMPTY), -linkall, true)
+TARGETS = $(OCamlPackageGeneratedFiles $(LIBRARY_NAME), false)
 
 all: gen $(TARGETS)
+
+DEFAULT: all

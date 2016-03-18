@@ -1,5 +1,5 @@
 
-.SUBDIRS: structures flags gl_bindings
+.SUBDIRS: structures flags
 
 #
 # This project requires ocamlfind (default - false).

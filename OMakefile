@@ -85,4 +85,4 @@ all: gen
 .DEFAULT: all
 
 install:
-	CreateInstalled(sdlcaml, $(glob i, src/*ml) $(glob i, src/*c))
+	CreateInstalled(sdlcaml, $(glob i, src/*ml))
