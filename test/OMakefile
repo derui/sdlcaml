@@ -50,7 +50,7 @@ OCAMLFINDFLAGS =
 #
 # Include path
 #
-OCAMLINCLUDES += $(file ../src) $(file ../gen/flags) $(file ../gen/structures)
+OCAMLINCLUDES += $(file ../src)
 
 #
 # Compile native or byte code?
@@ -74,7 +74,7 @@ else
 	MY_LINK_FLAGS += -lGL
 	export
 
-OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src) -L$(file ../gen/flags) -L$(file ../gen/types)"
+OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src)"
 # OCAML_BYTE_LINK_FLAGS +=
 # OCAML_NATIVE_LINK_FLAGS +=
 
@@ -109,7 +109,7 @@ MANUAL_EXEC_FILE[] =
 	test_sdl_gl
 
 #
-OCAML_LIBS += ../gen/flags/sdlcaml_flags ../gen/structures/sdlcaml_structures ../src/sdlcaml 
+OCAML_LIBS += ../src/sdlcaml 
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS +=
 # OCAML_LIB_FLAGS += -cclib -lsdl

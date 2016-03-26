@@ -5,7 +5,7 @@ type t = _t structure ptr
 let t : _t structure typ = structure "SDL_PixelFormat"
 
 let format = field t "format" uint32_t
-let palette = field t "palette" (ptr Palette.t)
+let palette = field t "palette" (ptr Sdl_structure_palette.t)
 let bits_per_pixel = field t "BitsPerPixel" uint32_t
 let bytes_per_pixel = field t "BytesPerPixel" uint32_t
 let r_mask = field t "Rmask" uint32_t

@@ -8,6 +8,7 @@
 
 open Ctypes
 open Sdlcaml_structures
+open Sdlcaml_flags
 
 type t = Sdl_types.GameController.t
 (** the type of SDL_GameController *)

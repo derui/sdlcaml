@@ -1,6 +1,6 @@
 version = "0.2"
 description = "SDL bindings for OCaml"
-requires = "num sugarpot candyvec bigarray"
+requires = "num bigarray"
 archive(byte) = "sdlcaml.cma"
 archive(byte, plugin) = "sdlcaml.cma"
 archive(native) = "sdlcaml.cmxa"

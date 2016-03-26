@@ -48,36 +48,22 @@ OCAMLFLAGS    += -bin-annot
 # Build bindings for OCaml to C.
 #
 
-FILES[] =
-	color_table
-	gamma_ramp
-	size
-	point
-	version
-	sys_wm_info
-	display_mode
-	renderer_info
-	color
-	palette
-	pixel_format
-	rect
-	joystick_guid
-	keysym
-	events
-	sys_wm_msg
-	audio_spec
-	audio_cvt
-	rw_ops
-	controller_button_bind
+FILES[] = $(removesuffix $(ls sdl_structure*.ml))
 
 #
 # OCAML_LIBS += -custom
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += camlidl
 # OCAML_LIB_FLAGS += -cclib -lsdlcaml
+MAIN=sdlcaml_structures.ml
 
-MyOCamlPackage(sdlcaml_structures, $(FILES), $(EMPTY), -linkall, false)
+$(MAIN):
+	if $(file-exists $(MAIN))
+		unlink $(MAIN)
+	foreach(x => ..., $(FILES))
+		private.f = $(removeprefix sdl_structure_, $x)
+		echo $(string module $(capitalize $f) = $(capitalize $x)) >> $(MAIN)
 
-gen: $(OCamlPackageGeneratedFiles sdlcaml_structures, false)
+gen: $(MAIN)
 
 .DEFAULT: gen

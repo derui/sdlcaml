@@ -45,7 +45,7 @@ let to_int = function
   | `SHOWN -> 0x4
   | `HIDDEN -> 0x8
   | `OPENGL -> 0x2
-  | _ -> invalid_arg "Sdlcaml_flags.Sdl_window_flags"
+  | _ -> invalid_arg "Sdlcaml_flags.Sdl_flag_window_flags"
 
 let of_int = function
   | 0x2000 -> `ALLOW_HIGHDPI
@@ -62,4 +62,4 @@ let of_int = function
   | 0x4 -> `SHOWN
   | 0x8 -> `HIDDEN
   | 0x2 -> `OPENGL
-  | _ -> invalid_arg "Sdlcaml_flags.Sdl_window_flags"
+  | _ -> invalid_arg "Sdlcaml_flags.Sdl_flag_window_flags"

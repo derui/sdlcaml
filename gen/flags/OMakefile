@@ -50,9 +50,16 @@ OCAMLFLAGS    += -bin-annot
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME = sdl_flags
 #
-FILES[] = $(removesuffix $(ls *.ml)) 
+FILES[] = $(removesuffix $(ls sdl_flag*.ml)) 
+MAIN=sdlcaml_flags.ml
 
-MyOCamlPackage(sdlcaml_flags, $(FILES), $(EMPTY), $(EMPTY), false)
-gen: $(OCamlPackageGeneratedFiles sdlcaml_flags, false)
+gen: $(MAIN)
+
+$(MAIN):
+	if $(file-exists $(MAIN))
+		unlink $(MAIN)
+	foreach(x => ..., $(FILES))
+		private.f = $(removeprefix sdl_flag_, $x)
+		echo $(string module $(capitalize sdl_$f) = $(capitalize $x)) >> $(MAIN)
 
 .DEFAULT: gen
