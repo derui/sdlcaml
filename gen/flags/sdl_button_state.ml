@@ -8,4 +8,4 @@ let to_int = function
 let of_int = function
   | 1 -> SDL_PRESSED
   | 0 -> SDL_RELEASED
-  | _ -> failwith "Unknown value on Sdl_flag_button_state.t"
+  | _ -> failwith "Unknown value on Sdl_button_state.t"

@@ -2,13 +2,13 @@ open Ctypes
 open Foreign
 
 type t = {
-  version : Sdl_structure_version.t;
+  version : Version.t;
   subsystem : Sdlcaml_flags.Sdl_syswm_type.t
 }
 
 let t : t structure typ = structure "SDL_SysWMinfo"
 
-let version = field t "version" Sdl_structure_version.t
+let version = field t "version" Version.t
 let subsystem = field t "subsystem" int
 
 let get_subsystem = fun t ->
@@ -16,7 +16,7 @@ let get_subsystem = fun t ->
   Sdlcaml_flags.Sdl_syswm_type.of_int sys
 
 let to_ocaml str =
-  {version = Sdl_structure_version.to_ocaml (getf str version);
+  {version = Version.to_ocaml (getf str version);
    subsystem = get_subsystem str;
   }
 

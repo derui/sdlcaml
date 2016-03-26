@@ -4,7 +4,7 @@
 #
 open MyUtil
 
-.PHONY: gen
+.PHONY: gen clean
 #
 # This project requires ocamlfind (default - false).
 #
@@ -50,8 +50,48 @@ OCAMLFLAGS    += -bin-annot
 # OCAML_LIB_FLAGS +=
 # OCAML_PACKAGE_NAME = sdl_flags
 #
-FILES[] = $(removesuffix $(ls sdl_flag*.ml)) 
-MAIN=sdlcaml_flags.ml
+FILES[] =
+	sdl_event_type.ml
+	sdl_audio_allow_status.ml
+	sdl_audio_device.ml
+	sdl_audio_format.ml
+	sdl_audio_status.ml
+	sdl_availability.ml
+	sdl_blendmode.ml
+	sdl_button_state.ml
+	sdl_controller_axis.ml
+	sdl_controller_bind_type.ml
+	sdl_controller_device.ml
+	sdl_dollar.ml
+	sdl_finger.ml
+	sdl_game_controller_button.ml
+	sdl_gl_attr.ml
+	sdl_gl_context_flags.ml
+	sdl_gl_profile.ml
+	sdl_hat.ml
+	sdl_init_flags.ml
+	sdl_joy_device.ml
+	sdl_scancode.ml
+	sdl_keycode.ml
+	sdl_keymod.ml
+	sdl_log_category.ml
+	sdl_log_priority.ml
+	sdl_messagebox_flags.ml
+	sdl_mousebutton.ml
+	sdl_mousewheel.ml
+	sdl_pixel_format_enum.ml
+	sdl_renderer_flags.ml
+	sdl_renderer_flip.ml
+	sdl_rwops_type.ml
+	sdl_state.ml
+	sdl_system_cursor.ml
+	sdl_syswm_type.ml
+	sdl_texture_access.ml
+	sdl_texture_modulate.ml
+	sdl_window_event_id.ml
+	sdl_window_flags.ml
+
+MAIN=../../src/sdlcaml_flags.ml
 
 gen: $(MAIN)
 
@@ -59,7 +99,11 @@ $(MAIN):
 	if $(file-exists $(MAIN))
 		unlink $(MAIN)
 	foreach(x => ..., $(FILES))
-		private.f = $(removeprefix sdl_flag_, $x)
-		echo $(string module $(capitalize sdl_$f) = $(capitalize $x)) >> $(MAIN)
+		echo $(string module $(capitalize $(removesuffix $x)) = struct) >> $(MAIN)
+		cat $x >> $(MAIN)
+		echo $(string end) >> $(MAIN)
+
+clean: $(MAIN)
+	unlink $<
 
 .DEFAULT: gen

@@ -429,7 +429,7 @@ module KeyboardEvent = struct
     window_id : int32;
     state : F.Sdl_button_state.t;
     repeat : bool;
-    keysym : Sdl_structure_keysym.t;
+    keysym : Keysym.t;
   }
 
   include Common(struct
@@ -441,7 +441,7 @@ module KeyboardEvent = struct
   let repeat = field t "repeat" uint8_t
   let _ = field t "padding2" uint8_t
   let _ = field t "padding3" uint8_t
-  let keysym = field t "keysym" Sdl_structure_keysym.t
+  let keysym = field t "keysym" Keysym.t
 
   let to_event_type e =
     match e.state with
@@ -454,7 +454,7 @@ module KeyboardEvent = struct
     window_id = getf e window_id |> Unsigned.UInt32.to_int32;
     state = getf e state |> Unsigned.UInt8.to_int |> F.Sdl_button_state.of_int;
     repeat = getf e repeat |> Unsigned.UInt8.to_int <> 0;
-    keysym = getf e keysym |> Sdl_structure_keysym.to_ocaml
+    keysym = getf e keysym |> Keysym.to_ocaml
   }
 
   let of_ocaml e =
@@ -463,7 +463,7 @@ module KeyboardEvent = struct
     timestamp_of_ocaml e.timestamp |> setf s timestamp;
     Unsigned.UInt32.of_int32 e.window_id |> setf s window_id;
     F.Sdl_button_state.to_int e.state |> Unsigned.UInt8.of_int |> setf s state;
-    Sdl_structure_keysym.of_ocaml e.keysym |> setf s keysym;
+    Keysym.of_ocaml e.keysym |> setf s keysym;
     s
 end
 
@@ -698,7 +698,7 @@ module SysWMEvent = struct
     type structure = t
     let struct_name = "SDL_SysWMEvent"
   end)
-  let msg = field t "msg" (ptr Sdl_structure_sys_wm_msg.t)
+  let msg = field t "msg" (ptr Sys_wm_msg.t)
 
   let to_event_type _ = F.Sdl_event_type.SDL_SYSWMEVENT
 
@@ -710,7 +710,7 @@ module SysWMEvent = struct
     let s = make t in
     to_event_type e |> type_of_ocaml |> setf s event_type;
     timestamp_of_ocaml e.timestamp |> setf s timestamp;
-    let sys_wm_msg = make Sdl_structure_sys_wm_msg.t in
+    let sys_wm_msg = make Sys_wm_msg.t in
     setf s msg (addr sys_wm_msg);
     s
 end

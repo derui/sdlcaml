@@ -1,11 +1,10 @@
-.PHONY: gen
+.PHONY: gen clean
 #
 # This project requires ocamlfind (default - false).
 #
 USE_OCAMLFIND = true
 #
 OCAMLPACKS[] =
-  ctypes
 
 #
 if $(not $(OCAMLFIND_EXISTS))
@@ -16,7 +15,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += ../flags
+OCAMLINCLUDES +=
 
 #
 # Compile native or byte code?
@@ -48,22 +47,45 @@ OCAMLFLAGS    += -bin-annot
 # Build bindings for OCaml to C.
 #
 
-FILES[] = $(removesuffix $(ls sdl_structure*.ml))
-
+FILES[] =
+	version.ml
+	audio_cvt.ml
+	audio_spec.ml
+	color.ml
+	color_table.ml
+	controller_button_bind.ml
+	display_mode.ml
+	gamma_ramp.ml
+	joystick_guid.ml
+	keysym.ml
+	palette.ml
+	pixel_format.ml
+	point.ml
+	rect.ml
+	renderer_info.ml
+	rw_ops.ml
+	size.ml
+	sys_wm_info.ml
+	sys_wm_msg.ml
+	events.ml
 #
 # OCAML_LIBS += -custom
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS += camlidl
 # OCAML_LIB_FLAGS += -cclib -lsdlcaml
-MAIN=sdlcaml_structures.ml
+MAIN=../../src/sdlcaml_structures.ml
 
-$(MAIN):
+$(MAIN): $(FILES)
 	if $(file-exists $(MAIN))
 		unlink $(MAIN)
 	foreach(x => ..., $(FILES))
-		private.f = $(removeprefix sdl_structure_, $x)
-		echo $(string module $(capitalize $f) = $(capitalize $x)) >> $(MAIN)
+		echo $(string module $(capitalize $(removesuffix $x)) = struct) >> $(MAIN)
+		cat $x >> $(MAIN)
+		echo $(string end) >> $(MAIN)
 
 gen: $(MAIN)
+
+clean:
+	rm -f $(MAIN)
 
 .DEFAULT: gen

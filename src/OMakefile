@@ -22,7 +22,6 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
-open build/C
 open MyUtil
 
 .PHONY: gen all
@@ -45,7 +44,7 @@ if $(not $(OCAMLFIND_EXISTS))
 #
 # Include path
 #
-OCAMLINCLUDES += ../gen/flags ../gen/structures
+OCAMLINCLUDES += 
 
 #
 # Compile native or byte code?
@@ -84,24 +83,22 @@ CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC -g
 if $(IsMac)
 	CFLAGS += -fnexted-functions
 
-FILES = $(removesuffix $(ls sdl*.ml))
-FILES[] +=
-	std
-
-# files for building extend libraries are contained to dependencies.
-LIBRARY_NAME = sdlcaml
-
 #
 # OCAML_LIBS += 
 # OCAML_CLIBS +=
 # OCAML_OTHER_LIBS +=
 OCAML_LIB_FLAGS += -cclib -lsdlcaml
 
-# As gl_enum.h is referenced by already existed .c file,
-# need to add generated files by camlidl to adependency for .DEFAULT.
+# files for building extend libraries are contained to dependencies.
+public.LIBRARY_NAME = sdlcaml
+public.FILES[] = $(removesuffix $(ls sdl*.ml))
+FILES[] +=
+	sdlcaml_flags
+	sdlcaml_structures
+	std
 
 MyOCamlPackage($(LIBRARY_NAME), $(FILES), $(EMPTY), -linkall, true)
-TARGETS = $(OCamlPackageGeneratedFiles $(LIBRARY_NAME), false)
+public.TARGETS = $(OCamlPackageGeneratedFiles $(LIBRARY_NAME), false)
 
 all: gen $(TARGETS)
 
