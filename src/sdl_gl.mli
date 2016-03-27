@@ -16,7 +16,7 @@ val create_context: window -> t Sdl_types.Result.t
     Before using OpenGL bindings that are provided by this library should call this.
 *)
 
-val delete_context: t -> unit
+val delete_context: t -> unit Sdl_types.Result.t
 (** [delete_context context] delete an OpenGL context *)
 
 val get_current: unit -> (t * window) Sdl_types.Result.t

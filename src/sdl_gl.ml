@@ -24,7 +24,10 @@ let create_context w =
   let ret = Inner.create_context w in
   Sdl_util.catch (fun () -> to_voidp ret <> null) (fun () -> ret)
 
-let delete_context = Inner.delete_context
+let delete_context ctx =
+  let open Core.Std in
+  Inner.delete_context ctx;
+  Sdl_util.catch (Fn.const true) ignore
 
 let get_current () =
   let ctx = Inner.get_current_context ()
