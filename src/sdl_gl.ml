@@ -35,7 +35,7 @@ let get_current () =
   Sdl_util.catch (fun () -> to_voidp ctx <> null && to_voidp win <> null)
     (fun () -> (ctx, win))
 
-let use_version ?(core_profile=true) ~major ~minor =
+let use_version ?(core_profile=true) ~major ~minor () =
   let module Gl_attr = Sdl_gl_attr in
   let module Gl_profile = Sdl_gl_profile in
   let core_setting = if core_profile then

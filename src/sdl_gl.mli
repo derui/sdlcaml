@@ -22,7 +22,7 @@ val delete_context: t -> unit Sdl_types.Result.t
 val get_current: unit -> (t * window) Sdl_types.Result.t
 (** [get_current ()] get the currently active OpenGL window and context *)
 
-val use_version: ?core_profile:bool -> major:int -> minor:int -> unit Sdl_types.Result.t
+val use_version: ?core_profile:bool -> major:int -> minor:int -> unit -> unit Sdl_types.Result.t
 (** [use_version ?core_profile ~major ~minor] set an OpenGL window attributes specialized
     to managet OpenGL version and profile settings.
 
