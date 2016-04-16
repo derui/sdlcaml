@@ -77,11 +77,7 @@ OCAMLFLAGS    += -annot -bin-annot -g -thread
 #
 
 # check that can sdl2-config use.
-INCLUDES += ../include $(shella $(OCAMLC) -config | grep standard_library: | cut -d' ' -f 2)
-CFLAGS += $(SDL_CONFIGURE) -std=c99 -fPIC -g
-
-if $(IsMac)
-	CFLAGS += -fnexted-functions
+INCLUDES += $(shella $(OCAMLC) -config | grep standard_library: | cut -d' ' -f 2)
 
 #
 # OCAML_LIBS += 
