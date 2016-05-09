@@ -95,3 +95,6 @@ val enable_rle : t -> unit Sdl_types.Result.t
 
 val disable_rle : t -> unit Sdl_types.Result.t
 (** [disable_rle] to set disable for the RLE acceleration. *)
+
+val rect : t -> Sdlcaml_structures.Rect.t Sdl_types.Result.t
+(** [rect surface] get rectanble of the surface. The left and top of the rect is always zero, so right and bottom is width and height. *)

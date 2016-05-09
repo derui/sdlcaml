@@ -191,5 +191,14 @@ let set_clip_rect ~surface ~rect =
   let ret = Inner.set_clip_rect surface (addr rect) |> Sdl_helper.int_to_bool in
   catch (fun _ -> ret) ignore
 
+let rect surface =
+  let module S = Sdl_types.Surface in
+  Sdl_types.Result.return {
+    Rect.x = 0;
+    y = 0;
+    w = !@(surface |-> Sdl_types.Surface.h);
+    h = !@(surface |-> Sdl_types.Surface.w);
+  }
+
 let () =
   Callback.register_exception "Sdl_surface_exception" (Sdl_surface_exception "any string")
