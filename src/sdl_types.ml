@@ -12,6 +12,7 @@ module Result = struct
 
     let return v = Success v
     let map = `Define_using_bind
+    let fail v = Failure v 
 
     let is_success = function
       | Success _ -> true

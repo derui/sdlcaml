@@ -8,6 +8,7 @@
 open Ctypes
 
 type t = Sdl_types.Surface.t
+type ('a, 'b) bigarray = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
 
 exception Sdl_surface_exception of string
 (** A Exception for operations SDL_surface *)
@@ -98,3 +99,7 @@ val disable_rle : t -> unit Sdl_types.Result.t
 
 val rect : t -> Sdlcaml_structures.Rect.t Sdl_types.Result.t
 (** [rect surface] get rectanble of the surface. The left and top of the rect is always zero, so right and bottom is width and height. *)
+
+val pixels: t -> ('a, 'b) Bigarray.kind -> ('a, 'b) bigarray Sdl_types.Result.t
+(** [pixels surface kind] get pixels of the surface as Bigarray with specified kind.
+     Do not free pixels returned this funciton *)

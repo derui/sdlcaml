@@ -2,6 +2,7 @@ open Sdlcaml_structures
 open Ctypes
 open Foreign
 
+type ('a, 'b) bigarray = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
 type t = Sdl_types.Surface.t
 let t = Sdl_types.Surface.t
 
@@ -199,6 +200,25 @@ let rect surface =
     w = !@(surface |-> Sdl_types.Surface.h);
     h = !@(surface |-> Sdl_types.Surface.w);
   }
+
+let pixel_format_kind surface =
+  let module S = Sdl_types.Surface in
+  let module F = Sdlcaml_structures.Pixel_format in
+  let format = !@(surface |-> S.format) in
+  Sdl_types.Result.(match !@(format |-> F.bytes_per_pixel) |> Unsigned.UInt32.to_int32 with
+  | 1l -> return `Int8
+  | 2l -> return `Int16
+  | n when n < 5l -> return `Int32
+  | _ -> fail "Unknown bytes of pixels of surface"
+  )
+
+let pixels surface kind =
+  let module S = Sdl_types.Surface in
+  let module F = Sdlcaml_structures.Pixel_format in
+  let count = !@(surface |-> S.w) * !@(surface |-> S.h) in
+  let pixels = !@(surface |-> S.pixels) in
+  let t = typ_of_bigarray_kind kind in 
+  (bigarray_of_ptr array1 count kind (from_voidp t pixels)) |> Sdl_types.Result.return
 
 let () =
   Callback.register_exception "Sdl_surface_exception" (Sdl_surface_exception "any string")
