@@ -197,8 +197,8 @@ let rect surface =
   Sdl_types.Result.return {
     Rect.x = 0;
     y = 0;
-    w = !@(surface |-> Sdl_types.Surface.h);
-    h = !@(surface |-> Sdl_types.Surface.w);
+    w = !@(surface |-> Sdl_types.Surface.w);
+    h = !@(surface |-> Sdl_types.Surface.h);
   }
 
 let pixel_format_kind surface =
@@ -218,7 +218,7 @@ let pixels surface kind =
   let count = !@(surface |-> S.w) * !@(surface |-> S.h) in
   let pixels = !@(surface |-> S.pixels) in
   let t = typ_of_bigarray_kind kind in 
-  (bigarray_of_ptr array1 count kind (from_voidp t pixels)) |> Sdl_types.Result.return
+  bigarray_of_ptr array1 count kind (from_voidp t pixels) |> Sdl_types.Result.return
 
 let () =
   Callback.register_exception "Sdl_surface_exception" (Sdl_surface_exception "any string")
