@@ -100,6 +100,6 @@ val disable_rle : t -> unit Sdl_types.Result.t
 val rect : t -> Sdlcaml_structures.Rect.t Sdl_types.Result.t
 (** [rect surface] get rectanble of the surface. The left and top of the rect is always zero, so right and bottom is width and height. *)
 
-val pixels: t -> ('a, 'b) Bigarray.kind -> ('a, 'b) bigarray Sdl_types.Result.t
+val pixels: surface:t -> kind:('a, 'b) Bigarray.kind -> ('a, 'b) bigarray Sdl_types.Result.t
 (** [pixels surface kind] get pixels of the surface as Bigarray with specified kind.
      Do not free pixels returned this funciton *)

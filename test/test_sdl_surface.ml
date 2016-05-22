@@ -159,4 +159,17 @@
      Types.Result.return ()
      >>= (fun _ -> S.free s)
    )
+
+ let%spec "SDL Surface module should get pixels of surface as given kind of Bigarray" =
+   let module S = Surface in
+   with_sdl (fun _ ->
+     let open Types.Result.Monad_infix in
+     let m s = S.pixels ~surface:s ~kind:Bigarray.int32
+               >>= fun pixels ->
+       Bigarray.Array1.dim pixels [@eq 50 * 8];
+       Types.Result.return ()
+       >>= (fun _ -> S.free s) in
+     let ret = S.create_argb_surface ~width:50 ~height:8 >>= m in
+     Types.Result.is_success ret [@eq true]
+   )
 ]

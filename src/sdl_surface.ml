@@ -212,7 +212,7 @@ let pixel_format_kind surface =
   | _ -> fail "Unknown bytes of pixels of surface"
   )
 
-let pixels surface kind =
+let pixels ~surface ~kind =
   let module S = Sdl_types.Surface in
   let module F = Sdlcaml_structures.Pixel_format in
   let count = !@(surface |-> S.w) * !@(surface |-> S.h) in
