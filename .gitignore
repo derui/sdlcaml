@@ -39,5 +39,5 @@
 installed/
 
 # generated header file:no tracking
-gen/gl_flags/sdlcaml_gl_flags*
-gen/gl_flags/make_enums
+src/sdlcaml_structures.ml
+src/sdlcaml_flags.ml
