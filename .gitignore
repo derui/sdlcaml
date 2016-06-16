@@ -41,3 +41,4 @@ installed/
 # generated header file:no tracking
 src/sdlcaml_structures.ml
 src/sdlcaml_flags.ml
+/setup.data
