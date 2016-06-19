@@ -1,7 +1,7 @@
 OASISFormat: 0.2
 Name:        sdlcaml
 Version:     0.2.0
-Synopsis:    Linux key configuration tool by OCaml
+Synopsis:    SDL2 wrapper for OCaml
 Authors:     derui
 License:     MIT
 Plugins:     StdFiles (0.2)

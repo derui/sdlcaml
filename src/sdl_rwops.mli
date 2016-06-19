@@ -10,6 +10,7 @@ open Ctypes
 open Sdlcaml_structures
 
 type t = Rw_ops.t structure ptr
+val t : Rw_ops.t structure ptr typ
 (** the type of handling structure in this module *)
 
 type mode = [`Read | `Write | `Append | `ReadPlus | `WritePlus | `AppendPlus]
