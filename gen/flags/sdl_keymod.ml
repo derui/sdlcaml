@@ -51,12 +51,12 @@ let of_int = function
   | m when m land 0x0300 = 0x0300 -> KMOD_ALT
   | m when m land 0x0003 = 0x0003 -> KMOD_SHIFT
   | m when m land 0x00C0 = 0x00C0 -> KMOD_CTRL
-  | _ -> failwith "Give invalid value to match any variant"
+  | m -> failwith (Printf.sprintf "Give invalid value to match any variant : %04x" m)
 
 let to_list m =
   let rec to_list_rec m l =
     match of_int m with
     | KMOD_NONE -> KMOD_NONE :: l
-    | f -> to_list_rec (m lsr 1) (f :: l)
+    | f -> to_list_rec (m land (lnot (to_int f))) (f :: l)
   in
   to_list_rec m []
