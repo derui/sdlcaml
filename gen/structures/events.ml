@@ -769,14 +769,14 @@ module TextInputEvent = struct
   end)
 
   let window_id = field t "windowID" uint32_t
-  let text = field t "text" string
+  let text = field t "text" (array 32 char)
 
   let to_event_type _ = F.Sdl_event_type.SDL_TEXTINPUT
 
   let to_ocaml e = {
     timestamp = timestamp_to_ocaml e timestamp;
     window_id = getf e window_id |> Unsigned.UInt32.to_int32;
-    text = getf e text;
+    text = getf e text |> CArray.start |> string_from_ptr ~length:32;
   }
 
   let of_ocaml e =
@@ -784,8 +784,10 @@ module TextInputEvent = struct
     to_event_type e |> type_of_ocaml |> setf s event_type;
     timestamp_of_ocaml e.timestamp |> setf s timestamp;
     Unsigned.UInt32.of_int32 e.window_id |> setf s window_id;
-    let max_len = String.length e.text |> min 31 in
-    String.sub e.text 0 max_len |> setf s text;
+    let max_len = String.length e.text |> min 32 in
+    let ary = CArray.make char max_len in
+    String.iteri (fun i c -> CArray.set ary i c) (String.sub e.text 0 max_len);
+    setf s text ary;
     s
 end
 

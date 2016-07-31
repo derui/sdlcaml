@@ -63,4 +63,4 @@ let polling f =
 let waiting f =
   let e = make S.Events.t in
   let ret = Inner.wait_event (addr e) in
-  Sdl_util.catch (fun _ -> Sdl_helper.int_to_bool ret) ignore
+  Sdl_util.catch (fun _ -> Sdl_helper.int_to_bool ret) (fun () -> S.Events.to_ocaml e |> f)
