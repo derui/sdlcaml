@@ -1,5 +1,6 @@
 type t =
     SDL_RENDER_TARGETS_RESET
+  | SDL_FIRSTEVENT
   | SDL_DROPFILE
   | SDL_CLIPBOARDUPDATE
   | SDL_MULTIGESTURE
@@ -44,6 +45,7 @@ type t =
   | SDL_USEREVENT of int32
 
 let to_int32 = function
+  | SDL_FIRSTEVENT -> 0x0l
   | SDL_QUIT -> 0x100l
   | SDL_APP_TERMINATING -> 0x101l
   | SDL_APP_LOWMEMORY -> 0x102l
@@ -97,6 +99,7 @@ let to_int32 = function
   | SDL_LASTEVENT -> 0xFFFFl
 
 let of_int32 = function
+  | 0x0l -> SDL_FIRSTEVENT
   | 0x100l -> SDL_QUIT
   | 0x101l -> SDL_APP_TERMINATING
   | 0x102l -> SDL_APP_LOWMEMORY

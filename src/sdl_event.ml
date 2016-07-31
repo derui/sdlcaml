@@ -13,6 +13,9 @@ module Inner = struct
   let pump_events = foreign "SDL_PumpEvents" (void @-> returning void)
   let poll_event = foreign "SDL_PollEvent" (ptr S.Events.t @-> returning int)
   let wait_event = foreign "SDL_WaitEvent" (ptr S.Events.t @-> returning int)
+  let peep_events = foreign "SDL_PeepEvents" (ptr S.Events.t @->
+                                              int @-> int @-> uint32_t @-> uint32_t @->
+                                              returning int)
 end
 
 let push e =
@@ -64,3 +67,16 @@ let waiting f =
   let e = make S.Events.t in
   let ret = Inner.wait_event (addr e) in
   Sdl_util.catch (fun _ -> Sdl_helper.int_to_bool ret) (fun () -> S.Events.to_ocaml e |> f)
+
+let get () =
+  let e = make S.Events.t in
+  (* TODO: SDL_eventaction to mapping *)
+  let module F = Sdlcaml_flags.Sdl_event_type in
+  let min_event = F.to_int32 F.SDL_FIRSTEVENT |> Unsigned.UInt32.of_int32
+  and max_event = F.to_int32 F.SDL_LASTEVENT |> Unsigned.UInt32.of_int32 in
+  let ret = Inner.peep_events (addr e) 1 2 min_event max_event in
+  Sdl_util.catch (fun _ -> ret >= 0) (fun () ->
+    match ret with
+    | 0 -> None
+    | _ -> Some (S.Events.to_ocaml e)
+  )

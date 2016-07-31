@@ -39,3 +39,6 @@ val polling: (Sdlcaml_structures.Events.t -> unit) -> unit Sdl_types.Result.t
 
 val waiting: (Sdlcaml_structures.Events.t -> unit) -> unit Sdl_types.Result.t
 (** [waiting f] wait indefinitely for the next available event. *)
+
+val get: unit -> Sdlcaml_structures.Events.t option Sdl_types.Result.t
+(** [get ()] get event from event queue if available. *)
