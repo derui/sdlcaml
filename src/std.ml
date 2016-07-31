@@ -13,6 +13,7 @@ module Renderer = Sdl_renderer
 module Window = Sdl_window
 module Log = Sdl_log
 module Joystick = Sdl_joystick
+module Pixel = Sdl_pixels
 module Event = Sdl_event
 module Mouse = Sdl_mouse
 module Timer = Sdl_timer
