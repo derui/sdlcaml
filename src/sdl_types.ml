@@ -1,32 +1,63 @@
-open Core.Std
-open Ctypes 
+module Monad = Core.Std.Monad
+module Fn = Core.Std.Fn
+open Ctypes
+
+exception SdlError of string
 
 module Result = struct
   module Core = struct
-    type 'a t = Success of 'a | Failure of string
+    type 'a t = ('a, string) result
 
-    let bind s f =
-      match s with
-      | Success v -> f v
-      | Failure s -> Failure s
-
-    let return v = Success v
+    let return v = Ok v
+    let fail msg = Error msg
     let map = `Define_using_bind
-    let fail v = Failure v 
 
-    let is_success = function
-      | Success _ -> true
-      | Failure _ -> false
-
-    (* Trap failure and do anything, then continue monad. *)
-    let tap ~f m =
+    let bind m f =
       match m with
-      | Success _ -> m
-      | Failure s -> f s; m
+      | Ok v -> f v
+      | Error msg -> fail msg
+
   end
 
   include Core
   include Monad.Make(Core)
+end
+
+(* Implementation for Continuation Monad. *)
+module Cont = struct
+  type ('a, 'b) t = {
+    continuation : ('a -> 'b) -> 'b
+  }
+
+  let make continuation = {continuation}
+  let run_cont cont f = cont.continuation f
+  let call_cc f = make @@ fun c -> run_cont (f (fun x -> make (fun _ -> c x))) c
+end
+
+(* The monad for Sdlcaml's resource management.
+
+   Using this monad want to manage some resource, contains another Resource monad,
+   or [Cont.call_cc] with not Resource monad.
+*)
+module Resource = struct
+  module Core = struct
+    type ('a, 'b) t = ('a, 'b) Cont.t
+
+    let bind m f = Cont.(make (fun c -> run_cont m (fun x -> run_cont (f x) c)))
+
+    let map = `Define_using_bind
+    let return v = Cont.make (fun c -> c v)
+    let fail v = raise (SdlError v)
+  end
+
+  let run res cc =
+    try
+      Ok (cc res)
+    with SdlError v -> Ok v
+
+  include Core
+  include Monad.Make2(Core)
+
 end
 
 type button_state = Pressed | Released
