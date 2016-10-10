@@ -8,6 +8,8 @@ let t = Sdl_types.Texture.t
 
 module A = CArray
 
+exception Sdl_texture_exception of string
+
 module Inner = struct
   let create_texture = foreign "SDL_CreateTexture" (Sdl_types.Renderer.t @-> uint32_t @->
                                                     int @-> int @-> int @-> returning t)
@@ -31,20 +33,36 @@ end
 
 let catch = Sdl_util.catch
 
-let create ~renderer ~format ~access ~width ~height () =
+let destroy = Inner.destroy_texture
+let inner_create ~renderer ~format ~access ~width ~height =
   let open Sdlcaml_flags in
   let format = Sdl_pixel_format_enum.to_int32 format |> Unsigned.UInt32.of_int32 in
   let access = Sdl_texture_access.to_int access in
-  let ret = Inner.create_texture renderer format access width height in
+  Inner.create_texture renderer format access width height
+
+let create ~renderer ~format ~access ~width ~height =
+  let ret = inner_create renderer format access width height in
   catch (fun () -> to_voidp ret <> null) (fun () -> ret)
+
+let with_create ~renderer ~format ~access ~width ~height =
+  let open Core.Std in
+  let module R = Sdl_types.Resource in
+  let ret = inner_create renderer format access width height in
+  Sdl_util.catch_exn (fun s -> Sdl_texture_exception s)
+    (fun () -> to_voidp ret <> null)
+    (fun () -> R.make (fun c -> protectx ~finally:destroy ~f:c ret))
 
 let create_from_surface ~renderer ~surface =
   let ret = Inner.create_texture_from_surface renderer surface in
   catch (fun () -> to_voidp ret <> null) (fun () -> ret)
 
-let destroy t =
-  Inner.destroy_texture t;
-  Sdl_types.Result.return ()
+let with_create_from_surface ~renderer ~surface =
+  let open Core.Std in
+  let module R = Sdl_types.Resource in
+  let ret = Inner.create_texture_from_surface renderer surface in
+  Sdl_util.catch_exn (fun s -> Sdl_texture_exception s)
+    (fun () -> to_voidp ret <> null)
+    (fun () -> R.make (fun c -> protectx ~finally:destroy ~f:c ret))
 
 let bind_gl texture = 
   let width = A.make float 1

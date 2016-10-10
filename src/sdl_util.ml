@@ -7,4 +7,4 @@ let catch_exn : 'a . (string -> exn) -> (unit -> bool) -> (unit -> 'a) -> 'a = f
 
 let catch pred success =
   let error = Sdl_error.get () in
-  if not (pred ()) then Sdl_types.Result.Failure error else Sdl_types.Result.return (success ())
+  if not (pred ()) then Sdl_types.Result.fail error else Sdl_types.Result.return (success ())

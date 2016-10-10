@@ -24,12 +24,12 @@ val blit_surface : src:t -> ?srcrect:Sdlcaml_structures.Rect.t -> dst:t
     {!Remark} if [srcrect] is not passed, this function copy the entire surface to dest.
 *)
 
-val convert : src:t -> format:Sdlcaml_structures.Pixel_format.t -> unit -> t Sdl_types.Result.t
+val convert : src:t -> format:Sdlcaml_structures.Pixel_format.t -> t Sdl_types.Result.t
 (** [convert ~src ~fmt ()] copy an existing surface into a new one that is optimized for blitting to a surfaice
     of a specified pixel format
 *)
 
-val convert_format : src:t -> format:Sdlcaml_flags.Sdl_pixel_format_enum.t -> unit -> t Sdl_types.Result.t
+val convert_format : src:t -> format:Sdlcaml_flags.Sdl_pixel_format_enum.t -> t Sdl_types.Result.t
 (** [convert_format ~src ~fmt ()] copy an existing surface into a new one of a specified pixel format
 *)
 
@@ -72,17 +72,23 @@ val set_color_mod : surface:t -> color:Sdlcaml_structures.Color.t -> unit Sdl_ty
 val convert_format : src:t -> fmt:Sdlcaml_flags.Sdl_pixel_format_enum.t -> t Sdl_types.Result.t
 (** [convert_surface_format ~src ~fmt] copy an existing surface to a new surface of the specified format *)
 
-val create_argb_surface : width:int -> height:int -> t Sdl_types.Result.t
-(** [create_argb_surface ~width ~height] allocate a new ARGB, and depth is 32bit surface.
-    Equals to call [create_rgb_surface ~width ~height ~depth:32 ~rmask ~gmask ~bmask ~amask],
-    but this function careful thought for endianness of current system.
+val create: width:int -> height:int -> t Sdl_types.Result.t
+(** [create ~width ~height] allocate a new ARGB, and depth is 32bit surface.
+    This function careful thought for endianness of current system.
 *)
 
-val free : t -> unit Sdl_types.Result.t
+val with_create: width:int -> height:int -> (t, 'a) Sdl_types.Resource.t
+(** [with_create ~width ~height] allocate a new ARGB, and depth is 32bit surface.
+    This function careful thought for endianness of current system.
+
+    Warning: The surface passed to continuation *must not* free in continuation.
+    If you free it, should program will gets segfault.
+*)
+
+val free : t -> unit
 (** [free surface] free allocated memory of the given surface.
 
-    {!Remark} if you create surface via [create_argv_surface] or [creawte_rgb_surface],
-    you have to call this function with it.
+    {!Remark} if you create surface via [create], you have to call this function with it.
 *)
 
 val lock : t -> unit Sdl_types.Result.t

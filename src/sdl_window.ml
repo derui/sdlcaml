@@ -81,14 +81,19 @@ end
 
 let catch pred success = Sdl_util.catch_exn (fun s -> Sdl_window_exception s) pred success
 
-let create ~title ~x ~y ~w ~h ~flags =
-  let flags = List.fold_left (fun flags flg ->
-      flags lor (creation_to_int flg)) 0 flags in
-  let window = Inner.create title x y w h flags in
-  catch (fun _ -> to_voidp window <> null)
-    (fun _ -> window)
-
 let destroy w = Inner.destroy w |> ignore
+
+let create ~title ~x ~y ~w ~h ~flags =
+  let open Core.Std in
+  let module R = Sdl_types.Resource in 
+  let flags = List.fold_left flags ~f:(fun flags flg ->
+      flags lor (creation_to_int flg)) ~init:0 in
+  let window = Inner.create title x y w h flags in
+
+  catch (fun _ -> to_voidp window <> null) (fun _ ->
+    R.make (fun c -> protectx ~finally:destroy ~f:c window)
+  )
+
 let get_brightness w = Inner.get_brightness w
 let get_display_index w = Inner.get_display_index w
 

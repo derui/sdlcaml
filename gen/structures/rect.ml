@@ -29,4 +29,6 @@ let to_ocaml r =
    h = getf r h;
   }
 
+let empty = {x = 0; y = 0; w = 0; h = 0;}
+
 let () = seal t

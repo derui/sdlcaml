@@ -15,7 +15,7 @@ type t = Sdl_types.Window.t
 exception Sdl_window_exception of string
 
 val create : title:string -> x:int -> y:int -> w:int -> h:int
-  -> flags:[> Sdlcaml_flags.Sdl_window_flags.t] list -> t
+  -> flags:[> Sdlcaml_flags.Sdl_window_flags.t] list -> (t, 'b) Sdl_types.Resource.t
 (** [create ~title ~x ~y ~w ~h ~flags] create a widnow with the
     specified position, dimensions, and flags.
 
@@ -27,9 +27,6 @@ val create : title:string -> x:int -> y:int -> w:int -> h:int
     @param flags Some flags to specify the window behavioies.
     @return the window that was created. If creation is fail, return None; call {Common.get_error} for more information.
 *)
-
-val destroy : t -> unit
-(** [destroy w] destroy a window. *)
 
 val get_brightness : t -> float
 (** Get brightness of the window *)

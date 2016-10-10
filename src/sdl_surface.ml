@@ -60,7 +60,7 @@ let blit_surface ~src ?srcrect ~dst ?dstrect () =
   let ret = Inner.blit_surface src srcrect dst dstrect in
   catch (fun _ -> ret = 0) ignore
 
-let convert ~src ~format () =
+let convert ~src ~format =
   let ret = Inner.convert_surface src format (Unsigned.UInt32.of_int32 0l) in
   catch (fun () -> to_voidp ret <> null) (fun () -> ret)
 
@@ -84,13 +84,24 @@ let fill_rects ~dst ~rects ~color =
   let ret = Inner.fill_rects dst (CArray.start rects) (CArray.length rects) (U.of_int32 color) in
   catch (fun _ -> ret = 0) ignore
 
-let create_argb_surface ~width ~height =
+let create ~width ~height =
   let module U = Unsigned.UInt32 in
   let zero = U.of_int32 0l in
   let surface = Inner.create_rgb_surface zero width height 32 zero zero zero zero in
   catch (fun () -> to_voidp surface <> null) (fun () -> surface)
 
-let free t = Inner.free_surface t |> Sdl_types.Result.return
+let free t = Inner.free_surface t
+
+let with_create ~width ~height =
+  let open Core.Std in
+  let module R = Sdl_types.Resource in
+  let module U = Unsigned.UInt32 in
+  let zero = U.of_int32 0l in
+  let surface = Inner.create_rgb_surface zero width height 32 zero zero zero zero in
+  Sdl_util.catch_exn (fun s -> Sdl_surface_exception s)
+    (fun () -> to_voidp surface <> null)
+    (fun () -> R.make (fun c -> protectx ~finally:free ~f:c surface))
+
 let lock t =
   let ret = Inner.lock_surface t in
   catch (fun _ -> ret = 0) ignore

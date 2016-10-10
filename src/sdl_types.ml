@@ -2,8 +2,6 @@ module Monad = Core.Std.Monad
 module Fn = Core.Std.Fn
 open Ctypes
 
-exception SdlError of string
-
 module Result = struct
   module Core = struct
     type 'a t = ('a, string) result
@@ -47,13 +45,17 @@ module Resource = struct
 
     let map = `Define_using_bind
     let return v = Cont.make (fun c -> c v)
-    let fail v = raise (SdlError v)
+    let fail v = failwith v
+
+    let make = Cont.make
+    let call_cc = Cont.call_cc
   end
 
-  let run res cc =
+  let run cc continuation =
     try
-      Ok (cc res)
-    with SdlError v -> Ok v
+      Ok (Cont.run_cont cc continuation)
+    with Failure v -> Error v
+    | _ -> Error (Sdl_error.get ())
 
   include Core
   include Monad.Make2(Core)

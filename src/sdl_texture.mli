@@ -8,16 +8,41 @@ open Ctypes
 
 type t = Sdl_types.Texture.t
 
+exception Sdl_texture_exception of string
+
 val create: renderer:Sdl_types.Renderer.t ->
   format:Sdlcaml_flags.Sdl_pixel_format_enum.t -> access:Sdlcaml_flags.Sdl_texture_access.t ->
-  width:int -> height:int -> unit -> Sdl_types.Texture.t Sdl_types.Result.t
-(** Create texture with given parameters *)
+  width:int -> height:int -> Sdl_types.Texture.t Sdl_types.Result.t
+(** Create texture with given parameters.
+
+    Warning: The texture returned this function *must* destroy by user manually.
+    If the texture is temporary, you should use [with_create] instead.
+*)
+
+val with_create: renderer:Sdl_types.Renderer.t ->
+  format:Sdlcaml_flags.Sdl_pixel_format_enum.t -> access:Sdlcaml_flags.Sdl_texture_access.t ->
+  width:int -> height:int -> (Sdl_types.Texture.t, 'b) Sdl_types.Resource.t
+(** Create texture with given parameters, and return continuation.
+
+    Warning: The texture passed to continuation from this function *must not* destroy by user manually.
+*)
 
 val create_from_surface: renderer:Sdl_types.Renderer.t -> surface:Sdl_types.Surface.t ->
   Sdl_types.Texture.t Sdl_types.Result.t
-(** Create texture from specified surface and renderer *)
+(** Create texture from specified surface and renderer.
 
-val destroy : t -> unit Sdl_types.Result.t
+    Warning: The texture returned this function *must* destroy by user manually.
+    If the texture is temporary, you should use [with_create_from_surface] instead.
+*)
+
+val with_create_from_surface: renderer:Sdl_types.Renderer.t -> surface:Sdl_types.Surface.t ->
+  (Sdl_types.Texture.t, 'b) Sdl_types.Resource.t
+(** Create texture from specified surface and renderer.
+
+    Warning: The texture passed to continuation from this function *must not* destroy by user manually.
+*)
+
+val destroy : t -> unit
 (** Destroy a texture *)
 
 val bind_gl: t -> (float * float) Sdl_types.Result.t
