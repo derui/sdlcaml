@@ -1,10 +1,4 @@
-(**
-   this module provide lowlevel SDL bindings for SDL Renderer.
-
-   @author derui
-   @since 0.2
-*)
-
+open Core.Std
 open Ctypes
 open Sdlcaml_structures
 open Foreign
@@ -71,16 +65,19 @@ let get_target renderer =
   catch (fun () -> to_voidp target <> null) (fun () -> target)
 
 let create ~window ?index ~flags () =
+  let module R = Sdl_types.Resource in 
   let module U = Unsigned.UInt32 in
-  let combine_flags = List.fold_left (fun memo flag -> Int32.logor memo flag) 0l in
-  let flags = List.map Sdlcaml_flags.Sdl_renderer_flags.to_int flags |> List.map Int32.of_int |> combine_flags in
+  let combine_flags = List.fold_left ~f:(fun memo flag -> Int32.bit_or memo flag) ~init:0l in
+  let flags = List.map ~f:Sdlcaml_flags.Sdl_renderer_flags.to_int flags |>
+      List.map ~f:Int32.of_int_exn |> combine_flags in
   let index = match index with | None -> -1 | Some (index) -> index in
   let renderer = Inner.create_renderer window index (U.of_int32 flags) in
-  catch (fun () -> to_voidp renderer <> null) (fun () -> renderer)
+  R.make (fun c -> protectx ~finally:Inner.destroy_renderer ~f:c renderer)
 
 let create_software surface =
+  let module R = Sdl_types.Resource in 
   let renderer = Inner.create_software_renderer surface in
-  catch (fun () -> to_voidp renderer <> null) (fun () -> renderer)
+  R.make (fun c -> protectx ~finally:Inner.destroy_renderer ~f:c renderer)
 
 let destroy r =
   Inner.destroy_renderer r;
@@ -93,7 +90,9 @@ let get_draw_blend_mode renderer =
   let flag = A.make uint32_t 1 in
   let ret = Inner.get_render_draw_blend_mode renderer (A.start flag) in
   catch (fun () -> ret = 0) (fun () ->
-      A.get flag 0 |> Unsigned.UInt32.to_int32 |> Int32.to_int |> Sdlcaml_flags.Sdl_blendmode.of_int)
+    A.get flag 0 |> Unsigned.UInt32.to_int32 |> Int32.to_int_exn
+                                |> Sdlcaml_flags.Sdl_blendmode.of_int
+  )
 
 let get_draw_color surface =
   let module U = Unsigned.UInt8 in
@@ -149,7 +148,7 @@ let draw_line ~renderer ~startp ~endp =
 
 let draw_lines ~renderer ~points =
   let count = List.length points in
-  let points = List.map Point.of_ocaml points |> CArray.of_list Point.t in
+  let points = List.map ~f:Point.of_ocaml points |> CArray.of_list Point.t in
   let ret = Inner.render_draw_lines renderer (CArray.start points) count in
   catch (fun () -> ret = 0) ignore
 
@@ -160,7 +159,7 @@ let draw_point ~renderer ~point =
 
 let draw_points ~renderer ~points =
   let module P = Point in
-  let points = List.map P.of_ocaml points |> CArray.of_list P.t in
+  let points = List.map ~f:P.of_ocaml points |> CArray.of_list P.t in
   let ret = Inner.render_draw_points renderer (CArray.start points) (CArray.length points) in
   catch (fun () -> ret = 0) ignore
 
@@ -170,7 +169,7 @@ let draw_rect ~renderer ~rect =
   catch (fun () -> ret = 0) ignore
 
 let draw_rects ~renderer ~rects =
-  let rects = List.map Rect.of_ocaml rects |> CArray.of_list Rect.t in
+  let rects = List.map ~f:Rect.of_ocaml rects |> CArray.of_list Rect.t in
   let ret = Inner.render_draw_rects renderer (CArray.start rects) (CArray.length rects) in
   catch (fun () -> ret = 0) ignore
 
@@ -223,7 +222,7 @@ let is_target_supported renderer = Inner.render_target_supported renderer |> Sdl
 
 let set_draw_blend_mode renderer blendmode =
   let open Sdlcaml_flags in
-  let flag = Sdl_blendmode.to_int blendmode |> Int32.of_int |> Unsigned.UInt32.of_int32 in
+  let flag = Sdl_blendmode.to_int blendmode |> Int32.of_int_exn |> Unsigned.UInt32.of_int32 in
   let ret = Inner.set_render_draw_blend_mode renderer flag in
   catch (fun () -> ret = 0) ignore
 

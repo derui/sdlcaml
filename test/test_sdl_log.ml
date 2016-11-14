@@ -4,11 +4,12 @@
  let%spec "The SDL Log module can log that proirotiy is critical for each category" =
    let categories = [`INPUT;`RENDER;`VIDEO;`AUDIO;`SYSTEM;`ERROR;`APPLICATION] in
    List.iter (fun cat ->
-     Log.set_output_function (fun incat inpri mes ->
+     let f incat inpri mes =
        incat [@eq cat];
        inpri [@eq `CRITICAL];
-       mes [@eq "test1"];
-     );
+       mes [@eq "test1"]
+     in 
+     Log.set_output_function f;
 
      Log.log_critical cat "test%d" 1 ()
    ) categories

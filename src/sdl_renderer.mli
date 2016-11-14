@@ -15,7 +15,7 @@ exception Sdl_renderer_exception of string
 val get_target : t -> Sdl_types.Texture.t Sdl_types.Result.t
 (** Get the current render target *)
 
-val create : window:Sdl_types.Window.t -> ?index:int -> flags:Sdlcaml_flags.Sdl_renderer_flags.t list -> unit -> t Sdl_types.Result.t
+val create : window:Sdl_types.Window.t -> ?index:int -> flags:Sdlcaml_flags.Sdl_renderer_flags.t list -> unit -> (t, 'a) Sdl_types.Resource.t
 (**
    Create the renderer for the window given.
 
@@ -25,11 +25,8 @@ val create : window:Sdl_types.Window.t -> ?index:int -> flags:Sdlcaml_flags.Sdl_
    @return the renderer created with parameters.
 *)
 
-val create_software : Sdl_types.Surface.t -> t Sdl_types.Result.t
+val create_software : Sdl_types.Surface.t -> (t, 'a) Sdl_types.Resource.t
 (** create a 2D software rendering context for a surface *)
-
-val destroy : t -> unit Sdl_types.Result.t
-(** Destroy the renderer. *)
 
 val get_num_render_drivers : unit -> int
 (** Get the number of 2D rendering drivers *)
@@ -94,7 +91,6 @@ val is_clip_enabled: t -> bool
 
 val present: t -> unit
 (** Update the screen with rendering performed *)
-
 
 val set_clip_rect: renderer:t -> rect:Rect.t -> unit Sdl_types.Result.t
 (** Set the clip rectangle for rendering on the specified target *)

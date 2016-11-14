@@ -1,3 +1,4 @@
+open Core.Std
 open Ctypes
 open Foreign
 open Sdlcaml_flags
@@ -21,13 +22,9 @@ module Inner = struct
 end
 
 let create_context w =
+  let module R = Sdl_types.Resource in 
   let ret = Inner.create_context w in
-  Sdl_util.catch (fun () -> to_voidp ret <> null) (fun () -> ret)
-
-let delete_context ctx =
-  let open Core.Std in
-  Inner.delete_context ctx;
-  Sdl_util.catch (Fn.const true) ignore
+  R.make (fun c -> protectx ~finally:Inner.delete_context ~f:c ret)
 
 let get_current () =
   let ctx = Inner.get_current_context ()

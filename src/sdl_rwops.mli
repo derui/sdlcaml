@@ -15,13 +15,10 @@ val t : Rw_ops.t structure ptr typ
 
 type mode = [`Read | `Write | `Append | `ReadPlus | `WritePlus | `AppendPlus]
 
-val read_from_file: ?binary:bool -> file:string -> mode:mode -> unit -> t Sdl_types.Result.t
+val read_from_file: ?binary:bool -> file:string -> mode:mode -> unit -> (t, 'a) Sdl_types.Resource.t
 (** [read_from_file ~file ~mode ()] create a new Rw_ops structure for reading and/or writing
    to a named file.
 *)
-
-val close: t -> unit Sdl_types.Result.t
-(** [close ops] cleans up the stream. *)
 
 val current_position: t -> int64 Sdl_types.Result.t
 (** [current_position t] query current stream position of the [t] *)

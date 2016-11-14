@@ -42,7 +42,10 @@ module Inner = struct
   let num_joysticks = foreign "SDL_NumJoysticks" (void @-> returning int)
 end
 
-let close js = Inner.joystick_close js
+let open_device index =
+  let module R = Sdl_types.Resource in 
+  let joystick = Inner.joystick_open () in
+  R.make (fun c -> protectx ~finally:Inner.joystick_close ~f:c joystick)
 
 let is_ignored () =
   let ret = Inner.joystick_event_state 0 in
@@ -127,10 +130,6 @@ let num_axes = get_num_with_fun Inner.joystick_num_axes
 let num_balls = get_num_with_fun Inner.joystick_num_balls
 let num_buttons = get_num_with_fun Inner.joystick_num_buttons
 let num_hats = get_num_with_fun Inner.joystick_num_hats
-
-let open_device index =
-  let joystick = Inner.joystick_open () in
-  Sdl_util.catch (fun () -> to_voidp joystick <> null) (fun () -> joystick)
 
 let update = Inner.joystick_update
 

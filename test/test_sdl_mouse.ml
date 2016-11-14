@@ -21,29 +21,27 @@
    with_sdl (fun () ->
      let open Flags in
      let cursor = Mouse.create_system_cursor Sdl_system_cursor.SDL_SYSTEM_CURSOR_ARROW in
-     let open Types.Result.Monad_infix in
+     let open Types.Resource.Monad_infix in
      let s = cursor >>= (fun cursor ->
        Mouse.set cursor;
-       Types.Result.return ()
+       Types.Resource.return ()
      ) in
+     let s = Types.Resource.run s ignore in
      match s with
-     | Types.Result.Success _ -> ()
-     | Types.Result.Failure s -> s [@fail]
+     | Ok _ -> ()
+     | Error s -> s [@fail]
    ) 
 
  let%spec "SDL Mouse module can toggle what cursor is shown" =
    with_sdl (fun () ->
      let open Types.Result.Monad_infix in
-     Mouse.show () >>= (fun s ->
-       Mouse.hide () >>= (fun h ->
-         Mouse.is_showing () >>= (fun q ->
-           s [@eq `SHOWN];
-           h [@eq `SHOWN];
-           q [@eq `HIDDEN];
-           Types.Result.return ()
-         )
-       )
-     )
+     Mouse.show () >>= fun s ->
+     Mouse.hide () >>= fun h ->
+     Mouse.is_showing () >>= fun q ->
+     s [@eq `SHOWN];
+     h [@eq `SHOWN];
+     q [@eq `HIDDEN];
+     Types.Result.return ()
    )
 
  let%spec "SDL Mouse module can warp to the point" =

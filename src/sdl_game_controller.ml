@@ -60,15 +60,17 @@ let add_mapping ~guid ~name ~mappings =
     | _ -> failwith "Unknown operation"
   )
 
-let open_controller ind =
-  let ret = Inner.game_controller_open ind in
-  Sdl_util.catch (fun () -> to_voidp ret <> null) (Fn.const ret)
-
 let close_controller = Inner.game_controller_close
 
+let open_controller ind =
+  let module R = Sdl_types.Resource in 
+  let ret = Inner.game_controller_open ind in
+  R.make (fun c -> protectx ~finally:close_controller ~f:c ret)
+
 let from_instance_id id =
+  let module R = Sdl_types.Resource in 
   let ret = Inner.game_controller_from_instance_id Unsigned.UInt32.(of_int32 id) in
-  Sdl_util.catch (fun () -> to_voidp ret <> null) (Fn.const ret)
+  R.make (fun c -> protectx ~finally:close_controller ~f:c ret)
 
 let of_name controller =
   let ret = Inner.game_controller_name controller in

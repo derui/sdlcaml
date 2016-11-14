@@ -50,7 +50,7 @@ let split_flag flag =
 let init flags =
   let flag = combine_flags flags in
   let result = Inner.init flag in
-  catch (fun _ -> result = 0) (fun _ -> ())
+  catch (fun _ -> result = 0) ignore
 
 (**
  * This function is wrapper of {b SDL_Quit}.
@@ -60,7 +60,7 @@ let init flags =
  * @author derui
  * @since 0.1
 *)
-let quit () = ignore (Inner.quit ())
+let quit = Inner.quit
 
 (**
  * return result of that if each subsystems are initialized.
@@ -72,9 +72,7 @@ let quit () = ignore (Inner.quit ())
 let was_init flag =
   let flag = Sdlcaml_flags.Sdl_init_flags.to_int flag |> Int32.of_int |> Unsigned.UInt32.of_int32 in
   let result = Inner.was_init flag in
-  match split_flag result with
-  | flag :: _ -> true
-  | _ -> false
+  List.mem flag (split_flag result)
 
 (**
  * Initializing a SDL subsystem.  this function used to after {!sdl_init}

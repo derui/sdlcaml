@@ -9,15 +9,12 @@ open Sdlcaml_flags
 type t = Sdl_types.GLContext.t
 type window = Sdl_types.Window.t
 
-val create_context: window -> t Sdl_types.Result.t
+val create_context: window -> (t, 'b) Sdl_types.Resource.t
 (** [create_context window] create and OpenGL context for use with an OpenGL window,
     and make it current.
 
     Before using OpenGL bindings that are provided by this library should call this.
 *)
-
-val delete_context: t -> unit Sdl_types.Result.t
-(** [delete_context context] delete an OpenGL context *)
 
 val get_current: unit -> (t * window) Sdl_types.Result.t
 (** [get_current ()] get the currently active OpenGL window and context *)

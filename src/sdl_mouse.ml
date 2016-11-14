@@ -56,11 +56,10 @@ let enable_capture () = capture true
 let disable_capture () = capture false
 
 let create_system_cursor cursor =
+  let module R = Sdl_types.Resource in 
   let flg = Sdl_system_cursor.to_int cursor in
   let ret = Inner.create_system_cursor flg in
-  catch (fun () -> to_voidp ret <> null) (fun () -> ret)
-
-let free = Inner.free_cursor
+  R.make (fun c -> protectx ~finally:Inner.free_cursor ~f:c ret)
 
 let get () =
   let current = Inner.get_cursor () in

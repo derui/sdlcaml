@@ -12,7 +12,7 @@ exception Sdl_texture_exception of string
 
 val create: renderer:Sdl_types.Renderer.t ->
   format:Sdlcaml_flags.Sdl_pixel_format_enum.t -> access:Sdlcaml_flags.Sdl_texture_access.t ->
-  width:int -> height:int -> Sdl_types.Texture.t Sdl_types.Result.t
+  width:int -> height:int -> t Sdl_types.Result.t
 (** Create texture with given parameters.
 
     Warning: The texture returned this function *must* destroy by user manually.
@@ -21,14 +21,14 @@ val create: renderer:Sdl_types.Renderer.t ->
 
 val with_create: renderer:Sdl_types.Renderer.t ->
   format:Sdlcaml_flags.Sdl_pixel_format_enum.t -> access:Sdlcaml_flags.Sdl_texture_access.t ->
-  width:int -> height:int -> (Sdl_types.Texture.t, 'b) Sdl_types.Resource.t
+  width:int -> height:int -> (t, 'b) Sdl_types.Resource.t
 (** Create texture with given parameters, and return continuation.
 
     Warning: The texture passed to continuation from this function *must not* destroy by user manually.
 *)
 
 val create_from_surface: renderer:Sdl_types.Renderer.t -> surface:Sdl_types.Surface.t ->
-  Sdl_types.Texture.t Sdl_types.Result.t
+  t Sdl_types.Result.t
 (** Create texture from specified surface and renderer.
 
     Warning: The texture returned this function *must* destroy by user manually.
@@ -36,7 +36,7 @@ val create_from_surface: renderer:Sdl_types.Renderer.t -> surface:Sdl_types.Surf
 *)
 
 val with_create_from_surface: renderer:Sdl_types.Renderer.t -> surface:Sdl_types.Surface.t ->
-  (Sdl_types.Texture.t, 'b) Sdl_types.Resource.t
+  (t, 'b) Sdl_types.Resource.t
 (** Create texture from specified surface and renderer.
 
     Warning: The texture passed to continuation from this function *must not* destroy by user manually.

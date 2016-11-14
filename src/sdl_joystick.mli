@@ -18,8 +18,8 @@ type axis = Axis1 | Axis2 | Axis3 | Axis4 | AxisX of int
 type button = Button of int
 (** The button of a Joystick *)
 
-val close : t -> unit
-(** Close the specified joystick. *)
+val open_device: int -> (t, 'a) Sdl_types.Resource.t
+(** open a joystick for use *)
 
 val is_ignored : unit -> bool Sdl_types.Result.t
 (** Get current state whether is ignore or not *)
@@ -68,9 +68,6 @@ val num_buttons: t -> int Sdl_types.Result.t
 
 val num_hats: t -> int Sdl_types.Result.t
 (** Get the number of POV hats on a joystick *)
-
-val open_device: int -> t Sdl_types.Result.t
-(** open a joystick for use *)
 
 val update : unit -> unit
 (** Update the current state of the open joysticks *)

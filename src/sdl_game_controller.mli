@@ -23,13 +23,10 @@ val add_mapping: guid:Joystick_guid.t -> name:string ->
    The labelled argument that is [name] is the name of mapping for adding this.
 *)
 
-val open_controller: int -> t Sdl_types.Result.t
-(** [open_controller index] open a gamecontroller for use *)
+val open_controller: int -> (t, 'b) Sdl_types.Resource.t
+(** [open_controller index] open a gamecontroller for use with resource monad *)
 
-val close_controller: t -> unit
-(** [close_controller t] close a game controller previously opened with [open_controller] *)
-
-val from_instance_id: Sdl_joystick.id -> t Sdl_types.Result.t
+val from_instance_id: Sdl_joystick.id -> (t, 'b) Sdl_types.Resource.t
 (** [from_instance_id id] gget the game controller associated with an instance id  *)
 
 val of_name: t -> string Sdl_types.Result.t

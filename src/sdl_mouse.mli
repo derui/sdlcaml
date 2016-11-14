@@ -19,11 +19,8 @@ val enable_capture: unit -> unit Sdl_types.Result.t
 val disable_capture: unit -> unit Sdl_types.Result.t
 (** [disable_capture ()] disable to capture the mouse and to track input outsize an SDL window *)
 
-val create_system_cursor: Sdlcaml_flags.Sdl_system_cursor.t -> system t Sdl_types.Result.t
+val create_system_cursor: Sdlcaml_flags.Sdl_system_cursor.t -> (system t, 'a) Sdl_types.Resource.t
 (** [create_system_cursor system_cursor] create a system cursor of type specified [system_cursor] *)
-
-val free: original t -> unit
-(** [free cursor]  *)
 
 val get: unit -> current t option
 (** [get ()] return the active cursor, or None if there is no mouse.

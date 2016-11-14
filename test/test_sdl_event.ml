@@ -1,5 +1,4 @@
 [%%suite
- open Core.Std
  open Sdlcaml.Std
  module S = Structures
  module E = Structures.Events
@@ -172,9 +171,10 @@
        event = E.Window_event.HIDDEN;
      })
    ] in
+   let module List = Core.Std.List in
    List.iter ~f:(fun e ->
      let ret = Event.push e in
-     ret [@eq Types.Result.Success ()]
+     ret [@eq Ok()]
    ) events
 
 ]

@@ -1,3 +1,4 @@
+open Core.Std
 open Ctypes
 open Foreign
 open Sdlcaml_structures
@@ -40,15 +41,15 @@ let build_mode_string : bool -> mode -> string = fun binary mode ->
   in
   if binary then base ^ "b" else base
 
-let read_from_file ?(binary=false) ~file ~mode () =
-  let mode = build_mode_string binary mode in
-  let rwops = Inner.rw_from_file file mode in
-  Sdl_util.catch (fun () -> to_voidp rwops <> null) (fun () -> rwops)
-
 let close ops =
   let fn = ops |-> Rw_ops.close in
-  let ret = (!@fn) ops in
-  Sdl_util.catch (fun () -> ret = 0) ignore
+  (!@fn) ops |> ignore
+
+let read_from_file ?(binary=false) ~file ~mode () =
+  let module R = Sdl_types.Resource in 
+  let mode = build_mode_string binary mode in
+  let rwops = Inner.rw_from_file file mode in
+  R.make (fun c -> protectx ~finally:close ~f:c rwops)
 
 let current_position ops =
   let fn = ops |-> Rw_ops.seek in

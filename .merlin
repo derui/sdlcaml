@@ -3,3 +3,4 @@ B src
 EXT spec
 PKG core
 PKG sdlcaml
+PKG ppx_simplespec
