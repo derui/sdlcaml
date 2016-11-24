@@ -34,7 +34,6 @@ open build/Common
 open build/C
 
 OMAKEPATH += $(dir ./MyOMake)
-
 #
 # The command-line variables are defined *after* the
 # standard configuration has been loaded.
