@@ -92,7 +92,6 @@ OCAML_LINK_FLAGS += -cclib "$(MY_LINK_FLAGS) -L$(file ../src)"
 #
 
 FILES[] =
-	test_sdl_log
 	test_sdl_window
 	test_sdl_init
 	test_sdl_renderer

@@ -11,7 +11,6 @@ module Surface = Sdl_surface
 module Texture = Sdl_texture
 module Renderer = Sdl_renderer
 module Window = Sdl_window
-module Log = Sdl_log
 module Joystick = Sdl_joystick
 module Pixel = Sdl_pixels
 module Event = Sdl_event
