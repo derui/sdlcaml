@@ -150,7 +150,7 @@
      let open Types.Resource.Monad_infix in
      W.create ~title:"test" ~x:100 ~y:110 ~w:100 ~h:100 ~flags:[] >>=
        fun window ->
-
+     
      let pos = W.get_position window in
      (pos.Structures.Point.x) [@eq 100];
      (pos.Structures.Point.y) [@eq 110];
