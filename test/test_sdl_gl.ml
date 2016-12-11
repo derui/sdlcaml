@@ -11,17 +11,15 @@
    with_sdl (fun () ->
      let window = Window.create ~title:"test" ~x:0 ~y:0 ~w:100 ~h:200 ~flags:[] in
 
-     protect ~f:(fun () -> f window) ~finally:(fun () -> Window.destroy window) |> ignore
+     Types.Resource.run window f
    )
 
  let%spec "SDL GL module can create and delete context" =
    let module C = Structures.Color in
    with_win (fun w ->
-     let open Types.Result.Monad_infix in
+     let open Types.Resource.Monad_infix in
      Gl.create_context w >>= fun c ->
      Gl.reset_attributes ();
-     Gl.swap_window w;
-     Types.Result.return c
-     >>= Gl.delete_context
+     Gl.swap_window w |> Types.Resource.return
    )
 ]

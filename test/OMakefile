@@ -22,6 +22,7 @@
 # Configuration.  You may want to modify any of these configuration
 # variables.
 #
+.PHONY: exec test
 
 open MyUtil
 

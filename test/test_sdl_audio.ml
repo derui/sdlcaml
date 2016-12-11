@@ -30,7 +30,9 @@ let%spec "SDL Audio can open device with desired status" =
         Audio.close_device id |> Types.Result.return
       ) in
     let module R = Types.Result in
-    (R.tap ~f:print_string ret |> R.is_success) [@eq true]
+    (match ret with
+    | Ok _ -> true
+    | Error _ -> false) [@eq true]
   )
 
 let%spec "SDL Audio can load .wav file" =
@@ -38,20 +40,25 @@ let%spec "SDL Audio can load .wav file" =
     let open Structures in
     let open Flags in 
 
-    let open Types.Result.Monad_infix in
-    let ret =
-      RWops.read_from_file ~binary:true ~file:"sample.wav" ~mode:`Read ()
-      >>= (fun rwops -> Audio.load_wav rwops ())
-      >>= (fun (buf, len, spec) ->
-        (len > 0l) [@eq true];
-        (CArray.length buf) [@eq (Int32.to_int len |> Option.value ~default:0)];
-        Audio_spec.(spec.freq) [@eq 44100];
-        Audio_spec.(spec.channels) [@eq 2];
-        Audio_spec.(spec.format) [@eq Sdl_audio_format.AUDIO_S16LSB];
-        Types.Result.return ()
-      ) in
-    let module R = Types.Result in
-    (R.tap ~f:print_string ret |> R.is_success) [@eq true]
+    let module R = Types.Resource in
+    let open Types.Resource.Monad_infix in
+    let cont = RWops.read_from_file ~binary:true ~file:"sample.wav" ~mode:`Read ()
+               >>= (fun rwops ->
+                 let open Types.Result.Monad_infix in
+                 let ret = Audio.load_wav rwops ()
+                           >>= fun (buf, len, spec) ->
+                   (len > 0l) [@eq true];
+                   (CArray.length buf) [@eq (Int32.to_int len |> Option.value ~default:0)];
+                   Audio_spec.(spec.freq) [@eq 44100];
+                   Audio_spec.(spec.channels) [@eq 2];
+                   Audio_spec.(spec.format) [@eq Sdl_audio_format.AUDIO_S16LSB];
+                   Types.Result.return () in
+                 (match ret with
+                 | Ok _ -> true
+                 | Error _ -> false) [@eq true];
+                 R.return ()
+               ) in
+    Types.Resource.run cont ident
   )
 
 let%spec "SDL Audio can play audio with loaded .wav file" =
@@ -59,22 +66,22 @@ let%spec "SDL Audio can play audio with loaded .wav file" =
     let open Structures in
     let open Flags in 
 
-    let open Types.Result.Monad_infix in
-    let ret =
-      RWops.read_from_file ~binary:true ~file:"sample.wav" ~mode:`Read ()
-      >>= (fun rwops -> Audio.load_wav rwops ())
-      >>= (fun (buf, len, spec) ->
-        Audio.open_device ~desired:spec ~allowed:[] ()
-        >>= (fun (id, _) ->
-          Audio.queue ~id ~data:buf
-          >>= (fun _ ->
-            Audio.unpause id;
-            (* wait 4 second *)
-            Timer.delay 4000l;
-            Audio.close_device id |> Types.Result.return
-          )
-        )
+    let module R = Types.Resource in
+    let open Types.Resource.Monad_infix in
+    let cont = RWops.read_from_file ~binary:true ~file:"sample.wav" ~mode:`Read ()
+      >>= (fun rwops ->
+        let open Types.Result.Monad_infix in
+        let ret = Audio.load_wav rwops ()
+        >>= fun (buf, len, spec) -> Audio.open_device ~desired:spec ~allowed:[] ()
+        >>= fun (id, _) -> Audio.queue ~id ~data:buf
+        >>= fun _ ->
+        begin
+          Audio.unpause id;
+          (* wait 4 second *)
+          Timer.delay 4000l;
+          Audio.close_device id |> Types.Result.return
+        end in
+        R.return ret
       ) in
-    let module R = Types.Result in
-    (R.tap ~f:print_string ret |> R.is_success) [@eq true]
+    R.run cont ident
   )
